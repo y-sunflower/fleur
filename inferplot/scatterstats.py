@@ -3,13 +3,14 @@ import matplotlib
 from scipy import stats
 import seaborn as sns
 from typing import Union
-import pandas as pd
+import narwhals as nw
+from narwhals.typing import IntoDataFrame
 
 
-def scatter_corr(
-    x,
-    y,
-    data: pd.DataFrame,
+def scatterstats(
+    x: str,
+    y: str,
+    data: IntoDataFrame,
     ax: Union[matplotlib.axes.Axes, None] = None,
     **kwargs,
 ) -> matplotlib.axes.Axes:
@@ -23,9 +24,12 @@ def scatter_corr(
 
     `y` : The column name for the y-axis variable
 
-    `data` : The DataFrame containing the data to be plotted
+    `data` : The DataFrame containing the data to be plotted.
+    Can be any dataframe format supported by
+    [narwhals](https://narwhals-dev.github.io/narwhals/)
+    (pandas, Polars, PyArrow, cuDF, Modin).
 
-    `ax` : The Axes to plot on. If None, use the current Axes (`plt.gca()`). Default is `None`.
+    `ax` : The Axes to plot on. If None, use the current Axes using `plt.gca()`. Default is `None`.
 
     `**kwargs` : Additional keyword arguments to pass to [`sns.regplot()`](https://seaborn.pydata.org/generated/seaborn.regplot.html)
 
@@ -45,14 +49,16 @@ def scatter_corr(
         y = pd.Series([2, 3, 6, 9, 10])
         data = pd.DataFrame({"x": x, "y": y})
 
-        fig, ax = plt.subplots(figsize=(12, 8))
-        inferplot.scatter_corr("x", "y", data, ax=ax)
+        fig, ax = plt.subplots(figsize=(8, 6))
+        inferplot.scatterstats("x", "y", data, ax=ax)
         plt.show()
 
-    ![img](https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatter_corr.png)
+    ![img](https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatterstats.png)
     """
     if ax is None:
         ax = plt.gca()
+
+    data = nw.from_native(data).to_pandas()
 
     linear_regression = stats.linregress(data[x], data[y])
 
@@ -67,6 +73,8 @@ def scatter_corr(
     ax.text(x=0.1, y=0.95, s=f"ρ (rho): {r_value:.2f}", **annotation_params)
     ax.text(x=0.1, y=0.9, s=f"R squared: {rsqr_value:.2f}", **annotation_params)
 
+    ax.spines[["top", "right"]].set_visible(False)
+
     return ax
 
 
@@ -79,7 +87,7 @@ if __name__ == "__main__":
     y = pd.Series([2, 3, 6, 9, 10])
     data = pd.DataFrame({"x": x, "y": y})
 
-    fig, ax = plt.subplots(figsize=(12, 8))
-    inferplot.scatter_corr("x", "y", data, ax=ax)
-    plt.savefig("docs/img/scatter_corr.png", dpi=300, bbox_inches="tight")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    inferplot.scatterstats("x", "y", data, ax=ax)
+    plt.savefig("docs/img/scatterstats.png", dpi=300, bbox_inches="tight")
     plt.close()

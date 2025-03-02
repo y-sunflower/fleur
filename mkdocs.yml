@@ -12,6 +12,9 @@ theme:
     - content.code.annotate
     - content.code.copy
 
+extra_css:
+  - stylesheets/extra.css
+
 plugins:
   - search
   - mkdocstrings:
@@ -29,10 +32,6 @@ plugins:
             separate_signature: true
             line_length: 40
             show_signature_annotations: true
-            extra:
-              doctest_module: doctest
-              doctest_examples: true
-              show_doctest_results: true
 
 markdown_extensions:
   - pymdownx.highlight:

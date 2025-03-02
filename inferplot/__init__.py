@@ -1,4 +1,4 @@
 from .between import ttestviz
-from .scatter_corr import scatter_corr
+from .scatterstats import scatterstats
 
-__all__ = ["ttestviz", "scatter_corr"]
+__all__ = ["ttestviz", "scatterstats"]
