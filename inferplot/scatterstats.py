@@ -11,7 +11,9 @@ def scatterstats(
     x: str,
     y: str,
     data: IntoDataFrame,
+    marginal: bool = True,
     ax: Union[matplotlib.axes.Axes, None] = None,
+    subplot_mosaic_kwargs: Union[dict, None] = None,
     **kwargs,
 ) -> matplotlib.axes.Axes:
     """
@@ -55,8 +57,25 @@ def scatterstats(
 
     ![img](https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatterstats.png)
     """
-    if ax is None:
-        ax = plt.gca()
+    default_subplot_mosaic_kwargs = dict(
+        width_ratios=(5, 1), height_ratios=(1, 5), figsize=(8, 6)
+    )
+    if subplot_mosaic_kwargs is None:
+        subplot_mosaic_kwargs = {}
+    subplot_mosaic_kwargs.update(default_subplot_mosaic_kwargs)
+
+    if marginal:
+        scheme = """
+B.
+AC
+"""
+        fig, axs = plt.subplot_mosaic(scheme, **subplot_mosaic_kwargs)
+        fig.subplots_adjust(wspace=0, hspace=0)
+        ax = axs["A"]  # main Axes of the Figure
+    else:
+        if ax is None:
+            ax = plt.gca()
+        fig = plt.gcf()
 
     data = nw.from_native(data).to_pandas()
 
@@ -68,26 +87,31 @@ def scatterstats(
 
     sns.regplot(x=x, y=y, data=data, ax=ax, **kwargs)
 
-    annotation_params = dict(transform=ax.transAxes, va="top")
-    ax.text(x=0.1, y=1, s=f"pvalue: {p_value:.4f}", **annotation_params)
-    ax.text(x=0.1, y=0.95, s=f"ρ (rho): {r_value:.2f}", **annotation_params)
-    ax.text(x=0.1, y=0.9, s=f"R squared: {rsqr_value:.2f}", **annotation_params)
+    if marginal:
+        axs["B"].hist(data[x])
+        axs["C"].hist(data[y], orientation="horizontal")
 
-    ax.spines[["top", "right"]].set_visible(False)
+        axs["B"].axis("off")
+        axs["C"].axis("off")
 
-    return ax
+    annotation_params = dict(transform=fig.transAxes, va="top")
+    fig.text(x=0.1, y=0.95, s=f"pvalue: {p_value:.4f}", **annotation_params)
+    fig.text(x=0.1, y=0.9, s=f"ρ (rho): {r_value:.2f}", **annotation_params)
+    fig.text(x=0.1, y=0.85, s=f"R squared: {rsqr_value:.2f}", **annotation_params)
+
+    return fig if marginal else ax
 
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+    import numpy as np
     import pandas as pd
-    import inferplot
 
-    x = pd.Series([1, 2, 3, 4, 5])
-    y = pd.Series([2, 3, 6, 9, 10])
+    x = np.random.normal(loc=5, scale=10, size=500)
+    y = x + np.random.normal(loc=0, scale=5, size=500)
     data = pd.DataFrame({"x": x, "y": y})
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    inferplot.scatterstats("x", "y", data, ax=ax)
+    # fig, ax = plt.subplots(figsize=(8, 6))
+    scatterstats("x", "y", data)  # , ax=ax)
     plt.savefig("docs/img/scatterstats.png", dpi=300, bbox_inches="tight")
     plt.close()
