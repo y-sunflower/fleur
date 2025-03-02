@@ -44,15 +44,15 @@ def scatterstats(
     --------
 
         import matplotlib.pyplot as plt
+        import numpy as np
         import pandas as pd
         import inferplot
 
-        x = pd.Series([1, 2, 3, 4, 5])
-        y = pd.Series([2, 3, 6, 9, 10])
+        x = np.random.normal(loc=5, scale=10, size=200)
+        y = x + np.random.normal(loc=0, scale=5, size=200)
         data = pd.DataFrame({"x": x, "y": y})
 
-        fig, ax = plt.subplots(figsize=(8, 6))
-        inferplot.scatterstats("x", "y", data, ax=ax)
+        inferplot.scatterstats("x", "y", data)
         plt.show()
 
     ![img](https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatterstats.png)
@@ -86,6 +86,7 @@ AC
     rsqr_value = r_value**2
 
     sns.regplot(x=x, y=y, data=data, ax=ax, **kwargs)
+    ax.set(xlabel="", ylabel="")
 
     if marginal:
         axs["B"].hist(data[x])
@@ -94,10 +95,19 @@ AC
         axs["B"].axis("off")
         axs["C"].axis("off")
 
-    annotation_params = dict(transform=fig.transAxes, va="top")
+    annotation_params = dict(transform=fig.transFigure, va="top")
     fig.text(x=0.1, y=0.95, s=f"pvalue: {p_value:.4f}", **annotation_params)
     fig.text(x=0.1, y=0.9, s=f"ρ (rho): {r_value:.2f}", **annotation_params)
     fig.text(x=0.1, y=0.85, s=f"R squared: {rsqr_value:.2f}", **annotation_params)
+    fig.text(
+        x=0.75,
+        y=0.05,
+        s=f"$\\hat{{y}}_i = {linear_regression.intercept:.2f} + {linear_regression.slope:.2f}x_i$",
+        ha="right",
+        weight="bold",
+        style="normal",
+        **annotation_params,
+    )
 
     return fig if marginal else ax
 
@@ -107,11 +117,10 @@ if __name__ == "__main__":
     import numpy as np
     import pandas as pd
 
-    x = np.random.normal(loc=5, scale=10, size=500)
-    y = x + np.random.normal(loc=0, scale=5, size=500)
+    x = np.random.normal(loc=5, scale=10, size=200)
+    y = x + np.random.normal(loc=0, scale=5, size=200)
     data = pd.DataFrame({"x": x, "y": y})
 
-    # fig, ax = plt.subplots(figsize=(8, 6))
-    scatterstats("x", "y", data)  # , ax=ax)
+    scatterstats("x", "y", data, ci=99.9)
     plt.savefig("docs/img/scatterstats.png", dpi=300, bbox_inches="tight")
     plt.close()
