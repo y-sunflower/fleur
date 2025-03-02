@@ -1,0 +1,49 @@
+site_name: InferPlot
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - content.code.annotate
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: false
+            show_if_no_docstring: true
+            show_docstring_examples: true
+            allow_inspection: true
+            heading_level: 2
+            separate_signature: true
+            line_length: 40
+            show_signature_annotations: true
+            extra:
+              doctest_module: doctest
+              doctest_examples: true
+              show_doctest_results: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      default_lang: python
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.inlinehilite
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
