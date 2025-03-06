@@ -37,8 +37,7 @@ def scatterstats(
 
     Returns
     -------
-    ax : `matplotlib.axes.Axes`
-        The axes with the scatter plot and annotations
+    `ax` : The axes with the scatter plot and annotations
 
     Examples
     --------
@@ -116,6 +115,8 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
+
+    np.random.seed(42)
 
     x = np.random.normal(loc=5, scale=10, size=200)
     y = x + np.random.normal(loc=0, scale=5, size=200)
