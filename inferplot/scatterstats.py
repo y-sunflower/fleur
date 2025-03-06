@@ -17,44 +17,46 @@ def scatterstats(
     **kwargs,
 ) -> matplotlib.axes.Axes:
     """
-    Plot a scatter plot of two variables, with a linear regression line
-    and annotate it with the p-value, rho (correlation coefficient), and R-squared.
+    Plot a scatter plot of two variables, with a linear regression line and annotate it with the p-value, rho (correlation coefficient), and R-squared.
 
-    Parameters
-    ----------
-    `x` : The column name for the x-axis variable
-
-    `y` : The column name for the y-axis variable
-
-    `data` : The DataFrame containing the data to be plotted.
-    Can be any dataframe format supported by
-    [narwhals](https://narwhals-dev.github.io/narwhals/)
-    (pandas, Polars, PyArrow, cuDF, Modin).
-
-    `ax` : The Axes to plot on. If None, use the current Axes using `plt.gca()`. Default is `None`.
-
-    `**kwargs` : Additional keyword arguments to pass to [`sns.regplot()`](https://seaborn.pydata.org/generated/seaborn.regplot.html)
-
-    Returns
-    -------
-    `ax` : The axes with the scatter plot and annotations
+    :param x: The column name for the x-axis variable.
+    :param y: The column name for the y-axis variable.
+    :param data: The DataFrame containing the data to be plotted. Can be any dataframe format supported by `narwhals <https://narwhals-dev.github.io/narwhals/>`_ (pandas, Polars, PyArrow, cuDF, Modin).
+    :param marginal: Whether to include marginal histograms. Default is ``True``.
+    :param ax: The Axes to plot on. If ``None``, use the current Axes using ``plt.gca()``. Default is ``None``.
+    :param subplot_mosaic_kwargs: Additional keyword arguments to pass to ``plt.subplot_mosaic``. Default is ``None``.
+    :param **kwargs: Additional keyword arguments to pass to `seaborn.regplot <https://seaborn.pydata.org/generated/seaborn.regplot.html>`_.
+    :return: The axes with the scatter plot and annotations.
 
     Examples
     --------
 
-        import matplotlib.pyplot as plt
-        import numpy as np
-        import pandas as pd
-        import inferplot
+    .. code-block:: python
 
-        x = np.random.normal(loc=5, scale=10, size=200)
-        y = x + np.random.normal(loc=0, scale=5, size=200)
-        data = pd.DataFrame({"x": x, "y": y})
+       import matplotlib.pyplot as plt
+       import numpy as np
+       import pandas as pd
+       import inferplot
 
-        inferplot.scatterstats("x", "y", data)
-        plt.show()
+       x = np.random.normal(loc=5, scale=10, size=200)
+       y = x + np.random.normal(loc=0, scale=5, size=200)
+       data = pd.DataFrame({"x": x, "y": y})
 
-    ![img](https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatterstats.png)
+       inferplot.scatterstats("x", "y", data)
+       plt.show()
+
+    .. image:: https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatterstats.png
+       :alt: Scatter plot with regression line and annotations
+
+    Notes
+    -----
+    The function uses `seaborn.regplot` to create the scatter plot and linear regression line. Marginal histograms are added if ``marginal=True``.
+
+    The annotations include:
+    - p-value
+    - ρ (rho): correlation coefficient
+    - R-squared: coefficient of determination
+    - The linear regression equation: :math:`\\hat{y}_i = \\text{intercept} + \\text{slope} \\cdot x_i`
     """
     default_subplot_mosaic_kwargs = dict(
         width_ratios=(5, 1), height_ratios=(1, 5), figsize=(8, 6)
@@ -111,17 +113,17 @@ AC
     return fig if marginal else ax
 
 
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
+# if __name__ == "__main__":
+#     import matplotlib.pyplot as plt
+#     import numpy as np
+#     import pandas as pd
 
-    np.random.seed(42)
+#     np.random.seed(42)
 
-    x = np.random.normal(loc=5, scale=10, size=200)
-    y = x + np.random.normal(loc=0, scale=5, size=200)
-    data = pd.DataFrame({"x": x, "y": y})
+#     x = np.random.normal(loc=5, scale=10, size=200)
+#     y = x + np.random.normal(loc=0, scale=5, size=200)
+#     data = pd.DataFrame({"x": x, "y": y})
 
-    scatterstats("x", "y", data, ci=99.9)
-    plt.savefig("docs/img/scatterstats.png", dpi=300, bbox_inches="tight")
-    plt.close()
+#     scatterstats("x", "y", data, ci=99.9)
+#     plt.savefig("docs/img/scatterstats.png", dpi=300, bbox_inches="tight")
+#     plt.close()
