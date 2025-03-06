@@ -31,28 +31,25 @@ def scatterstats(
     Examples
     --------
 
-    .. code-block:: python
+    .. plot::
 
-       import matplotlib.pyplot as plt
-       import numpy as np
-       import pandas as pd
-       import inferplot
+       >>> import matplotlib.pyplot as plt
+       >>> import numpy as np
+       >>> import pandas as pd
+       >>> import inferplot
 
-       x = np.random.normal(loc=5, scale=10, size=200)
-       y = x + np.random.normal(loc=0, scale=5, size=200)
-       data = pd.DataFrame({"x": x, "y": y})
+       >>> x = np.random.normal(loc=5, scale=10, size=200)
+       >>> y = x + np.random.normal(loc=0, scale=5, size=200)
+       >>> data = pd.DataFrame({"x": x, "y": y})
 
-       inferplot.scatterstats("x", "y", data)
-       plt.show()
-
-    .. image:: https://raw.githubusercontent.com/JosephBARBIERDARNAL/inferplot/main/docs/img/scatterstats.png
-       :alt: Scatter plot with regression line and annotations
+       >>> inferplot.scatterstats("x", "y", data)
 
     Notes
     -----
     The function uses `seaborn.regplot` to create the scatter plot and linear regression line. Marginal histograms are added if ``marginal=True``.
 
     The annotations include:
+
     - p-value
     - ρ (rho): correlation coefficient
     - R-squared: coefficient of determination
@@ -111,19 +108,3 @@ AC
     )
 
     return fig if marginal else ax
-
-
-# if __name__ == "__main__":
-#     import matplotlib.pyplot as plt
-#     import numpy as np
-#     import pandas as pd
-
-#     np.random.seed(42)
-
-#     x = np.random.normal(loc=5, scale=10, size=200)
-#     y = x + np.random.normal(loc=0, scale=5, size=200)
-#     data = pd.DataFrame({"x": x, "y": y})
-
-#     scatterstats("x", "y", data, ci=99.9)
-#     plt.savefig("docs/img/scatterstats.png", dpi=300, bbox_inches="tight")
-#     plt.close()
