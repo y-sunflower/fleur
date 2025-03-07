@@ -1,7 +1,7 @@
-﻿inferplot
-=========
+﻿inferplot.utils
+===============
 
-.. automodule:: inferplot
+.. automodule:: inferplot.utils
 
    
 .. rubric:: Modules
@@ -10,5 +10,4 @@
    :toctree:
    :recursive:
 
-   scatterstats
    utils

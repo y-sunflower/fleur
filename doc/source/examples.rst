@@ -4,7 +4,7 @@ Examples
 Basic Usage
 -----------
 
-.. code-block:: python
+.. plot::
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -18,6 +18,3 @@ Basic Usage
 
     inferplot.scatterstats("x", "y", data, ci=99.9)
     plt.show()
-
-.. image:: ../img/scatterstats.png
-   :alt: Example scatterstats plot

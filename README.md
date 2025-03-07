@@ -16,8 +16,8 @@ Ideally, those should be the only dependencies.
 
 <br><br>
 
-## Contributing
+## Questions
 
-The project is still in very early stages, so contributions are not possible yet.
+- how opiniated should the design of the charts be? the more the easier to develop
 
 <br><br>

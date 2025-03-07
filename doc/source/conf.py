@@ -16,12 +16,15 @@ extensions = [
     "sphinx.ext.doctest",
     "matplotlib.sphinxext.mathmpl",
     "matplotlib.sphinxext.plot_directive",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns = ["utils/*"]
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 
 plot_include_source = True
+plot_html_show_source_link = False
+plot_rcparams = {"figure.dpi": 200, "savefig.dpi": 200}
