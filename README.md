@@ -21,3 +21,7 @@ Ideally, those should be the only dependencies.
 - how opiniated should the design of the charts be? the more the easier to develop
 
 <br><br>
+
+## Miscellaneous
+
+- requires python 3.11

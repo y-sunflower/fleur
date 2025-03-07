@@ -27,7 +27,7 @@ def scatterstats(
     ax: Union[matplotlib.axes.Axes, None] = None,
     **kwargs,
 ) -> Union[matplotlib.axes.Axes, matplotlib.figure.Figure]:
-    """
+    r"""
     Plot a scatter plot of two variables, with a linear regression line and annotate it with the p-value, rho (correlation coefficient), and R-squared.
 
     :param x: The column name for the x-axis variable.
@@ -70,47 +70,47 @@ def scatterstats(
 
     The linear regression model is of the form:
 
-    :math:`\hat{y}_i = \\beta_0 + \\beta_1 x_i + \epsilon_i`
+    :math:`\hat{y}_i = \beta_0 + \beta_1 x_i + \epsilon_i`
 
     where:
 
     - :math:`\hat{y}_i` is the predicted value of :math:`y` for the :math:`i`-th observation.
-    - :math:`\\beta_0` is the intercept (constant term).
-    - :math:`\\beta_1` is the slope (regression coefficient).
+    - :math:`\beta_0` is the intercept (constant term).
+    - :math:`\beta_1` is the slope (regression coefficient).
     - :math:`x_i` is the independent variable.
     - :math:`\epsilon_i` is the error term (residual).
 
     The Pearson correlation coefficient measures the linear relationship between :math:`x` and :math:`y`. It is calculated as:
 
-    :math:`r = \\frac{\\text{cov}(x, y)}{\sigma_x \sigma_y}`
+    :math:`r = \frac{\text{cov}(x, y)}{\sigma_x \sigma_y}`
 
     where:
 
-    - :math:`\\text{cov}(x, y)` is the covariance between :math:`x` and :math:`y`.
+    - :math:`\text{cov}(x, y)` is the covariance between :math:`x` and :math:`y`.
     - :math:`\sigma_x` and :math:`\sigma_y` are the standard deviations of :math:`x` and :math:`y`, respectively.
     - :math:`r` ranges from :math:`-1` (perfect negative correlation) to :math:`1` (perfect positive correlation).
 
-    The confidence interval for the slope (:math:`\\beta_1`) is calculated as:
+    The confidence interval for the slope (:math:`\beta_1`) is calculated as:
 
-    :math:`\\text{CI} = \left[ \hat{\\beta}_1 - t_{\\alpha/2, n-2} \cdot \\text{SE}_{\hat{\\beta}_1}, \hat{\\beta}_1 + t_{\\alpha/2, n-2} \cdot \\text{SE}_{\hat{\\beta}_1} \\right]`
+    :math:`\text{CI} = \left[ \hat{\beta}_1 - t_{\alpha/2, n-2} \cdot \text{SE}_{\hat{\beta}_1}, \hat{\beta}_1 + t_{\alpha/2, n-2} \cdot \text{SE}_{\hat{\beta}_1} \right]`
 
     where:
 
-    - :math:`\hat{\\beta}_1` is the estimated slope.
-    - :math:`t_{\\alpha/2, n-2}` is the critical value from the t-distribution with :math:`n-2` degrees of freedom.
-    - :math:`\\text{SE}_{\hat{\\beta}_1}` is the standard error of the slope.
+    - :math:`\hat{\beta}_1` is the estimated slope.
+    - :math:`t_{\alpha/2, n-2}` is the critical value from the t-distribution with :math:`n-2` degrees of freedom.
+    - :math:`\text{SE}_{\hat{\beta}_1}` is the standard error of the slope.
 
-    The null hypothesis (:math:`H_0`) is that there is no linear relationship between :math:`x` and :math:`y` (:math:`\\beta_1 = 0`).
+    The null hypothesis (:math:`H_0`) is that there is no linear relationship between :math:`x` and :math:`y` (:math:`\beta_1 = 0`).
 
     The alternative hypothesis (:math:`H_1`) depends on the `alternative` parameter:
 
-    - "two-sided": :math:`\\beta_1 \\neq 0`
-    - "less": :math:`\\beta_1 < 0`
-    - "greater": :math:`\\beta_1 > 0`
+    - "two-sided": :math:`\beta_1 \neq 0`
+    - "less": :math:`\beta_1 < 0`
+    - "greater": :math:`\beta_1 > 0`
 
     The p-value is calculated using the t-statistic:
 
-    :math:`t = \\frac{\hat{\\beta}_1}{\\text{SE}_{\hat{\\beta}_1}}`
+    :math:`t = \frac{\hat{\beta}_1}{\text{SE}_{\hat{\beta}_1}}`
 
     The degrees of freedom for the t-distribution is :math:`n - 2`, where :math:`n` is the number of observations.
     """
@@ -168,9 +168,9 @@ AC
     expr_list = [
         "$",
         f"t_{{Student}}({dof}) = {slope:.2f}, ",
-        f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
+        f"CI_{{{ci:.{ci_decimal}f}\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
         f"p = {p_value:.4f}, ",
-        f"\\hat{{r}}_{{Pearson}} = {rho:.2f}, ",
+        f"\hat{{r}}_{{Pearson}} = {rho:.2f}, ",
         f"n = {n}",
         "$",
     ]
@@ -223,7 +223,7 @@ AC
     fig.text(
         x=0.75,
         y=0.05,
-        s=f"$\\hat{{y}}_i = {intercept:.2f} + {slope:.2f}x_i$",
+        s=f"$\hat{{y}}_i = {intercept:.2f} + {slope:.2f}x_i$",
         ha="right",
         weight="bold",
         style="normal",
