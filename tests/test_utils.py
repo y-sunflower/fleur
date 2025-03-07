@@ -1,4 +1,4 @@
-from inferplot.utils import _count_n_decimals
+from inferplot._utils import _count_n_decimals
 import pytest
 
 

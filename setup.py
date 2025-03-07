@@ -11,5 +11,5 @@ setup(
     author_email="joseph.barbierdarnal@gmail.com",
     url="https://github.com/JosephBARBIERDARNAL/inferplot",
     install_requires=["matplotlib"],
-    include_package_data=False,
+    include_package_data=True,
 )

@@ -11,3 +11,4 @@ sandbox*
 *cache*
 
 .vscode/settings.json
+*.zip

@@ -10,5 +10,5 @@
    :toctree:
    :recursive:
 
+   datasets
    scatterstats
-   utils

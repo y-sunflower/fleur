@@ -4,6 +4,8 @@ Examples
 Basic Usage
 -----------
 
+Hey there
+
 .. plot::
 
     import matplotlib.pyplot as plt

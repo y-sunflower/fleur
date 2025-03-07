@@ -7,7 +7,7 @@ import narwhals as nw
 from narwhals.typing import IntoDataFrame
 import warnings
 
-from inferplot.utils import _count_n_decimals
+from inferplot._utils import _count_n_decimals
 
 
 def scatterstats(
@@ -28,7 +28,7 @@ def scatterstats(
     **kwargs,
 ) -> Union[matplotlib.axes.Axes, matplotlib.figure.Figure]:
     r"""
-    Plot a scatter plot of two variables, with a linear regression line and annotate it with the p-value, rho (correlation coefficient), and R-squared.
+    Plot a scatter plot of two variables, with a linear regression line and annotate it with main statistical results.
 
     :param x: The column name for the x-axis variable.
     :param y: The column name for the y-axis variable.
@@ -52,7 +52,6 @@ def scatterstats(
 
     .. plot::
 
-        >>> import matplotlib.pyplot as plt
         >>> import numpy as np
         >>> import pandas as pd
         >>> import inferplot
@@ -168,9 +167,9 @@ AC
     expr_list = [
         "$",
         f"t_{{Student}}({dof}) = {slope:.2f}, ",
-        f"CI_{{{ci:.{ci_decimal}f}\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
+        f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
         f"p = {p_value:.4f}, ",
-        f"\hat{{r}}_{{Pearson}} = {rho:.2f}, ",
+        f"\\hat{{r}}_{{Pearson}} = {rho:.2f}, ",
         f"n = {n}",
         "$",
     ]
@@ -223,7 +222,7 @@ AC
     fig.text(
         x=0.75,
         y=0.05,
-        s=f"$\hat{{y}}_i = {intercept:.2f} + {slope:.2f}x_i$",
+        s=f"$\\hat{{y}}_i = {intercept:.2f} + {slope:.2f}x_i$",
         ha="right",
         weight="bold",
         style="normal",
