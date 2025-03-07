@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    name: continuous-integration
     runs-on: ubuntu-latest
     strategy:
       matrix:
