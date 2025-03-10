@@ -15,41 +15,69 @@ def sample_data():
     return pd.DataFrame({"x": x, "y": y})
 
 
-def test_scatterstats_default(sample_data):
-    fig = scatterstats("x", "y", sample_data)
+def test_default(sample_data):
+    fig, stats = scatterstats("x", "y", sample_data)
     assert isinstance(fig, plt.Figure), "Expected a matplotlib Figure object"
+    assert isinstance(stats, dict), "Expected a dictionnary"
+    assert len(stats.keys()) == 9
+    for key in stats.keys():
+        assert key in [
+            "p_value",
+            "t_critical",
+            "correlation",
+            "intercept",
+            "slope",
+            "stderr_slope",
+            "ci_lower",
+            "ci_upper",
+            "dof",
+        ]
     plt.close(fig)
 
 
-def test_scatterstats_no_marginal(sample_data):
-    ax = scatterstats("x", "y", sample_data, marginal=False)
+def test_no_marginal(sample_data):
+    ax, stats = scatterstats("x", "y", sample_data, marginal=False)
     assert isinstance(ax, plt.Axes), "Expected a matplotlib Axes object"
+    assert isinstance(stats, dict), "Expected a dictionnary"
+    assert len(stats.keys()) == 9
+    for key in stats.keys():
+        assert key in [
+            "p_value",
+            "t_critical",
+            "correlation",
+            "intercept",
+            "slope",
+            "stderr_slope",
+            "ci_lower",
+            "ci_upper",
+            "dof",
+        ]
     plt.close(ax.figure)
 
 
-def test_scatterstats_custom_ax(sample_data):
+def test_custom_ax(sample_data):
     fig, ax = plt.subplots()
-    returned_ax = scatterstats("x", "y", sample_data, ax=ax, marginal=False)
+    returned_ax, stats = scatterstats("x", "y", sample_data, ax=ax, marginal=False)
     assert returned_ax == ax, (
         "Expected the returned Axes to be the same as the input Axes"
     )
     plt.close(fig)
 
 
-def test_scatterstats_invalid_columns(sample_data):
+def test_invalid_columns(sample_data):
     with pytest.raises(KeyError):
         scatterstats("invalid_x", "y", sample_data)
     with pytest.raises(KeyError):
         scatterstats("x", "invalid_y", sample_data)
 
 
-def test_scatterstats_invalid_color(sample_data):
+def test_invalid_color(sample_data):
     with pytest.raises(ValueError):
         scatterstats("x", "y", sample_data, color="invalid_color")
 
 
-def test_scatterstats_style_params(sample_data):
-    fig = scatterstats(
+def test_style_params(sample_data):
+    fig, stats = scatterstats(
         "x",
         "y",
         sample_data,
@@ -76,7 +104,7 @@ def test_scatterstats_style_params(sample_data):
     assert sum(isinstance(item, Rectangle) for item in axesC.get_children()) >= 20
 
 
-def test_scatterstats_raise_warning(sample_data):
+def test_raise_warning(sample_data):
     with pytest.warns(UserWarning):
         scatterstats("x", "y", sample_data, bins=20, marginal=False)
 
@@ -84,9 +112,14 @@ def test_scatterstats_raise_warning(sample_data):
         scatterstats("x", "y", sample_data, hist_kws={"color": "red"}, marginal=False)
 
 
-def test_scatterstats_error_alternative(sample_data):
+def test_error_alternative(sample_data):
     with pytest.raises(ValueError):
         scatterstats("x", "y", sample_data, alternative="invalid")
+
+
+def test_correlation_measure_invalid(sample_data):
+    with pytest.raises(ValueError):
+        scatterstats("x", "y", sample_data, correlation_measure="invalid")
 
 
 if __name__ == "__main__":

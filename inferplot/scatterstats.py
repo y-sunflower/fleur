@@ -6,6 +6,7 @@ from typing import Union, List, Tuple
 import narwhals as nw
 from narwhals.typing import IntoDataFrame
 import warnings
+from numbers import Number
 
 from inferplot._utils import _count_n_decimals
 
@@ -15,11 +16,12 @@ def scatterstats(
     y: str,
     data: IntoDataFrame,
     marginal: bool = True,
-    ci: float = 95,
+    ci: Number = 95,
     alternative: str = "two-sided",
+    correlation_measure: str = "pearson",
     bins: Union[int, List[int]] = None,
     color: Union[str, tuple, None] = None,
-    figsize: Tuple = (8, 6),
+    figsize: Tuple[float, float] = (8, 6),
     scatter_kws: Union[dict, None] = None,
     line_kws: Union[dict, None] = None,
     hist_kws: Union[dict, None] = None,
@@ -35,6 +37,7 @@ def scatterstats(
     :param data: The DataFrame containing the data to be plotted. Can be any dataframe format supported by `narwhals <https://narwhals-dev.github.io/narwhals/>`_ (pandas, Polars, PyArrow, cuDF, Modin).
     :param ci: Confidence level for the top label and the regression plot. The default value is 95 (for a 95% confidence level).
     :param alternative: Defines the alternative hypothesis. Default is 'two-sided'. Must be one of 'two-sided', 'less' and 'greater'.
+    :param correlation_measure: The correlation measure to use. Default is 'pearson'. Must be one of 'pearson', 'kendall', 'spearman'.
     :param bins: Number of bins for the marginal distributions. This can be an integer or a list of two integers (the first for the top distribution and the second for the other).
     :param marginal: Whether to include marginal histograms. Default is ``True``.
     :param color: Any valid matplotlib color that will be used to color all the elements of the plot.
@@ -45,7 +48,7 @@ def scatterstats(
     :param subplot_mosaic_kwargs: Additional keyword arguments to pass to ``plt.subplot_mosaic()``. Default is ``None``.
     :param ax: The Axes to plot on. If ``None``, use the current Axes using ``plt.gca()``. Default is ``None``.
     :param kwargs: Additional keyword arguments to pass to `seaborn.regplot <https://seaborn.pydata.org/generated/seaborn.regplot.html>`_.
-    :return: An Axes (if ``marginal=False``) or a Figure (if ``marginal=True``).
+    :return: A Tuple containing either an Axes (if ``marginal=False``) or a Figure (if ``marginal=True``) for the first element, and a statistics dictionary for the second element.
 
     Examples
     --------
@@ -61,57 +64,7 @@ def scatterstats(
         >>> y = x * 0.06 + np.random.normal(loc=0, scale=5, size=200)
         >>> data = pd.DataFrame({"x": x, "y": y})
 
-        >>> fig = inferplot.scatterstats("x", "y", data, bins=20, ci=90)
-
-    Notes
-    -----
-    The function performs a linear regression analysis and provides statistical annotations on the plot. Below are the key statistical concepts and formulas used:
-
-    The linear regression model is of the form:
-
-    :math:`\hat{y}_i = \beta_0 + \beta_1 x_i + \epsilon_i`
-
-    where:
-
-    - :math:`\hat{y}_i` is the predicted value of :math:`y` for the :math:`i`-th observation.
-    - :math:`\beta_0` is the intercept (constant term).
-    - :math:`\beta_1` is the slope (regression coefficient).
-    - :math:`x_i` is the independent variable.
-    - :math:`\epsilon_i` is the error term (residual).
-
-    The Pearson correlation coefficient measures the linear relationship between :math:`x` and :math:`y`. It is calculated as:
-
-    :math:`r = \frac{\text{cov}(x, y)}{\sigma_x \sigma_y}`
-
-    where:
-
-    - :math:`\text{cov}(x, y)` is the covariance between :math:`x` and :math:`y`.
-    - :math:`\sigma_x` and :math:`\sigma_y` are the standard deviations of :math:`x` and :math:`y`, respectively.
-    - :math:`r` ranges from :math:`-1` (perfect negative correlation) to :math:`1` (perfect positive correlation).
-
-    The confidence interval for the slope (:math:`\beta_1`) is calculated as:
-
-    :math:`\text{CI} = \left[ \hat{\beta}_1 - t_{\alpha/2, n-2} \cdot \text{SE}_{\hat{\beta}_1}, \hat{\beta}_1 + t_{\alpha/2, n-2} \cdot \text{SE}_{\hat{\beta}_1} \right]`
-
-    where:
-
-    - :math:`\hat{\beta}_1` is the estimated slope.
-    - :math:`t_{\alpha/2, n-2}` is the critical value from the t-distribution with :math:`n-2` degrees of freedom.
-    - :math:`\text{SE}_{\hat{\beta}_1}` is the standard error of the slope.
-
-    The null hypothesis (:math:`H_0`) is that there is no linear relationship between :math:`x` and :math:`y` (:math:`\beta_1 = 0`).
-
-    The alternative hypothesis (:math:`H_1`) depends on the `alternative` parameter:
-
-    - "two-sided": :math:`\beta_1 \neq 0`
-    - "less": :math:`\beta_1 < 0`
-    - "greater": :math:`\beta_1 > 0`
-
-    The p-value is calculated using the t-statistic:
-
-    :math:`t = \frac{\hat{\beta}_1}{\text{SE}_{\hat{\beta}_1}}`
-
-    The degrees of freedom for the t-distribution is :math:`n - 2`, where :math:`n` is the number of observations.
+        >>> fig, stats = inferplot.scatterstats("x", "y", data, bins=20, ci=90)
     """
 
     if alternative not in ["two-sided", "less", "greater"]:
@@ -123,6 +76,11 @@ def scatterstats(
         warnings.warn(
             "bins/hist_kws arguments are ignored when marginal=False.",
             category=UserWarning,
+        )
+
+    if correlation_measure not in ["pearson", "kendall", "spearman"]:
+        raise ValueError(
+            "correlation_measure argument must be one of: 'pearson', 'kendall', 'spearman'."
         )
 
     default_subplot_mosaic_kwargs = dict(
@@ -153,14 +111,34 @@ AC
     alpha = 1 - ci / 100
     dof = n - 2
 
+    if correlation_measure == "pearson":
+        correlation = st.pearsonr(data[x], data[y]).statistic
+        symbol_correl = "\\rho"
+    elif correlation_measure == "kendall":
+        correlation = st.kendalltau(data[x], data[y]).statistic
+        symbol_correl = "\\tau"
+    elif correlation_measure == "spearman":
+        correlation = st.spearmanr(data[x], data[y]).statistic
+        symbol_correl = "\\rho"
+
     p_value = regression.pvalue
-    rho = regression.rvalue
     intercept = regression.intercept
     slope = regression.slope
     stderr_slope = regression.stderr
     t_critical = st.t.ppf(1 - alpha / 2, dof)
     ci_lower = slope - t_critical * stderr_slope
     ci_upper = slope + t_critical * stderr_slope
+    statistics = {
+        "p_value": p_value,
+        "t_critical": t_critical,
+        "correlation": correlation,
+        "intercept": intercept,
+        "slope": slope,
+        "stderr_slope": stderr_slope,
+        "ci_lower": ci_lower,
+        "ci_upper": ci_upper,
+        "dof": dof,
+    }
 
     ci_decimal = _count_n_decimals(ci)
 
@@ -169,7 +147,7 @@ AC
         f"t_{{Student}}({dof}) = {slope:.2f}, ",
         f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
         f"p = {p_value:.4f}, ",
-        f"\\hat{{r}}_{{Pearson}} = {rho:.2f}, ",
+        f"{symbol_correl}_{{{correlation_measure.title()}}} = {correlation:.2f}, ",
         f"n = {n}",
         "$",
     ]
@@ -230,7 +208,7 @@ AC
         **annotation_params,
     )
 
-    return fig if marginal else ax
+    return (fig, statistics) if marginal else (ax, statistics)
 
 
 if __name__ == "__main__":
@@ -244,5 +222,7 @@ if __name__ == "__main__":
     y = x * 0.06 + np.random.normal(loc=0, scale=5, size=200)
     data = pd.DataFrame({"x": x, "y": y})
 
-    fig = scatterstats("x", "y", data, bins=20, ci=90)
+    fig, stats = scatterstats(
+        "x", "y", data, bins=20, ci=90, correlation_measure="pearson"
+    )
     fig.savefig("cache.png", dpi=300)
