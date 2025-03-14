@@ -9,7 +9,7 @@
 #     data: IntoDataFrame,
 #     ax=None,
 # ):
-#     data = nw.from_native(data).to_pandas()
+#     data = nw.from_native(data)
 
 #     if ax is None:
 #         ax = plt.gca()
