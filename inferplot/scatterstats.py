@@ -223,18 +223,18 @@ AC
     return (fig, statistics) if marginal else (ax, statistics)
 
 
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    from inferplot import datasets
+# if __name__ == "__main__":
+#     import matplotlib.pyplot as plt
+#     from inferplot import datasets
 
-    data = datasets.load_data("iris")
+#     data = datasets.load_data("iris")
 
-    fig, stats = scatterstats(
-        x="sepal_length",
-        y="sepal_width",
-        data=data,
-        bins=20,
-        ci=95,
-        correlation_measure="pearson",
-    )
-    fig.savefig("cache.png", dpi=300)
+#     fig, stats = scatterstats(
+#         x="sepal_length",
+#         y="sepal_width",
+#         data=data,
+#         bins=20,
+#         ci=95,
+#         correlation_measure="pearson",
+#     )
+#     fig.savefig("cache.png", dpi=300)
