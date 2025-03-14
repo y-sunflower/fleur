@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import narwhals as nw
-import seaborn as sns
 from narwhals.typing import IntoDataFrame
 
 
@@ -14,18 +13,6 @@ def betweenstats(
 
     if ax is None:
         ax = plt.gca()
-
-    sns.violinplot(x=x, y=y, data=data, ax=ax)
-    sns.boxplot(
-        x=x,
-        y=y,
-        data=data,
-        width=0.3,
-        color="black",
-        linewidth=1,
-        fill=False,
-        ax=ax,
-    )
 
     return ax
 

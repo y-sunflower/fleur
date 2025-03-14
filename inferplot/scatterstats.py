@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
 import matplotlib
 import scipy.stats as st
-import seaborn as sns
-from typing import Union, List, Tuple
+import numpy as np
 import narwhals as nw
 from narwhals.typing import IntoDataFrame
+
 import warnings
 from numbers import Number
+from typing import Union, List, Tuple
 
 from inferplot._utils import _count_n_decimals
 
@@ -20,10 +21,10 @@ def scatterstats(
     alternative: str = "two-sided",
     correlation_measure: str = "pearson",
     bins: Union[int, List[int]] = None,
-    color: Union[str, tuple, None] = None,
     figsize: Tuple[float, float] = (8, 6),
     scatter_kws: Union[dict, None] = None,
     line_kws: Union[dict, None] = None,
+    area_kws: Union[dict, None] = None,
     hist_kws: Union[dict, None] = None,
     subplot_mosaic_kwargs: Union[dict, None] = None,
     ax: Union[matplotlib.axes.Axes, None] = None,
@@ -40,14 +41,13 @@ def scatterstats(
     :param correlation_measure: The correlation measure to use. Default is 'pearson'. Must be one of 'pearson', 'kendall', 'spearman'.
     :param bins: Number of bins for the marginal distributions. This can be an integer or a list of two integers (the first for the top distribution and the second for the other).
     :param marginal: Whether to include marginal histograms. Default is ``True``.
-    :param color: Any valid matplotlib color that will be used to color all the elements of the plot.
     :param figsize: Dimensions of the matplotlib figure created. The default value is ``(8, 6)``.
     :param line_kws: Additional parameters which will be passed to the ``plot()`` function in matplotlib.
     :param scatter_kws: Additional parameters which will be passed to the ``scatter()`` function in matplotlib.
+    :param area_kws: Additional parameters which will be passed to the ``fill_between()`` function in matplotlib.
     :param hist_kws: Additional parameters which will be passed to the ``hist()`` function in matplotlib.
     :param subplot_mosaic_kwargs: Additional keyword arguments to pass to ``plt.subplot_mosaic()``. Default is ``None``.
     :param ax: The Axes to plot on. If ``None``, use the current Axes using ``plt.gca()``. Default is ``None``.
-    :param kwargs: Additional keyword arguments to pass to `seaborn.regplot <https://seaborn.pydata.org/generated/seaborn.regplot.html>`_.
     :return: A Tuple containing either an Axes (if ``marginal=False``) or a Figure (if ``marginal=True``) for the first element, and a statistics dictionary for the second element.
 
     Examples
@@ -104,22 +104,24 @@ AC
             ax = plt.gca()
         fig = plt.gcf()
 
-    data = nw.from_native(data).to_pandas()
+    data = nw.from_native(data)
+    x_np = data[x].to_numpy()
+    y_np = data[y].to_numpy()
 
-    regression = st.linregress(data[x], data[y], alternative=alternative)
+    regression = st.linregress(x_np, y_np, alternative=alternative)
 
     n = len(data)
     alpha = 1 - ci / 100
     dof = n - 2
 
     if correlation_measure == "pearson":
-        correlation = st.pearsonr(data[x], data[y]).statistic
+        correlation = st.pearsonr(x_np, y_np).statistic
         symbol_correl = "\\rho"
     elif correlation_measure == "kendall":
-        correlation = st.kendalltau(data[x], data[y]).statistic
+        correlation = st.kendalltau(x_np, y_np).statistic
         symbol_correl = "\\tau"
     elif correlation_measure == "spearman":
-        correlation = st.spearmanr(data[x], data[y]).statistic
+        correlation = st.spearmanr(x_np, y_np).statistic
         symbol_correl = "\\rho"
 
     p_value = regression.pvalue
@@ -158,16 +160,25 @@ AC
         scatter_kws = {}
     if line_kws is None:
         line_kws = {}
-    sns.regplot(
-        x=x,
-        y=y,
-        data=data,
-        ci=ci,
-        color=color,
-        scatter_kws=scatter_kws,
-        line_kws=line_kws,
-        ax=ax,
-        **kwargs,
+    if area_kws is None:
+        area_kws = {}
+
+    ax.scatter(x_np, y_np, **scatter_kws)
+    x_values = np.linspace(np.min(x_np), np.max(x_np), 100)
+    y_values = slope * x_values + intercept
+    ax.plot(x_values, y_values, **line_kws)
+
+    residuals = y_np - (slope * x_np + intercept)
+    rse = np.sqrt(np.sum(residuals**2) / dof)
+    x_mean = np.mean(x_np)
+    x_var = np.sum((x_np - x_mean) ** 2)
+    y_err = t_critical * rse * np.sqrt(1 / n + (x_values - x_mean) ** 2 / x_var)
+    ax.fill_between(
+        x_values,
+        y_values - y_err,
+        y_values + y_err,
+        alpha=0.2,
+        **area_kws,
     )
 
     ax.set(xlabel="", ylabel="")
@@ -188,15 +199,13 @@ AC
         else:
             binsB = binsC = bins
 
-        axs["B"].hist(data[x], bins=binsB, color=color, **hist_kws)
-        axs["C"].hist(
-            data[y], orientation="horizontal", bins=binsC, color=color, **hist_kws
-        )
+        axs["B"].hist(x_np, bins=binsB, **hist_kws)
+        axs["C"].hist(y_np, orientation="horizontal", bins=binsC, **hist_kws)
 
         axs["B"].axis("off")
         axs["C"].axis("off")
 
-    equation_sign = "+" if slope > 0 else "-"
+    equation_sign = "+" if slope >= 0 else "-"
 
     annotation_params = dict(transform=fig.transFigure, va="top")
     fig.text(x=0.1, y=0.95, s=all_expr, size=9, **annotation_params)
@@ -216,16 +225,16 @@ AC
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
+    from inferplot import datasets
 
-    np.random.seed(42)
-
-    x = np.random.normal(loc=5, scale=10, size=200)
-    y = x * 0.06 + np.random.normal(loc=0, scale=5, size=200)
-    data = pd.DataFrame({"x": x, "y": y})
+    data = datasets.load_data("iris")
 
     fig, stats = scatterstats(
-        "x", "y", data, bins=20, ci=90, correlation_measure="pearson"
+        x="sepal_length",
+        y="sepal_width",
+        data=data,
+        bins=20,
+        ci=95,
+        correlation_measure="pearson",
     )
     fig.savefig("cache.png", dpi=300)

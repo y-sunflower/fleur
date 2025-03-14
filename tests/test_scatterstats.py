@@ -71,19 +71,13 @@ def test_invalid_columns(sample_data):
         scatterstats("x", "invalid_y", sample_data)
 
 
-def test_invalid_color(sample_data):
-    with pytest.raises(ValueError):
-        scatterstats("x", "y", sample_data, color="invalid_color")
-
-
 def test_style_params(sample_data):
     fig, stats = scatterstats(
         "x",
         "y",
         sample_data,
         bins=[10, 20],
-        color="#1c3475",
-        line_kws={"lw": 3},
+        line_kws={"lw": 3, "color": "#1c3475"},
     )
     assert fig.get_figheight() == 6.0
     assert fig.get_figwidth() == 8.0

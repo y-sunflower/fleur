@@ -9,7 +9,7 @@ I'm in the process of building a PoC to find out which library to use, to think 
 ## Current status/ideas
 
 - narwhals to handle dataframes
-- matplotlib/seaborn to handle plots
+- matplotlib to handle plots
 - scipy to handle stats
 
 Ideally, those should be the only dependencies.

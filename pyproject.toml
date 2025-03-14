@@ -8,11 +8,11 @@ dependencies = [
     "matplotlib>=3.10.0",
     "narwhals>=1.28.0",
     "scipy>=1.15.1",
-    "seaborn>=0.13.2",
 ]
 
 [dependency-groups]
 dev = [
+    "pandas>=2.2.3",
     "polars>=1.24.0",
     "pre-commit>=4.1.0",
     "pydata-sphinx-theme>=0.16.1",
