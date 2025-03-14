@@ -55,16 +55,17 @@ def scatterstats(
 
     .. plot::
 
-        >>> import numpy as np
-        >>> import pandas as pd
-        >>> import inferplot
-        >>> np.random.seed(42)
+        import pandas as pd
+        import inferplot
+        from inferplot import datasets
 
-        >>> x = np.random.normal(loc=5, scale=10, size=200)
-        >>> y = x * 0.06 + np.random.normal(loc=0, scale=5, size=200)
-        >>> data = pd.DataFrame({"x": x, "y": y})
-
-        >>> fig, stats = inferplot.scatterstats("x", "y", data, bins=20, ci=90)
+        data = datasets.load_data("iris")
+        fig, stats = inferplot.scatterstats(
+            x="sepal_length",
+            y="sepal_width",
+            data=data,
+            correlation_measure="spearman",
+        )
     """
 
     if alternative not in ["two-sided", "less", "greater"]:
@@ -148,7 +149,7 @@ AC
         f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
         f"p = {p_value:.4f}, ",
         f"{symbol_correl}_{{{correlation_measure.title()}}} = {correlation:.2f}, ",
-        f"n = {n}",
+        f"n_{{obs}} = {n}",
         "$",
     ]
     all_expr = "".join(expr_list)
@@ -195,12 +196,14 @@ AC
         axs["B"].axis("off")
         axs["C"].axis("off")
 
+    equation_sign = "+" if slope > 0 else "-"
+
     annotation_params = dict(transform=fig.transFigure, va="top")
     fig.text(x=0.1, y=0.95, s=all_expr, size=9, **annotation_params)
     fig.text(
         x=0.75,
         y=0.05,
-        s=f"$\\hat{{y}}_i = {intercept:.2f} + {slope:.2f}x_i$",
+        s=f"$\\hat{{y}}_i = {intercept:.2f} {equation_sign} {abs(slope):.2f}x_i$",
         ha="right",
         weight="bold",
         style="normal",

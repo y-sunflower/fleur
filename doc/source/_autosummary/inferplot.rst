@@ -10,5 +10,6 @@
    :toctree:
    :recursive:
 
+   betweenstats
    datasets
    scatterstats
