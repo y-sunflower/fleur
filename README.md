@@ -17,3 +17,12 @@ The goal behind inferplot is:
 ## Miscellaneous
 
 - requires python 3.11
+
+<br><br>
+
+## State
+
+| Functions        | Description                         | Parametric | Non-parametric | Robust | Bayesian |
+| :--------------- | :---------------------------------- | :--------- | :------------- | :----- | :------- |
+| `betweenstats()` | Between group/condition comparisons | ✅         | ❌             | ❌     | ❌       |
+| `scatterstats()` | Correlation between two variables   | ✅         | ❌             | ❌     | ❌       |

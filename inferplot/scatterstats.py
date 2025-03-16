@@ -10,6 +10,7 @@ from numbers import Number
 from typing import Union, List, Tuple
 
 from inferplot._utils import _count_n_decimals
+from inferplot.utils import themify
 
 
 def scatterstats(
@@ -55,7 +56,6 @@ def scatterstats(
 
     .. plot::
 
-        import pandas as pd
         import inferplot
         from inferplot import datasets
 
@@ -124,7 +124,7 @@ AC
         correlation = st.spearmanr(x_np, y_np).statistic
         symbol_correl = "\\rho"
 
-    p_value = regression.pvalue
+    pvalue = regression.pvalue
     intercept = regression.intercept
     slope = regression.slope
     stderr_slope = regression.stderr
@@ -132,7 +132,7 @@ AC
     ci_lower = slope - t_critical * stderr_slope
     ci_upper = slope + t_critical * stderr_slope
     statistics = {
-        "p_value": p_value,
+        "pvalue": pvalue,
         "t_critical": t_critical,
         "correlation": correlation,
         "intercept": intercept,
@@ -149,7 +149,7 @@ AC
         "$",
         f"t_{{Student}}({dof}) = {slope:.2f}, ",
         f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{ci_lower:.2f}, {ci_upper:.2f}], ",
-        f"p = {p_value:.4f}, ",
+        f"p = {pvalue:.4f}, ",
         f"{symbol_correl}_{{{correlation_measure.title()}}} = {correlation:.2f}, ",
         f"n_{{obs}} = {n}",
         "$",
@@ -181,10 +181,7 @@ AC
         **area_kws,
     )
 
-    ax.set(xlabel="", ylabel="")
-    ax.grid(color="#525252", alpha=0.2)
-    ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
-    ax.tick_params(size=0, labelsize=8)
+    ax = themify(ax)
 
     if marginal:
         if bins is None:

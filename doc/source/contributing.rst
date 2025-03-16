@@ -1,6 +1,6 @@
 .. _contributing:
 
-Contributing to InferPlot
+Contributing
 =========================
 
 We welcome contributions from the community! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated. Below are the steps to get started.

@@ -13,3 +13,4 @@
    betweenstats
    datasets
    scatterstats
+   utils

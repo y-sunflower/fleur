@@ -22,7 +22,7 @@ def test_default(sample_data_pandas):
     assert len(stats.keys()) == 9
     for key in stats.keys():
         assert key in [
-            "p_value",
+            "pvalue",
             "t_critical",
             "correlation",
             "intercept",
@@ -42,7 +42,7 @@ def test_no_marginal(sample_data_pandas):
     assert len(stats.keys()) == 9
     for key in stats.keys():
         assert key in [
-            "p_value",
+            "pvalue",
             "t_critical",
             "correlation",
             "intercept",

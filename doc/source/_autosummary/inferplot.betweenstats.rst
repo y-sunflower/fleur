@@ -1,6 +1,6 @@
 inferplot.betweenstats
 ======================
 
-.. automodule:: inferplot.betweenstats
+.. currentmodule:: inferplot
 
-   
+.. autofunction:: betweenstats
