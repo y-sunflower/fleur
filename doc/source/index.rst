@@ -15,4 +15,5 @@ The goal behind inferplot is:
 
    api
    examples
+   contributing
 
