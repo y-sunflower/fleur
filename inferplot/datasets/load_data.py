@@ -7,7 +7,7 @@ AVAILABLE_DATASETS = ["iris"]
 AVAILABLE_OUTPUTS = ["pandas", "polars", "pyarrow", "modin", "cudf"]
 
 
-def load_data(dataset_name: str, return_as: str = "pandas", **kwargs) -> IntoDataFrame:
+def _load_data(dataset_name: str, return_as: str, **kwargs) -> IntoDataFrame:
     """
     Load one of the available datasets in inferplot. This function is a minimalist wrapper around `narwhals.read_csv() <https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv>`_ function.
 
@@ -47,3 +47,29 @@ def load_data(dataset_name: str, return_as: str = "pandas", **kwargs) -> IntoDat
     df = nw.read_csv(dataset_path, backend=return_as, **kwargs).to_native()
 
     return df
+
+
+def load_iris(return_as: str = "pandas", **kwargs) -> IntoDataFrame:
+    """
+    Load the iris dataset.
+
+    :param return_as: The output format of the dataframe. Note that, for example, if you set ``return_as="polars"``, you must have polars installed. Must be one of the following: "pandas", "polars", "pyarrow", "modin", "cudf". Default to "pandas".
+    :param kwargs: Additional arguments passed to `narwhals.read_csv() <https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv>`_.
+    :return: A dataframe with the specified dataset.
+
+    Examples
+    --------
+
+    .. doctest::
+
+        >>> import inferplot.datasets as datasets
+        >>> iris = datasets.load_iris()
+        >>> iris.head()
+        sepal_length    sepal_width    petal_length    petal_width    species
+                 5.1            3.5             1.4            0.2     setosa
+                 4.9            3.0             1.4            0.2     setosa
+                 4.7            3.2             1.3            0.2     setosa
+                 4.6            3.1             1.5            0.2     setosa
+                 5.0            3.6             1.4            0.2     setosa
+    """
+    return _load_data("iris", return_as=return_as, **kwargs)

@@ -10,6 +10,6 @@ setup(
     author="Joseph Barbier",
     author_email="joseph.barbierdarnal@gmail.com",
     url="https://github.com/JosephBARBIERDARNAL/inferplot",
-    install_requires=["matplotlib"],
+    install_requires=["matplotlib", "narwhals", "scipy"],
     include_package_data=True,
 )
