@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib
 import narwhals as nw
 from narwhals.typing import IntoDataFrame
 from typing import Union
@@ -24,7 +25,7 @@ def betweenstats(
     violin_kws: Union[dict, None] = None,
     box_kws: Union[dict, None] = None,
     scatter_kws: Union[dict, None] = None,
-    ax=None,
+    ax: Union[matplotlib.axes.Axes, None] = None,
     **kwargs,
 ):
     r"""

@@ -20,11 +20,10 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["inferplot/utils/*.py"]
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 
 plot_include_source = True
 plot_html_show_source_link = False
-plot_rcparams = {"figure.dpi": 300, "savefig.dpi": 300}
+plot_rcparams = {"figure.dpi": 200, "savefig.dpi": 200}

@@ -1,6 +1,12 @@
 ﻿inferplot.datasets.load\_data
 =============================
 
-.. currentmodule:: inferplot.datasets
+.. automodule:: inferplot.datasets.load_data
 
-.. autofunction:: load_data
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      load_iris
+   
