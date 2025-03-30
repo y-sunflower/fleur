@@ -1,5 +1,5 @@
 from .scatterstats import scatterstats
-from .betweenstats import betweenstats
+from .betweenstats import BetweenStats
 from .utils.theme import themify
 
-__all__ = ["scatterstats", "betweenstats", "themify"]
+__all__ = ["scatterstats", "BetweenStats", "themify"]
