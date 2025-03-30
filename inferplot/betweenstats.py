@@ -83,29 +83,35 @@ def betweenstats(
         box_kws = {}
     if scatter_kws is None:
         scatter_kws = {}
+    violin_default_kws = {"orientation": orientation, "showextrema": False}
+    violin_default_kws.update(violin_kws)
+    box_default_kws = {"orientation": orientation}
+    box_default_kws.update(box_kws)
+    scatter_default_kws = {"alpha": 0.5}
+    scatter_default_kws.update(box_kws)
 
     if plot_violin:
-        violin_artists = ax.violinplot(
-            result, orientation=orientation, showextrema=False, **violin_kws
-        )
+        violin_artists = ax.violinplot(result, **violin_default_kws)
 
     if plot_box:
         box_style = {"color": "#3b3b3b"}
         ax.boxplot(
             result,
-            orientation=orientation,
             boxprops=box_style,
             medianprops=box_style,
             capprops=box_style,
             whiskerprops=box_style,
-            **box_kws,
+            **box_default_kws,
         )
 
     if plot_scatter:
         for i, (values, label, color) in enumerate(zip(result, cat_labels, colors)):
             jitter = np.random.uniform(low=-0.1, high=0.1, size=len(values))
             x_coords = np.full(len(values), i) + jitter + 1
-            ax.scatter(x_coords, values, alpha=0.3, color=color, **scatter_kws)
+            if orientation == "vertical":
+                ax.scatter(x_coords, values, color=color, **scatter_default_kws)
+            else:  # "horizontal":
+                ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
     for patch, color in zip(violin_artists["bodies"], colors):
         patch.set(color=color)
@@ -147,7 +153,7 @@ def betweenstats(
     all_expr = "".join(expr_list)
 
     annotation_params = dict(transform=ax.transAxes, va="top")
-    ax.text(x=0.1, y=0.95, s=all_expr, size=9, **annotation_params)
+    ax.text(x=0.05, y=1.09, s=all_expr, size=9, **annotation_params)
 
     ax = themify(ax)
 
@@ -164,8 +170,7 @@ def betweenstats(
 if __name__ == "__main__":
     from inferplot import datasets
 
-    data = datasets.load_data("iris", return_as="pandas")
-    # data = data[data["species"] != "setosa"]
+    data = datasets.load_iris()
 
     fig, ax = plt.subplots()
     betweenstats(

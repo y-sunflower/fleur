@@ -4,10 +4,10 @@ inferplot.datasets
 .. automodule:: inferplot.datasets
 
    
-.. rubric:: Modules
+   .. rubric:: Functions
 
-.. autosummary::
-   :toctree:
-   :recursive:
-
-   load_data
+   .. autosummary::
+   
+      load_iris
+      load_mtcars
+   

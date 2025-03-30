@@ -1,4 +1,4 @@
-﻿inferplot.betweenstats
+inferplot.betweenstats
 ======================
 
 .. currentmodule:: inferplot

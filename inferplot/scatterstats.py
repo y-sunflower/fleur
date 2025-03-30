@@ -162,24 +162,28 @@ AC
         line_kws = {}
     if area_kws is None:
         area_kws = {}
+    area_default_kws = {
+        "color": plt.rcParams["axes.prop_cycle"].by_key()["color"][0],
+        "alpha": 0.2,
+    }
+    area_default_kws.update(area_kws)
 
-    ax.scatter(x_np, y_np, **scatter_kws)
     x_values = np.linspace(np.min(x_np), np.max(x_np), 100)
     y_values = slope * x_values + intercept
-    ax.plot(x_values, y_values, **line_kws)
-
     residuals = y_np - (slope * x_np + intercept)
     rse = np.sqrt(np.sum(residuals**2) / dof)
     x_mean = np.mean(x_np)
     x_var = np.sum((x_np - x_mean) ** 2)
     y_err = t_critical * rse * np.sqrt(1 / n + (x_values - x_mean) ** 2 / x_var)
+
     ax.fill_between(
         x_values,
         y_values - y_err,
         y_values + y_err,
-        alpha=0.2,
-        **area_kws,
+        **area_default_kws,
     )
+    ax.scatter(x_np, y_np, **scatter_kws)
+    ax.plot(x_values, y_values, **line_kws)
 
     ax = themify(ax)
 
@@ -220,18 +224,18 @@ AC
     return (fig, statistics) if marginal else (ax, statistics)
 
 
-# if __name__ == "__main__":
-#     import matplotlib.pyplot as plt
-#     from inferplot import datasets
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    from inferplot import datasets
 
-#     data = datasets.load_data("iris")
+    data = datasets.load_iris()
 
-#     fig, stats = scatterstats(
-#         x="sepal_length",
-#         y="sepal_width",
-#         data=data,
-#         bins=20,
-#         ci=95,
-#         correlation_measure="pearson",
-#     )
-#     fig.savefig("cache.png", dpi=300)
+    fig, stats = scatterstats(
+        x="sepal_length",
+        y="sepal_width",
+        data=data,
+        bins=20,
+        ci=95,
+        correlation_measure="pearson",
+    )
+    fig.savefig("cache.png", dpi=300)

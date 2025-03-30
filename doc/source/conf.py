@@ -7,6 +7,7 @@ project = "inferplot"
 copyright = "2025, Joseph Barbier"
 author = "Joseph Barbier"
 release = "0.1.0"
+version = "0.1.0"
 
 extensions = [
     "sphinx.ext.autodoc",
