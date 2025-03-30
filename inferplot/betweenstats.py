@@ -53,9 +53,9 @@ def betweenstats(
         import inferplot
         from inferplot import datasets
 
-        data = datasets.load_data("iris")
+        iris = datasets.load_iris()
         ax = inferplot.betweenstats(
-            data=data,
+            data=iris,
             x="species",
             y="sepal_length",
         )
@@ -146,8 +146,8 @@ def betweenstats(
 
     all_expr = "".join(expr_list)
 
-    annotation_params = dict(transform=fig.transFigure, va="top")
-    fig.text(x=0.1, y=0.95, s=all_expr, size=9, **annotation_params)
+    annotation_params = dict(transform=ax.transAxes, va="top")
+    ax.text(x=0.1, y=0.95, s=all_expr, size=9, **annotation_params)
 
     ax = themify(ax)
 

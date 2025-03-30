@@ -59,7 +59,7 @@ def scatterstats(
         import inferplot
         from inferplot import datasets
 
-        data = datasets.load_data("iris")
+        data = datasets.load_iris()
         fig, stats = inferplot.scatterstats(
             x="sepal_length",
             y="sepal_width",
