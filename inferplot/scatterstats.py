@@ -89,14 +89,14 @@ def scatterstats(
     )
     if subplot_mosaic_kwargs is None:
         subplot_mosaic_kwargs = {}
-    subplot_mosaic_kwargs.update(default_subplot_mosaic_kwargs)
+    default_subplot_mosaic_kwargs.update(subplot_mosaic_kwargs)
 
     if marginal:
         scheme = """
 B.
 AC
 """
-        fig, axs = plt.subplot_mosaic(scheme, **subplot_mosaic_kwargs)
+        fig, axs = plt.subplot_mosaic(scheme, **default_subplot_mosaic_kwargs)
         fig.subplots_adjust(wspace=0, hspace=0)
         ax = axs["A"]  # main Axes of the Figure
     else:
