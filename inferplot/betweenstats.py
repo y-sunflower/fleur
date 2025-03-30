@@ -36,6 +36,7 @@ def betweenstats(
     :param data: The DataFrame containing the data to be plotted. Can be any dataframe format supported by `narwhals <https://narwhals-dev.github.io/narwhals/>`_ (pandas, Polars, PyArrow, cuDF, Modin).
     :param orientation: Defines the orientation of the violins/boxs. Default is 'vertical'. Must be one of 'vertical' and 'horizontal'.
     :param paired: Whether or not the samples are related or not (e.g independent).
+    :param colors: A list of valid matplotlib colors of the same length as the number of unique categories in your categorical column (``x`` or ``y``). Will use colors from matplotlib's rcParams by default.
     :param plot_violin: Whether or not to plot a violin plot. Default to ``True``.
     :param plot_box: Whether or not to plot a box plot. Default to ``True``.
     :param plot_scatter: Whether or not to plot a scatter plot. Default to ``True``.
@@ -75,6 +76,11 @@ def betweenstats(
 
     if colors is None:
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][:n_cat]
+    else:
+        if len(colors) < n_cat:
+            raise ValueError(
+                f"`colors` argument must have at least {n_cat} elements, not {len(colors)}"
+            )
     if ax is None:
         ax = plt.gca()
     if violin_kws is None:
@@ -110,7 +116,7 @@ def betweenstats(
             x_coords = np.full(len(values), i) + jitter + 1
             if orientation == "vertical":
                 ax.scatter(x_coords, values, color=color, **scatter_default_kws)
-            else:  # "horizontal":
+            else:  # "horizontal"
                 ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
     for patch, color in zip(violin_artists["bodies"], colors):
@@ -178,6 +184,7 @@ if __name__ == "__main__":
         x="species",
         y="sepal_length",
         orientation="vertical",
+        colors=["#FED789FF", "#023743FF"],
         ax=ax,
     )
     plt.savefig("cache.png", dpi=300)

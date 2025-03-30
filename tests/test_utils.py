@@ -34,10 +34,10 @@ def test_infer_types():
     assert _infer_types("x", "y", data1) == ("y", "x")
     assert _infer_types("x", "y", data2) == ("x", "y")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         _infer_types("x", "y", data3)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         _infer_types("x", "y", data4)
 
 

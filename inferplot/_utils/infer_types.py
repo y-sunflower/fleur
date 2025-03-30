@@ -13,7 +13,7 @@ def _infer_types(x, y, data: FrameT):
     """
 
     if x not in data.columns or y not in data.columns:
-        raise ValueError(f"Columns {x} and/or {y} not found in the dataframe")
+        raise KeyError(f"Columns {x} and/or {y} not found in the dataframe")
 
     def is_categorical(column_name):
         col_dtype = data.schema[column_name]
@@ -41,7 +41,7 @@ def _infer_types(x, y, data: FrameT):
     elif x_is_num and y_is_cat:
         return (y, x)
     else:
-        raise ValueError(
+        raise KeyError(
             "Either both columns are categorical or both are numerical. "
             "Function requires one categorical and one numerical column."
         )
