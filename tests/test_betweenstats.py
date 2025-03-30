@@ -12,6 +12,11 @@ def sample_data_pandas():
     return df
 
 
+def test_summary_error():
+    with pytest.raises(RuntimeError):
+        BetweenStats.summary()
+
+
 def test_default(sample_data_pandas):
     bs = BetweenStats.fit("x", "y", sample_data_pandas)
     assert isinstance(bs.ax, plt.Axes), "Expected a matplotlib Axes object"
@@ -30,6 +35,18 @@ def test_invalid_columns(sample_data_pandas):
         BetweenStats.fit("invalid_x", "y", sample_data_pandas)
     with pytest.raises(KeyError):
         BetweenStats.fit("x", "invalid_y", sample_data_pandas)
+
+
+def test_expected_attributes(sample_data_pandas):
+    fig, ax = plt.subplots()
+    bs = BetweenStats.fit("x", "y", sample_data_pandas, ax=ax)
+
+    assert hasattr(bs, "ax")
+    assert hasattr(bs, "statistic")
+    assert hasattr(bs, "pvalue")
+    assert hasattr(bs, "main_stat")
+    assert hasattr(bs, "expression")
+    assert hasattr(bs, "n_cat")
 
 
 if __name__ == "__main__":

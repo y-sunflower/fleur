@@ -13,12 +13,9 @@ np.random.seed(0)
 
 
 class BetweenStats:
-    def __init__(self):
-        self._is_fitted = False
-
     @classmethod
     def fit(
-        self,
+        cls,
         x: str,
         y: str,
         data: IntoDataFrame,
@@ -100,31 +97,33 @@ class BetweenStats:
                 "You must have at least 2 distinct categories in your category column"
             )
         elif n_cat == 2:
+            cls.is_ANOVA = False
             if paired:
                 ttest = st.ttest_rel(result[0], result[1])
-                self.name = "Paired t-test"
+                cls.name = "Paired t-test"
             else:
                 ttest = st.ttest_ind(result[0], result[1])
-                self.name = "T-test"
+                cls.name = "T-test"
             statistic = ttest.statistic
             pvalue = ttest.pvalue
             dof = int(ttest.df)
-            self.dof = dof
+            cls.dof = dof
             main_stat = f"t_{{Student}}({dof}) = {statistic:.2f}"
         else:  # n >= 3
+            cls.is_ANOVA = True
             if paired:
                 raise NotImplementedError(
                     "Repeated measures ANOVA has not been implemented yet."
                 )
             else:
                 anova = st.f_oneway(*result)
-                self.name = "One-way ANOVA"
+                cls.name = "One-way ANOVA"
             statistic = anova.statistic
             pvalue = anova.pvalue
             dof_between = n_cat - 1
             dof_within = n - n_cat
-            self.dof_between = dof_between
-            self.dof_within = dof_within
+            cls.dof_between = dof_between
+            cls.dof_within = dof_within
             main_stat = f"F({dof_between}, {dof_within}) = {statistic:.2f}"
 
         expr_list = [
@@ -149,34 +148,35 @@ class BetweenStats:
         elif orientation == "horizontal":
             ax.set_yticks(ticks, labels=labels)
 
-        self.statistic = statistic
-        self.pvalue = pvalue
-        self.main_stat = main_stat
-        self.ax = ax
-        self.is_paired = paired
-        self.expression = all_expr
-        self.n_cat = n_cat
-        self._is_fitted = True
+        cls.statistic = statistic
+        cls.pvalue = pvalue
+        cls.main_stat = main_stat
+        cls.ax = ax
+        cls.is_paired = paired
+        cls.expression = all_expr
+        cls.n_cat = n_cat
+        cls.n_obs = n
+        cls._is_fitted = True
 
-        return self
+        return cls
 
     @classmethod
     def summary(cls):
-        if not cls._is_fitted:
+        if not hasattr(cls, "_is_fitted"):
             raise RuntimeError("Must call 'fit()' before calling 'summary()'.")
 
         print("Between stats comparison\n")
 
         info_about_test = [
             f"{cls.name} ",
-            f"with {cls.n_cat} groups",
+            f"with {cls.n_cat} groups" if cls.is_ANOVA else "",
         ]
         info_about_test = "".join(info_about_test)
 
         clean_expression = (
             cls.expression.replace("$", "").replace("{", "").replace("}", "")
         )
-        print(f"Info: {info_about_test}")
+        print(f"Test: {info_about_test}")
         print(clean_expression)
 
 
@@ -184,6 +184,7 @@ if __name__ == "__main__":
     from inferplot import datasets
 
     data = datasets.load_iris()
+    data = data[data["species"] != "setosa"]
 
     fig, ax = plt.subplots()
     bs = BetweenStats.fit(
