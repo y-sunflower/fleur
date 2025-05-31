@@ -1,5 +1,7 @@
 import narwhals as nw
 
+from typing import Dict
+
 from inferplot.data_input import InputDataHandler
 
 import pytest
@@ -20,13 +22,12 @@ def test_output_scheme(backend):
         "x_name",
         "y_name",
         "source",
-        "x_dtype",
-        "y_dtype",
-        "length",
+        "x",
+        "y",
     ]
 
     for info in [info_df, info_series]:
-        assert isinstance(info, dict)
+        assert isinstance(info, Dict)
         assert list(info) == expected_keys
 
     for key in expected_keys:
@@ -35,3 +36,16 @@ def test_output_scheme(backend):
 
     assert info_df["source"] == "dataframe"
     assert info_series["source"] == "series"
+
+
+@pytest.mark.parametrize("x", [[1, 2, 3, 4, 5], "height"])
+@pytest.mark.parametrize("y", [[1, 2, 3, 4, 5], "weight"])
+@pytest.mark.parametrize("backend", ["pandas", "polars"])
+def test_different_x_and_y_inputs(x, y, backend):
+    df = nw.from_dict(
+        {"height": [1, 2, 3, 4, 5], "weight": [1, 2, 3, 4, 5]}, backend=backend
+    )
+    info_df = InputDataHandler("height", "weight", data=df).get_info()
+
+    assert info_df["x"] == nw.new_series(x, backend=backend)
+    assert info_df["y"] == nw.new_series(y, backend=backend)
