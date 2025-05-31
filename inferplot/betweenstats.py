@@ -2,9 +2,10 @@ import matplotlib.pyplot as plt
 import matplotlib
 import narwhals as nw
 from narwhals.typing import IntoDataFrame
-from typing import Union
 import scipy.stats as st
 import numpy as np
+
+from typing import Union
 
 from inferplot._utils import _infer_types
 from inferplot.utils import themify
@@ -39,7 +40,7 @@ class BetweenStats:
     @classmethod
     def fit(
         cls,
-        x: str,
+        x: Union[str],
         y: str,
         data: IntoDataFrame,
         orientation: str = "vertical",

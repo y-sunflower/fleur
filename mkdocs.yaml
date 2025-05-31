@@ -4,6 +4,7 @@ repo_url: https://github.com/y-sunflower/inferplot
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - content.code.copy
     - navigation.path

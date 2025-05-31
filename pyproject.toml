@@ -17,7 +17,7 @@ classifiers = [
 ]
 dependencies = [
     "matplotlib>=3.9.4",
-    "narwhals>=1.28.0",
+    "narwhals>=1.41.0",
     "scipy>=1.13.1",
 ]
 
@@ -41,6 +41,8 @@ dev = [
     "mkdocs-material>=9.6.9",
     "mkdocstrings-python>=1.16.5",
     "mkdocs-matplotlib>=0.10.1",
+    "polars>=1.30.0",
+    "narwhals>=1.28.0",
 ]
 quarto = [
     "jupyter>=1.1.1",
