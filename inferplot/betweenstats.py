@@ -13,6 +13,29 @@ np.random.seed(0)
 
 
 class BetweenStats:
+    """
+    Statistical comparison and plotting class for between-group analysis.
+
+    This class provides functionality to visualize and statistically compare
+    numerical data across two or more categorical groups. It supports t-tests
+    for two groups and one-way ANOVA for three or more groups. Visualization
+    options include violin plots, box plots, and scatter plots.
+
+    Attributes:
+        statistic (float): The computed test statistic (t or F).
+        pvalue (float): The p-value of the statistical test.
+        main_stat (str): The formatted test statistic string for display.
+        expression (str): Full LaTeX-style annotation string.
+        is_ANOVA (bool): True if test is ANOVA, False if t-test.
+        is_paired (bool): Whether a paired test was used.
+        dof (int): Degrees of freedom for t-tests.
+        dof_between (int): Between-group degrees of freedom (for ANOVA).
+        dof_within (int): Within-group degrees of freedom (for ANOVA).
+        n_cat (int): Number of unique categories in the group column.
+        n_obs (int): Total number of observations.
+        ax (matplotlib.axes.Axes): The matplotlib axes used for plotting.
+    """
+
     @classmethod
     def fit(
         cls,
@@ -31,6 +54,32 @@ class BetweenStats:
         ax: Union[matplotlib.axes.Axes, None] = None,
         **kwargs,
     ):
+        """
+        Fit the BetweenStats class to data and render a statistical comparison plot.
+
+        Args:
+            x (str): The name of the categorical (grouping) column.
+            y (str): The name of the numerical column to compare.
+            data (IntoDataFrame): Input data in DataFrame-compatible format.
+            orientation (str): 'vertical' or 'horizontal' orientation of plots.
+            paired (bool): If True, perform paired t-test (only for 2 groups).
+            colors (list, optional): List of colors for each group.
+            plot_violin (bool): Whether to include violin plot.
+            plot_box (bool): Whether to include box plot.
+            plot_scatter (bool): Whether to include scatter plot of raw data.
+            violin_kws (dict, optional): Keyword args for violinplot customization.
+            box_kws (dict, optional): Keyword args for boxplot customization.
+            scatter_kws (dict, optional): Keyword args for scatter plot customization.
+            ax (matplotlib.axes.Axes, optional): Existing Axes to plot on. If None, uses current Axes.
+            **kwargs: Additional unused keyword arguments (placeholder for extension).
+
+        Returns:
+            BetweenStats: The fitted BetweenStats class with calculated statistics and annotated plot.
+
+        Raises:
+            ValueError: If the orientation is invalid or less than 2 categories are provided.
+            NotImplementedError: If a repeated measures ANOVA is requested.
+        """
         if orientation not in ["vertical", "horizontal"]:
             raise ValueError(
                 "orientation argument must be one of: 'vertical', 'horizontal'."
@@ -162,6 +211,15 @@ class BetweenStats:
 
     @classmethod
     def summary(cls):
+        """
+        Print a text summary of the statistical test performed.
+
+        Displays the type of test conducted (t-test or ANOVA), number of groups,
+        and the formatted test statistic with p-value and sample size.
+
+        Raises:
+            RuntimeError: If `fit()` was not called before `summary()`.
+        """
         if not hasattr(cls, "_is_fitted"):
             raise RuntimeError("Must call 'fit()' before calling 'summary()'.")
 

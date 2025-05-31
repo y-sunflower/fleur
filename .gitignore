@@ -1,19 +1,22 @@
 __pycache__/
 *.py[oc]
 build/
-_build/
 dist/
 wheels/
 *.egg-info
+.env
+uv.lock
 
-.venv
-env
-venv
+.venv/
+venv/
+.env/
+env/
 
-sandbox*
+.vscode/
+
+.DS_Store
+
 *cache*
 
-.vscode/settings.json
 *.zip
-
-gifing/
+sandbox.*

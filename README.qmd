@@ -1,0 +1,5 @@
+---
+format: gfm
+---
+
+<!-- Automatically generated, uses README.qmd to modify README.md -->
