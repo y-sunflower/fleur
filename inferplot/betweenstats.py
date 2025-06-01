@@ -231,7 +231,7 @@ class BetweenStats:
         Raises:
             RuntimeError: If `plot()` was not called before `summary()`.
         """
-        if not hasattr(self, "_is_fitted"):
+        if not self._is_fitted:
             raise RuntimeError("Must call 'plot()' before calling 'summary()'.")
 
         print("Between stats comparison\n")
