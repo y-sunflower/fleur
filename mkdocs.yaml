@@ -1,6 +1,6 @@
-site_name: inferplot
-site_url: https://y-sunflower.github.io/inferplot/
-repo_url: https://github.com/y-sunflower/inferplot
+site_name: fleur
+site_url: https://y-sunflower.github.io/fleur/
+repo_url: https://github.com/y-sunflower/fleur
 
 theme:
   name: material

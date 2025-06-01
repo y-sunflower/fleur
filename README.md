@@ -1,12 +1,12 @@
-# inferplot
+# fleur
 
-**inferplot is currently a work in progress.**
+**fleur is currently a work in progress.**
 
-Inferplot is basically [ggstatsplot](https://indrajeetpatil.github.io/ggstatsplot/index.html), but for Python.
+fleur is basically [ggstatsplot](https://indrajeetpatil.github.io/ggstatsplot/index.html), but for Python.
 
-I'm in the process of building a PoC to find out which library to use, to think about what form the graphs should take and so on. Any feedback is welcome (especially about the name, I'm not a big fan of inferplot).
+I'm in the process of building a PoC to find out which library to use, to think about what form the graphs should take and so on. Any feedback is welcome (especially about the name, I'm not a big fan of fleur).
 
-The goal behind inferplot is:
+The goal behind fleur is:
 
 - provide a fast way to do data exploration
 - highly customizable plots but with a sufficient/clean default style
@@ -16,7 +16,7 @@ The goal behind inferplot is:
 
 ## Miscellaneous
 
-- requires python 3.11
+- requires python 3.10
 
 <br><br>
 

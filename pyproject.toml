@@ -1,5 +1,5 @@
 [project]
-name = "inferplot"
+name = "fleur"
 description = "Description"
 version = "0.1.0"
 license = "MIT"
@@ -29,10 +29,10 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["inferplot"]
+packages = ["fleur"]
 
 [tool.uv.sources]
-inferplot = { workspace = true }
+fleur = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -51,7 +51,7 @@ quarto = [
 ]
 
 [project.urls]
-Homepage = "https://y-sunflower.github.io/inferplot/"
-Issues = "https://github.com/y-sunflower/inferplot/issues"
-Documentation = "https://y-sunflower.github.io/inferplot/"
-Repository = "https://github.com/y-sunflower/inferplot"
+Homepage = "https://y-sunflower.github.io/fleur/"
+Issues = "https://github.com/y-sunflower/fleur/issues"
+Documentation = "https://y-sunflower.github.io/fleur/"
+Repository = "https://github.com/y-sunflower/fleur"

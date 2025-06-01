@@ -1,1 +1,1 @@
-include inferplot/datasets/*.csv
+include fleur/datasets/*.csv

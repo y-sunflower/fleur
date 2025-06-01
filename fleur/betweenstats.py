@@ -250,7 +250,7 @@ class BetweenStats:
 
 
 if __name__ == "__main__":
-    from inferplot import datasets
+    from fleur import datasets
 
     df = datasets.load_iris()
     df = df.rename(columns={"species": "x", "sepal_length": "y"})

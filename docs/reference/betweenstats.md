@@ -1,6 +1,6 @@
 # Between stats
 
-::: inferplot.betweenstats.BetweenStats
+::: fleur.betweenstats.BetweenStats
 
 <br>
 
@@ -10,8 +10,8 @@
 
 ```python
 # mkdocs: render
-from inferplot import BetweenStats
-from inferplot import datasets
+from fleur import BetweenStats
+from fleur import datasets
 
 df = datasets.load_iris()
 
@@ -31,7 +31,7 @@ The `BetweenStats` class is designed for **between-group statistical analysis**.
 
 After computing the test, it returns relevant statistics like the test statistic, degrees of freedom, p-value, and a formatted LaTeX-style string for annotation in plots.
 
-### 📐 Statistical Tests
+### Statistical Tests
 
 #### 1. **Two Groups: t-test**
 
@@ -109,7 +109,7 @@ Where:
 
 If the null hypothesis (that all group means are equal) is true, the F-statistic follows the $F(df_{\text{between}}, df_{\text{within}})$ distribution.
 
-### 📎 Reporting Results
+### Reporting Results
 
 The formatted statistical expression rendered on the plot is:
 

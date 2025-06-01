@@ -1,10 +1,10 @@
 Any kind of contribution is more than welcomed! There are several ways you can contribute:
 
-- Opening [GitHub issues](https://github.com/your_name/inferplot/issues) to list the bugs you've found
+- Opening [GitHub issues](https://github.com/your_name/fleur/issues) to list the bugs you've found
 - Implementation of new features or resolution of existing bugs
 - Enhancing the documentation
 
-## How `inferplot` works
+## How `fleur` works
 
 Here how it wokrs
 
@@ -17,8 +17,8 @@ Here how it wokrs
 - Clone your forked repository to your local machine (ensure you have [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)):
 
 ```bash
-git clone https://github.com/your_name/inferplot.git
-cd inferplot
+git clone https://github.com/your_name/fleur.git
+cd fleur
 ```
 
 - Create a new branch:
@@ -64,6 +64,6 @@ git push
 
 - Go back to your fork and click on the "Open a PR" popup
 
-Congrats! Once your PR is merged, it will be part of `inferplot`.
+Congrats! Once your PR is merged, it will be part of `fleur`.
 
 <br>

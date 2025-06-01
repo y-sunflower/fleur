@@ -5,7 +5,7 @@ import numpy as np
 
 from typing import Dict
 
-from inferplot import InputDataHandler
+from fleur import InputDataHandler
 
 import pytest
 

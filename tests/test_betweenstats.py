@@ -2,8 +2,8 @@ import pytest
 import re
 import matplotlib.pyplot as plt
 
-from inferplot import BetweenStats
-import inferplot.datasets as datasets
+from fleur import BetweenStats
+import fleur.datasets as datasets
 
 
 @pytest.fixture
