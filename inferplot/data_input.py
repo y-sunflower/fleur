@@ -26,7 +26,7 @@ class InputDataHandler:
             self.y = nw.new_series("y", y, backend="pandas")
             self.x_name = x.name or "x"
             self.y_name = y.name or "y"
-            self.dataframe = None
+            self.dataframe = nw.from_dict({self.x_name: self.x, self.y_name: self.y})
             self.source = "series"
 
         # Case 3: x and y are array-like (list, numpy, etc.)
@@ -35,7 +35,7 @@ class InputDataHandler:
             self.y = nw.new_series("y", y, backend="pandas")
             self.x_name = "x"
             self.y_name = "y"
-            self.dataframe = None
+            self.dataframe = nw.from_dict({self.x_name: self.x, self.y_name: self.y})
             self.source = "array"
 
         else:

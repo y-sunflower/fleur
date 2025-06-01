@@ -3,13 +3,11 @@ import matplotlib
 import scipy.stats as st
 import numpy as np
 
-from typing import Union
+from typing import Union, Optional
 
 from inferplot._utils import _infer_types
 from inferplot.data_input import InputDataHandler
 from inferplot.utils import themify
-
-np.random.seed(0)
 
 
 class BetweenStats:
@@ -51,10 +49,10 @@ class BetweenStats:
         self,
         orientation: str = "vertical",
         paired: bool = False,
-        colors: list = None,
-        plot_violin: bool = True,
-        plot_box: bool = True,
-        plot_scatter: bool = True,
+        colors: Optional[list] = None,
+        violin: bool = True,
+        box: bool = True,
+        scatter: bool = True,
         violin_kws: Union[dict, None] = None,
         box_kws: Union[dict, None] = None,
         scatter_kws: Union[dict, None] = None,
@@ -62,15 +60,19 @@ class BetweenStats:
         **kwargs,
     ):
         """
-        Fit the BetweenStats class to data and render a statistical comparison plot.
+        Plot and fit the BetweenStats class to data and render a statistical
+        comparison plot.
+
+        `plot()` detects how many groups you have and apply the required test
+        for this number. For paired groups, use the `paired` argument.
 
         Args:
             orientation (str): 'vertical' or 'horizontal' orientation of plots.
             paired (bool): If True, perform paired t-test (only for 2 groups).
             colors (list, optional): List of colors for each group.
-            plot_violin (bool): Whether to include violin plot.
-            plot_box (bool): Whether to include box plot.
-            plot_scatter (bool): Whether to include scatter plot of raw data.
+            violin (bool): Whether to include violin plot.
+            box (bool): Whether to include box plot.
+            scatter (bool): Whether to include scatter plot of raw data.
             violin_kws (dict, optional): Keyword args for violinplot customization.
             box_kws (dict, optional): Keyword args for boxplot customization.
             scatter_kws (dict, optional): Keyword args for scatter plot customization.
@@ -92,20 +94,22 @@ class BetweenStats:
         x_name = self._data_info["x_name"]
         y_name = self._data_info["y_name"]
         df = self._data_info["dataframe"]
+        print(df)
 
         cat_col, num_col = _infer_types(x_name, y_name, df)
         result = [sub_df[num_col].to_list() for _, sub_df in df.group_by(cat_col)]
         sample_sizes = [len(sub_df) for _, sub_df in df.group_by(cat_col)]
         cat_labels = df[cat_col].unique().to_list()
         n_cat = df[cat_col].n_unique()
-        n = len(data)
+        n = len(df)
 
         if colors is None:
             colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][:n_cat]
         else:
             if len(colors) < n_cat:
                 raise ValueError(
-                    f"`colors` argument must have at least {n_cat} elements, not {len(colors)}"
+                    f"`colors` argument must have at least {n_cat} elements, "
+                    f"not {len(colors)}"
                 )
         if ax is None:
             ax = plt.gca()
@@ -122,10 +126,10 @@ class BetweenStats:
         scatter_default_kws = {"alpha": 0.5}
         scatter_default_kws.update(box_kws)
 
-        if plot_violin:
+        if violin:
             violin_artists = ax.violinplot(result, **violin_default_kws)
 
-        if plot_box:
+        if box:
             box_style = {"color": "#3b3b3b"}
             ax.boxplot(
                 result,
@@ -136,7 +140,7 @@ class BetweenStats:
                 **box_default_kws,
             )
 
-        if plot_scatter:
+        if scatter:
             for i, (values, label, color) in enumerate(zip(result, cat_labels, colors)):
                 jitter = np.random.uniform(low=-0.1, high=0.1, size=len(values))
                 x_coords = np.full(len(values), i) + jitter + 1
@@ -247,12 +251,12 @@ class BetweenStats:
 if __name__ == "__main__":
     from inferplot import datasets
 
-    data = datasets.load_iris()
-    data = data[data["species"] != "setosa"]
+    df = datasets.load_iris()
+    df = df.rename(columns={"species": "x", "sepal_length": "y"})
 
     fig, ax = plt.subplots(dpi=200)
-    bs = BetweenStats(data=data, x="species", y="sepal_length")
-    bs.plot(orientation="horizontal", ax=ax)
+    bs = BetweenStats(x=df["x"], y=df["y"])
+    bs.plot()
     bs.summary()
 
     fig.savefig("cache.png", dpi=300, bbox_inches="tight")

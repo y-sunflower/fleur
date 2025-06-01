@@ -26,6 +26,7 @@ def test_output_scheme(backend):
         "y",
         "x_name",
         "y_name",
+        "dataframe",
         "source",
     ]
 
