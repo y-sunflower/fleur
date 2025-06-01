@@ -9,14 +9,14 @@ authors = [
   { name="Joseph Barbier", email="joseph.barbierdarnal@gmail.com" },
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
     "Development Status :: 3 - Alpha"
 ]
 dependencies = [
-    "matplotlib>=3.9.4",
+    "matplotlib>=3.10",
     "narwhals>=1.41.0",
     "scipy>=1.13.1",
 ]
