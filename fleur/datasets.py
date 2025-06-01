@@ -9,7 +9,7 @@ AVAILABLE_OUTPUTS = ["pandas", "polars", "pyarrow", "modin", "cudf"]
 
 def _load_data(dataset_name: str, return_as: str, **kwargs) -> IntoDataFrame:
     """
-    Load one of the available datasets in inferplot. This function is a minimalist wrapper around `narwhals.read_csv() <https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv>`_ function.
+    Load one of the available datasets in fleur. This function is a minimalist wrapper around `narwhals.read_csv() <https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv>`_ function.
 
     :param dataset_name: A string specifying the name of the dataset. Currently, only "iris" is supported.
     :param return_as: The output format of the dataframe. Note that, for example, if you set ``return_as="polars"``, you must have polars installed. Must be one of the following: "pandas", "polars", "pyarrow", "modin", "cudf". Default to "pandas".
@@ -47,7 +47,7 @@ def load_iris(return_as: str = "pandas", **kwargs) -> IntoDataFrame:
 
     .. doctest::
 
-        >>> import inferplot.datasets as datasets
+        >>> import fleur.datasets as datasets
         >>> iris = datasets.load_iris()
     """
     return _load_data("iris", return_as=return_as, **kwargs)
@@ -66,7 +66,7 @@ def load_mtcars(return_as: str = "pandas", **kwargs) -> IntoDataFrame:
 
     .. doctest::
 
-        >>> import inferplot.datasets as datasets
+        >>> import fleur.datasets as datasets
         >>> mtcars = datasets.load_mtcars()
     """
     return _load_data("mtcars", return_as=return_as, **kwargs)

@@ -3,7 +3,7 @@ import matplotlib as mpl
 
 def themify(ax: mpl.axes.Axes) -> mpl.axes.Axes:
     """
-    Set the inferplot theme to a matplotlib Axes.
+    Set the fleur theme to a matplotlib Axes.
 
     :param ax: The matplotlib Axes to which you want to apply the theme.
     :return: The matplotlib Axes.
@@ -14,7 +14,7 @@ def themify(ax: mpl.axes.Axes) -> mpl.axes.Axes:
     .. plot::
 
         import matplotlib.pyplot as plt
-        from inferplot.utils import themify
+        from fleur.utils import themify
 
         fig, ax = plt.subplots()
         ax = themify(ax)

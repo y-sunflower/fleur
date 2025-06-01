@@ -1,5 +1,5 @@
 [project]
-name = "inferplot"
+name = "fleur"
 description = "Description"
 version = "0.1.0"
 license = "MIT"
@@ -9,15 +9,15 @@ authors = [
   { name="Joseph Barbier", email="joseph.barbierdarnal@gmail.com" },
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
     "Development Status :: 3 - Alpha"
 ]
 dependencies = [
-    "matplotlib>=3.9.4",
-    "narwhals>=1.28.0",
+    "matplotlib>=3.10",
+    "narwhals>=1.41.0",
     "scipy>=1.13.1",
 ]
 
@@ -29,10 +29,10 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["inferplot"]
+packages = ["fleur"]
 
 [tool.uv.sources]
-inferplot = { workspace = true }
+fleur = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -41,6 +41,8 @@ dev = [
     "mkdocs-material>=9.6.9",
     "mkdocstrings-python>=1.16.5",
     "mkdocs-matplotlib>=0.10.1",
+    "polars>=1.30.0",
+    "pandas>=2.2.3",
 ]
 quarto = [
     "jupyter>=1.1.1",
@@ -49,7 +51,7 @@ quarto = [
 ]
 
 [project.urls]
-Homepage = "https://y-sunflower.github.io/inferplot/"
-Issues = "https://github.com/y-sunflower/inferplot/issues"
-Documentation = "https://y-sunflower.github.io/inferplot/"
-Repository = "https://github.com/y-sunflower/inferplot"
+Homepage = "https://y-sunflower.github.io/fleur/"
+Issues = "https://github.com/y-sunflower/fleur/issues"
+Documentation = "https://y-sunflower.github.io/fleur/"
+Repository = "https://github.com/y-sunflower/fleur"

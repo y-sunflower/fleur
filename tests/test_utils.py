@@ -1,8 +1,13 @@
-from inferplot._utils import _count_n_decimals, _infer_types
+import fleur
+from fleur._utils import _count_n_decimals, _infer_types
 import pytest
 
 import narwhals as nw
 import pandas as pd
+
+
+def test_version():
+    assert fleur.__version__ == "0.1.0"
 
 
 def test_count_n_decimals():

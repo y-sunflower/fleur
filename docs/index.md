@@ -1,13 +1,13 @@
-# inferplot
+# fleur
 
-My very cool package named `inferplot`
+My very cool package named `fleur`
 
 <br>
 
 ## Quick start
 
 ```py
-from inferplot import add_digit
+from fleur import add_digit
 
 add_digit(5, 8)
 ```
@@ -19,13 +19,13 @@ add_digit(5, 8)
 === "stable"
 
     ```bash
-    pip install inferplot
+    pip install fleur
     ```
 
 === "dev"
 
     ```bash
-    pip install git+https://github.com/your_name/inferplot.git
+    pip install git+https://github.com/your_name/fleur.git
     ```
 
 <br><br>

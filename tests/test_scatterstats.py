@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
-from inferplot import scatterstats
+from fleur import scatterstats
 
 
 @pytest.fixture

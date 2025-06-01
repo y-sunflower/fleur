@@ -9,8 +9,8 @@ import warnings
 from numbers import Number
 from typing import Union, List, Tuple
 
-from inferplot._utils import _count_n_decimals
-from inferplot.utils import themify
+from fleur._utils import _count_n_decimals
+from fleur.utils import themify
 
 
 def scatterstats(
@@ -56,11 +56,11 @@ def scatterstats(
 
     .. plot::
 
-        import inferplot
-        from inferplot import datasets
+        import fleur
+        from fleur import datasets
 
         data = datasets.load_iris()
-        fig, stats = inferplot.scatterstats(
+        fig, stats = fleur.scatterstats(
             x="sepal_length",
             y="sepal_width",
             data=data,
@@ -226,7 +226,7 @@ AC
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    from inferplot import datasets
+    from fleur import datasets
 
     data = datasets.load_iris()
 

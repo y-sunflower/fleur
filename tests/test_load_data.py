@@ -3,7 +3,7 @@ import pandas as pd
 import polars as pl
 import os
 
-from inferplot.datasets import _load_data, load_iris
+from fleur.datasets import _load_data, load_iris
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_FILE = "iris.csv"
