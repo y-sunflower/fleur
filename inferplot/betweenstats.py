@@ -3,7 +3,8 @@ import matplotlib
 import scipy.stats as st
 import numpy as np
 
-from typing import Union, Optional
+from typing import Union, Optional, Iterable
+from narwhals.typing import SeriesT, Frame
 
 from ._utils import _infer_types
 from .input_data_handling import InputDataHandler
@@ -17,7 +18,7 @@ class BetweenStats:
     This class provides functionality to visualize and statistically compare
     numerical data across two or more categorical groups. It supports t-tests
     for two groups and one-way ANOVA for three or more groups. Visualization
-    options include violin plots, box plots, and scatter plots.
+    options include violin plots, box plots, and swarm plots.
 
     Attributes:
         statistic (float): The computed test statistic (t or F).
@@ -34,7 +35,12 @@ class BetweenStats:
         ax (matplotlib.axes.Axes): The matplotlib axes used for plotting.
     """
 
-    def __init__(self, x, y, data=None):
+    def __init__(
+        self,
+        x: Union[str, SeriesT, Iterable],
+        y: Union[str, SeriesT, Iterable],
+        data: Optional[Frame] = None,
+    ):
         """
         Initialize a `BetweenStats()` instance.
 
@@ -44,6 +50,7 @@ class BetweenStats:
             data: An optional dataframe.
         """
         self._data_info = InputDataHandler(x=x, y=y, data=data).get_info()
+        self._is_fitted = False
 
     def plot(
         self,
@@ -57,7 +64,6 @@ class BetweenStats:
         box_kws: Union[dict, None] = None,
         scatter_kws: Union[dict, None] = None,
         ax: Union[matplotlib.axes.Axes, None] = None,
-        **kwargs,
     ):
         """
         Plot and fit the BetweenStats class to data and render a statistical
@@ -77,10 +83,6 @@ class BetweenStats:
             box_kws (dict, optional): Keyword args for boxplot customization.
             scatter_kws (dict, optional): Keyword args for scatter plot customization.
             ax (matplotlib.axes.Axes, optional): Existing Axes to plot on. If None, uses current Axes.
-            **kwargs: Additional unused keyword arguments (placeholder for extension).
-
-        Returns:
-            BetweenStats: The fitted BetweenStats class with calculated statistics and annotated plot.
 
         Raises:
             ValueError: If the orientation is invalid or less than 2 categories are provided.
@@ -94,7 +96,6 @@ class BetweenStats:
         x_name = self._data_info["x_name"]
         y_name = self._data_info["y_name"]
         df = self._data_info["dataframe"]
-        print(df)
 
         cat_col, num_col = _infer_types(x_name, y_name, df)
         result = [sub_df[num_col].to_list() for _, sub_df in df.group_by(cat_col)]
