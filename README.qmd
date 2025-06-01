@@ -18,27 +18,7 @@ format: gfm
 
 ## State
 
-```{python}
-# | echo: false
-
-from great_tables import GT
-import pandas as pd
-
-
-df = pd.DataFrame(
-    {
-        "Functions": ["BetweenStats()", "ScatterStats()"],
-        "Description": [
-            "Between group/condition comparisons",
-            "Correlation between two variables",
-        ],
-        "Parametric": ["✅", "✅"],
-        "Non-parametric": ["❌", "❌"],
-        "Robust": ["❌", "❌"],
-        "Bayesian": ["❌", "❌"],
-    }
-)
-
-GT(df).cols_align("center")
-
-```
+| Functions      | Description                         | Parametric | Non-parametric | Robust | Bayesian |
+| -------------- | ----------------------------------- | ---------- | -------------- | ------ | -------- |
+| BetweenStats() | Between group/condition comparisons | ✅         | ❌             | ❌     | ❌       |
+| ScatterStats() | Correlation between two variables   | ✅         | ❌             | ❌     | ❌       |
