@@ -5,7 +5,7 @@ import numpy as np
 
 from typing import Dict
 
-from inferplot.data_input import InputDataHandler
+from inferplot import InputDataHandler
 
 import pytest
 
@@ -57,3 +57,20 @@ def test_different_x_and_y_inputs(x, y):
     assert isinstance(info_df["y"], nw.Series)
 
     assert info_df["source"] in ["series", "array"]
+
+
+def test_raise_type_error():
+    with pytest.raises(
+        TypeError, match=r"^`x` and `y` must be both strings \(column names\),"
+    ):
+        InputDataHandler("a", pd.Series([1, 2, 3]))
+
+
+def test_raise_value_error():
+    with pytest.raises(
+        ValueError, match="If x and y are strings, `data` argument must be passed."
+    ):
+        InputDataHandler("a", "b")
+
+    with pytest.raises(ValueError, match="`x` and/or `y` not found in `data` columns."):
+        InputDataHandler("a", "b", pd.DataFrame({"a": [1, 2], "c": [1, 2]}))

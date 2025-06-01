@@ -5,9 +5,9 @@ import numpy as np
 
 from typing import Union, Optional
 
-from inferplot._utils import _infer_types
-from inferplot.data_input import InputDataHandler
-from inferplot.utils import themify
+from ._utils import _infer_types
+from .input_data_handling import InputDataHandler
+from .utils import themify
 
 
 class BetweenStats:
