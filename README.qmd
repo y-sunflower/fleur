@@ -4,15 +4,9 @@ format: gfm
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
-**`fleur` is currently a work in progress.**
+# `fleur`: stats and plots holding hands
 
-fleur is basically [ggstatsplot](https://indrajeetpatil.github.io/ggstatsplot/index.html), but for Python.
-
-The goal behind fleur is:
-
-- combine statistics with data visualization
-- pretty plots by default
-- detailed statistical results
+`fleur` provides a set of tools to combine data visualization with statistics.
 
 <br><br>
 
