@@ -49,6 +49,9 @@ quarto = [
     "nbclient>=0.10.2",
     "nbformat>=5.10.4",
 ]
+readme = [
+    "great-tables>=0.17.0",
+]
 
 [project.urls]
 Homepage = "https://y-sunflower.github.io/fleur/"
