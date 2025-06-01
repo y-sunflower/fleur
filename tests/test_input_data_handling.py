@@ -51,4 +51,8 @@ def test_different_x_and_y_inputs(x, y):
 
     assert info_df["x"] == nw.new_series("x", x, backend="pandas")
     assert info_df["y"] == nw.new_series("y", y, backend="pandas")
+
+    assert isinstance(info_df["x"], nw.Series)
+    assert isinstance(info_df["y"], nw.Series)
+
     assert info_df["source"] in ["series", "array"]

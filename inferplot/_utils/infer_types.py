@@ -6,14 +6,13 @@ def _infer_types(x, y, data: FrameT):
     """
     Identify which column is categorical and which is numerical in a dataframe.
 
-    :param x: Name of the first column
-    :param y: Name of the second column
-    :param data: A narwhals dataframe containing the columns
-    :return: (categorical_col, numerical_col) - Names of the identified columns
-    """
+    Args
+        x Name of the first column
+        y Name of the second column
+        data A narwhals dataframe containing the columns
 
-    if x not in data.columns or y not in data.columns:
-        raise KeyError(f"Columns {x} and/or {y} not found in the dataframe")
+    Return (categorical_col, numerical_col) - Names of the identified columns
+    """
 
     def is_categorical(column_name):
         col_dtype = data.schema[column_name]

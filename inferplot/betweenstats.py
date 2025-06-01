@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import matplotlib
-import narwhals as nw
-from narwhals.typing import IntoDataFrame
 import scipy.stats as st
 import numpy as np
 
@@ -38,14 +36,19 @@ class BetweenStats:
         ax (matplotlib.axes.Axes): The matplotlib axes used for plotting.
     """
 
-    def __init__(x, y, data=None):
-        InputDataHandler(x=x, y=y, data=data)
+    def __init__(self, x, y, data=None):
+        """
+        Initialize a `BetweenStats()` instance.
 
-    def fit(
-        cls,
-        x: Union[str],
-        y: str,
-        data: IntoDataFrame,
+        Args:
+            x: Colname of `data` or a Series or array-like.
+            y: Colname of `data` or a Series or array-like.
+            data: An optional dataframe.
+        """
+        self._data_info = InputDataHandler(x=x, y=y, data=data).get_info()
+
+    def plot(
+        self,
         orientation: str = "vertical",
         paired: bool = False,
         colors: list = None,
@@ -62,9 +65,6 @@ class BetweenStats:
         Fit the BetweenStats class to data and render a statistical comparison plot.
 
         Args:
-            x (str): The name of the categorical (grouping) column.
-            y (str): The name of the numerical column to compare.
-            data (IntoDataFrame): Input data in DataFrame-compatible format.
             orientation (str): 'vertical' or 'horizontal' orientation of plots.
             paired (bool): If True, perform paired t-test (only for 2 groups).
             colors (list, optional): List of colors for each group.
@@ -89,8 +89,11 @@ class BetweenStats:
                 "orientation argument must be one of: 'vertical', 'horizontal'."
             )
 
-        df = nw.from_native(data)
-        cat_col, num_col = _infer_types(x, y, df)
+        x_name = self._data_info["x_name"]
+        y_name = self._data_info["y_name"]
+        df = self._data_info["dataframe"]
+
+        cat_col, num_col = _infer_types(x_name, y_name, df)
         result = [sub_df[num_col].to_list() for _, sub_df in df.group_by(cat_col)]
         sample_sizes = [len(sub_df) for _, sub_df in df.group_by(cat_col)]
         cat_labels = df[cat_col].unique().to_list()
@@ -150,33 +153,33 @@ class BetweenStats:
                 "You must have at least 2 distinct categories in your category column"
             )
         elif n_cat == 2:
-            cls.is_ANOVA = False
+            self.is_ANOVA = False
             if paired:
                 ttest = st.ttest_rel(result[0], result[1])
-                cls.name = "Paired t-test"
+                self.name = "Paired t-test"
             else:
                 ttest = st.ttest_ind(result[0], result[1])
-                cls.name = "T-test"
+                self.name = "T-test"
             statistic = ttest.statistic
             pvalue = ttest.pvalue
             dof = int(ttest.df)
-            cls.dof = dof
+            self.dof = dof
             main_stat = f"t_{{Student}}({dof}) = {statistic:.2f}"
         else:  # n >= 3
-            cls.is_ANOVA = True
+            self.is_ANOVA = True
             if paired:
                 raise NotImplementedError(
                     "Repeated measures ANOVA has not been implemented yet."
                 )
             else:
                 anova = st.f_oneway(*result)
-                cls.name = "One-way ANOVA"
+                self.name = "One-way ANOVA"
             statistic = anova.statistic
             pvalue = anova.pvalue
             dof_between = n_cat - 1
             dof_within = n - n_cat
-            cls.dof_between = dof_between
-            cls.dof_within = dof_within
+            self.dof_between = dof_between
+            self.dof_within = dof_within
             main_stat = f"F({dof_between}, {dof_within}) = {statistic:.2f}"
 
         expr_list = [
@@ -201,19 +204,19 @@ class BetweenStats:
         elif orientation == "horizontal":
             ax.set_yticks(ticks, labels=labels)
 
-        cls.statistic = statistic
-        cls.pvalue = pvalue
-        cls.main_stat = main_stat
-        cls.ax = ax
-        cls.is_paired = paired
-        cls.expression = all_expr
-        cls.n_cat = n_cat
-        cls.n_obs = n
-        cls._is_fitted = True
+        self.statistic = statistic
+        self.pvalue = pvalue
+        self.main_stat = main_stat
+        self.ax = ax
+        self.is_paired = paired
+        self.expression = all_expr
+        self.n_cat = n_cat
+        self.n_obs = n
+        self._is_fitted = True
 
-        return cls
+        return self
 
-    def summary(cls):
+    def summary(self):
         """
         Print a text summary of the statistical test performed.
 
@@ -221,21 +224,21 @@ class BetweenStats:
         and the formatted test statistic with p-value and sample size.
 
         Raises:
-            RuntimeError: If `fit()` was not called before `summary()`.
+            RuntimeError: If `plot()` was not called before `summary()`.
         """
-        if not hasattr(cls, "_is_fitted"):
-            raise RuntimeError("Must call 'fit()' before calling 'summary()'.")
+        if not hasattr(self, "_is_fitted"):
+            raise RuntimeError("Must call 'plot()' before calling 'summary()'.")
 
         print("Between stats comparison\n")
 
         info_about_test = [
-            f"{cls.name} ",
-            f"with {cls.n_cat} groups" if cls.is_ANOVA else "",
+            f"{self.name} ",
+            f"with {self.n_cat} groups" if self.is_ANOVA else "",
         ]
         info_about_test = "".join(info_about_test)
 
         clean_expression = (
-            cls.expression.replace("$", "").replace("{", "").replace("}", "")
+            self.expression.replace("$", "").replace("{", "").replace("}", "")
         )
         print(f"Test: {info_about_test}")
         print(clean_expression)
@@ -247,13 +250,9 @@ if __name__ == "__main__":
     data = datasets.load_iris()
     data = data[data["species"] != "setosa"]
 
-    fig, ax = plt.subplots()
-    bs = BetweenStats.fit(
-        data=data,
-        x="species",
-        y="sepal_length",
-        orientation="vertical",
-        ax=ax,
-    )
+    fig, ax = plt.subplots(dpi=200)
+    bs = BetweenStats(data=data, x="species", y="sepal_length")
+    bs.plot(orientation="horizontal", ax=ax)
     bs.summary()
+
     fig.savefig("cache.png", dpi=300, bbox_inches="tight")
