@@ -42,7 +42,7 @@ dev = [
     "mkdocstrings-python>=1.16.5",
     "mkdocs-matplotlib>=0.10.1",
     "polars>=1.30.0",
-    "narwhals>=1.28.0",
+    "pandas>=2.2.3",
 ]
 quarto = [
     "jupyter>=1.1.1",
