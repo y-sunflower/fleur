@@ -4,22 +4,41 @@ format: gfm
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
-**`fleur` is currently a work in progress.**
+# `fleur`: stats and plots holding hands
 
-fleur is basically [ggstatsplot](https://indrajeetpatil.github.io/ggstatsplot/index.html), but for Python.
-
-The goal behind fleur is:
-
-- combine statistics with data visualization
-- pretty plots by default
-- dataframe agnostic thanks to [narwhals](https://narwhals-dev.github.io/narwhals/)
+`fleur` provides a set of tools to combine data visualization with statistics.
 
 <br><br>
 
 ## Miscellaneous
 
 - requires python 3.10
-- names idea:
-   - sunpie
-   - goldenpie
-   - fleur
+
+<br><br>
+
+## State
+
+```{python}
+# | echo: false
+
+from great_tables import GT
+import pandas as pd
+
+
+df = pd.DataFrame(
+    {
+        "Functions": ["BetweenStats()", "ScatterStats()"],
+        "Description": [
+            "Between group/condition comparisons",
+            "Correlation between two variables",
+        ],
+        "Parametric": ["✅", "✅"],
+        "Non-parametric": ["❌", "❌"],
+        "Robust": ["❌", "❌"],
+        "Bayesian": ["❌", "❌"],
+    }
+)
+
+GT(df).cols_align("center")
+
+```

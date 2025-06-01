@@ -1,18 +1,24 @@
-# fleur
+# `fleur`: stats and plots holding hands
 
-My very cool package named `fleur`
+`fleur` provides a set of tools to combine data visualization with statistics.
+
+???+ warning
+
+    fleur is still in a very early stage and in beta version: expect regular breaking changes.
 
 <br>
 
 ## Quick start
 
 ```py
-from fleur import add_digit
+# mkdocs: render
+from fleur import BetweenStats
+from fleur import datasets
 
-add_digit(5, 8)
+df = datasets.load_iris()
+
+BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
-
-> 13
 
 ## Installation
 
@@ -25,7 +31,7 @@ add_digit(5, 8)
 === "dev"
 
     ```bash
-    pip install git+https://github.com/your_name/fleur.git
+    pip install git+https://github.com/y-sunflower/fleur.git
     ```
 
 <br><br>

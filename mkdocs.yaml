@@ -29,6 +29,7 @@ nav:
   - Examples: examples.md
   - Reference:
       - reference/betweenstats.md
+      - reference/datasets.md
   - Contributing: contributing.md
 
 extra_css:

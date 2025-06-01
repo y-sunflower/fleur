@@ -11,23 +11,23 @@ DATASET_PATH = os.path.join(PACKAGE_DIR, DATASET_FILE)
 
 
 def test_invalid_dataset_name():
-    with pytest.raises(ValueError):
-        _load_data("invalid_dataset", return_as="pandas")
+    with pytest.raises(ValueError, match=r"^dataset_name must be one of:"):
+        _load_data("invalid_dataset", backend="pandas")
 
 
-def test_invalid_return_as():
-    with pytest.raises(ValueError):
-        _load_data("iris", return_as="invalid_format")
+def test_invalid_backend():
+    with pytest.raises(ValueError, match=r"^backend must be one of:"):
+        _load_data("iris", backend="invalid_format")
 
 
 def test_load_data_pandas():
-    df = _load_data("iris", return_as="pandas")
+    df = _load_data("iris", backend="pandas")
     assert isinstance(df, pd.DataFrame)
     assert not df.empty
 
 
 def test_load_data_polars():
-    df = _load_data("iris", return_as="polars")
+    df = _load_data("iris", backend="polars")
     assert isinstance(df, pl.DataFrame)
     assert not df.is_empty()
 
