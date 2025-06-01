@@ -8,6 +8,7 @@ import numpy as np
 from typing import Union
 
 from inferplot._utils import _infer_types
+from inferplot.data_input import InputDataHandler
 from inferplot.utils import themify
 
 np.random.seed(0)
@@ -37,7 +38,9 @@ class BetweenStats:
         ax (matplotlib.axes.Axes): The matplotlib axes used for plotting.
     """
 
-    @classmethod
+    def __init__(x, y, data=None):
+        InputDataHandler(x=x, y=y, data=data)
+
     def fit(
         cls,
         x: Union[str],
@@ -210,7 +213,6 @@ class BetweenStats:
 
         return cls
 
-    @classmethod
     def summary(cls):
         """
         Print a text summary of the statistical test performed.
