@@ -4,7 +4,7 @@ format: gfm
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
-[![codecov](https://codecov.io/gh/y-sunflower/fleur/branch/main/graph/badge.svg)](https://codecov.io/gh/y-sunflower/fleur)
+![Coverage](./reports/coverage/coverage-badge.svg?dummy=8484744)
 
 
 # `fleur`: stats and plots holding hands

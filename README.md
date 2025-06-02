@@ -2,6 +2,8 @@
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
+![Coverage](./reports/coverage/coverage-badge.svg?dummy=8484744)
+
 # `fleur`: stats and plots holding hands
 
 `fleur` provides a set of tools to combine data visualization with
