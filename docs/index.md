@@ -8,17 +8,31 @@
 
 <br>
 
-## Quick start
+## Examples
 
-```py
-# mkdocs: render
-from fleur import BetweenStats
-from fleur import datasets
+=== "Group comparison"
 
-df = datasets.load_iris()
+    ```py
+    # mkdocs: render
+    from fleur import BetweenStats
+    from fleur import datasets
 
-BetweenStats(df["sepal_length"], df["species"]).plot()
-```
+    df = datasets.load_iris()
+
+    BetweenStats(df["sepal_length"], df["species"]).plot()
+    ```
+
+=== "Correlation"
+
+    ```py
+    # mkdocs: render
+    from fleur import ScatterStats
+    from fleur import datasets
+
+    df = datasets.load_iris()
+
+    ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+    ```
 
 ## Installation
 

@@ -1,3 +1,0 @@
-class ScatterStats:
-    @classmethod
-    def fit(): ...

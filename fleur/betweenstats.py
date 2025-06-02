@@ -73,16 +73,16 @@ class BetweenStats:
         for this number. For paired groups, use the `paired` argument.
 
         Args:
-            orientation (str): 'vertical' or 'horizontal' orientation of plots.
-            paired (bool): If True, perform paired t-test (only for 2 groups).
-            colors (list, optional): List of colors for each group.
-            violin (bool): Whether to include violin plot.
-            box (bool): Whether to include box plot.
-            scatter (bool): Whether to include scatter plot of raw data.
-            violin_kws (dict, optional): Keyword args for violinplot customization.
-            box_kws (dict, optional): Keyword args for boxplot customization.
-            scatter_kws (dict, optional): Keyword args for scatter plot customization.
-            ax (matplotlib.axes.Axes, optional): Existing Axes to plot on. If None, uses current Axes.
+            orientation:  'vertical' or 'horizontal' orientation of plots.
+            paired: If True, perform paired t-test (only for 2 groups).
+            colors: List of colors for each group.
+            violin: Whether to include violin plot.
+            box: Whether to include box plot.
+            scatter: Whether to include scatter plot of raw data.
+            violin_kws: Keyword args for violinplot customization.
+            box_kws: Keyword args for boxplot customization.
+            scatter_kws: Keyword args for scatter plot customization.
+            ax (matplotlib.axes.Axes, ): Existing Axes to plot on. If None, uses current Axes.
 
         Raises:
             ValueError: If the orientation is invalid or less than 2 categories are provided.
@@ -195,10 +195,10 @@ class BetweenStats:
             "$",
         ]
 
-        all_expr = "".join(expr_list)
+        self.expression = "".join(expr_list)
 
         annotation_params = dict(transform=ax.transAxes, va="top")
-        ax.text(x=0.05, y=1.09, s=all_expr, size=9, **annotation_params)
+        ax.text(x=0.05, y=1.09, s=self.expression, size=9, **annotation_params)
 
         ax = themify(ax)
 
@@ -214,7 +214,6 @@ class BetweenStats:
         self.main_stat = main_stat
         self.ax = ax
         self.is_paired = paired
-        self.expression = all_expr
         self.n_cat = n_cat
         self.n_obs = n
         self._is_fitted = True
@@ -251,6 +250,7 @@ class BetweenStats:
 
 if __name__ == "__main__":
     from fleur import datasets
+    import matplotlib.pyplot as plt
 
     df = datasets.load_iris()
     df = df.rename(columns={"species": "x", "sepal_length": "y"})
