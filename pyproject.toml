@@ -43,6 +43,7 @@ dev = [
     "mkdocs-matplotlib>=0.10.1",
     "polars>=1.30.0",
     "pandas>=2.2.3",
+    "pytest-cov>=6.1.1",
 ]
 quarto = [
     "jupyter>=1.1.1",

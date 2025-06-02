@@ -4,6 +4,9 @@ format: gfm
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
+[![codecov](https://codecov.io/gh/y-sunflower/fleur/branch/main/graph/badge.svg)](https://codecov.io/gh/y-sunflower/fleur)
+
+
 # `fleur`: stats and plots holding hands
 
 `fleur` provides a set of tools to combine data visualization with statistics.
