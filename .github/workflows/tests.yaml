@@ -31,17 +31,8 @@ jobs:
       - name: Run tests
         run: uv run pytest
 
-      - name: Generate coverage badge
-        if: matrix.python-version == '3.13'
-        run: |
-          uv run coverage xml
-          uv run genbadge coverage -i coverage.xml
+      - name: Update code coverage badge
+        uses: actions/checkout@v4
 
-      - name: Commit coverage badge
-        if: matrix.python-version == '3.13'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add coverage.svg
-          git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
-          git push origin HEAD:${{ github.ref_name }}
+      - name: Coverage Badge
+        uses: tj-actions/coverage-badge-py@v2
