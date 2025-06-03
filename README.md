@@ -2,7 +2,7 @@
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
-![Coverage](./reports/coverage/coverage-badge.svg?dummy=8484744)
+![Coverage](coverage-badge.svg)
 
 # `fleur`: stats and plots holding hands
 
