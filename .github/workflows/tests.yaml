@@ -11,8 +11,6 @@ jobs:
       matrix:
         python-version:
           - "3.10"
-          - "3.11"
-          - "3.12"
           - "3.13"
     env:
       UV_PYTHON: ${{ matrix.python-version }}
@@ -27,14 +25,21 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          fail_ci_if_error: true
-          verbose: true
-
       - name: Install the project
         run: uv sync --all-extras --dev
 
       - name: Run tests
         run: uv run pytest
+
+      - name: Generate coverage badge
+        if: matrix.python-version == '3.13'
+        run: uv run genbadge coverage
+
+      - name: Commit coverage badge
+        if: matrix.python-version == '3.13'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add coverage.svg
+          git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref_name }}
