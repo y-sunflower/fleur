@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://y-sunflower.github.io/fleur/</loc>
+         <lastmod>2025-06-03</lastmod>
+    </url>
+    <url>
+         <loc>https://y-sunflower.github.io/fleur/contributing/</loc>
+         <lastmod>2025-06-03</lastmod>
+    </url>
+    <url>
+         <loc>https://y-sunflower.github.io/fleur/examples/</loc>
+         <lastmod>2025-06-03</lastmod>
+    </url>
+    <url>
+         <loc>https://y-sunflower.github.io/fleur/reference/betweenstats/</loc>
+         <lastmod>2025-06-03</lastmod>
+    </url>
+    <url>
+         <loc>https://y-sunflower.github.io/fleur/reference/datasets/</loc>
+         <lastmod>2025-06-03</lastmod>
+    </url>
+    <url>
+         <loc>https://y-sunflower.github.io/fleur/reference/scatterstats/</loc>
+         <lastmod>2025-06-03</lastmod>
+    </url>
+</urlset>
