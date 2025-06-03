@@ -33,7 +33,7 @@ jobs:
 
       - name: Run coverage
         run: |
-          uv run coverage run ...
+          uv run coverage run --source=fleur -m pytest
           uv run coverage report -m
 
       - name: Coverage Badge
