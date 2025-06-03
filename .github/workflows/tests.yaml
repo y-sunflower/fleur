@@ -33,7 +33,9 @@ jobs:
 
       - name: Generate coverage badge
         if: matrix.python-version == '3.13'
-        run: uv run genbadge coverage
+        run: |
+          uv run coverage xml
+          uv run genbadge coverage -i coverage.xml
 
       - name: Commit coverage badge
         if: matrix.python-version == '3.13'
