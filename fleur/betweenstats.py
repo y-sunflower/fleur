@@ -6,9 +6,8 @@ import numpy as np
 from typing import Union, Optional, Iterable
 from narwhals.typing import SeriesT, Frame
 
-from ._utils import _infer_types
-from .input_data_handling import InputDataHandler
-from .utils import themify
+from ._utils import _infer_types, _themify
+from .input_data_handling import _InputDataHandler
 from .upstream import _beeswarm
 
 
@@ -52,7 +51,7 @@ class BetweenStats:
             data: An optional dataframe.
             paired: If True, perform paired t-test (only for 2 groups).
         """
-        self._data_info = InputDataHandler(x=x, y=y, data=data).get_info()
+        self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
         self._is_fitted = False
         self.is_paired = paired
 
@@ -203,7 +202,7 @@ class BetweenStats:
             annotation_params = dict(transform=ax.transAxes, va="top")
             ax.text(x=0.05, y=1.09, s=self._expression, size=9, **annotation_params)
 
-        ax = themify(ax)
+        ax = _themify(ax)
 
         ticks = [i + 1 for i in range(len(self._sample_sizes))]
         labels = [

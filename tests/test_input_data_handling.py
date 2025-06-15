@@ -5,7 +5,7 @@ import numpy as np
 
 from typing import Dict
 
-from fleur import InputDataHandler
+from fleur.input_data_handling import _InputDataHandler
 
 import pytest
 
@@ -15,11 +15,11 @@ def test_output_scheme(backend):
     df = nw.from_dict(
         {"height": [150, 160, 170], "weight": [50, 60, 70]}, backend=backend
     )
-    info_df = InputDataHandler("height", "weight", data=df).get_info()
+    info_df = _InputDataHandler("height", "weight", data=df).get_info()
 
     x_series = nw.new_series("height", [150, 160, 170], backend=backend)
     y_series = nw.new_series("weight", [50, 60, 70], backend=backend)
-    info_series = InputDataHandler(x_series, y_series).get_info()
+    info_series = _InputDataHandler(x_series, y_series).get_info()
 
     expected_keys = [
         "x",
@@ -48,7 +48,7 @@ def test_output_scheme(backend):
     ],
 )
 def test_different_x_and_y_inputs(x, y):
-    info_df = InputDataHandler(x, y).get_info()
+    info_df = _InputDataHandler(x, y).get_info()
 
     assert info_df["x"] == nw.new_series("x", x, backend="pandas")
     assert info_df["y"] == nw.new_series("y", y, backend="pandas")
@@ -63,14 +63,14 @@ def test_raise_type_error():
     with pytest.raises(
         TypeError, match=r"^`x` and `y` must be both strings \(column names\),"
     ):
-        InputDataHandler("a", pd.Series([1, 2, 3]))
+        _InputDataHandler("a", pd.Series([1, 2, 3]))
 
 
 def test_raise_value_error():
     with pytest.raises(
         ValueError, match="If x and y are strings, `data` argument must be passed."
     ):
-        InputDataHandler("a", "b")
+        _InputDataHandler("a", "b")
 
     with pytest.raises(ValueError, match="`x` and/or `y` not found in `data` columns."):
-        InputDataHandler("a", "b", pd.DataFrame({"a": [1, 2], "c": [1, 2]}))
+        _InputDataHandler("a", "b", pd.DataFrame({"a": [1, 2], "c": [1, 2]}))

@@ -1,7 +1,10 @@
 import fleur
-from fleur._utils import _count_n_decimals, _infer_types
+from fleur._utils import _count_n_decimals, _infer_types, _themify
+
 import pytest
 
+import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 import narwhals as nw
 import pandas as pd
 
@@ -46,5 +49,30 @@ def test_infer_types():
         _infer_types("x", "y", data4)
 
 
-if __name__ == "__main__":
-    pytest.main()
+@pytest.fixture
+def ax():
+    fig, ax = plt.subplots()
+    yield ax
+    plt.close(fig)
+
+
+def test_themify_grid(ax: Axes):
+    _themify(ax)
+    gridlines = ax.get_xgridlines() + ax.get_ygridlines()
+    for line in gridlines:
+        assert line.get_color() == "#525252"
+        assert line.get_alpha() == 0.2
+        assert line.get_zorder() == -5
+
+
+def test_themify_spines_hidden(ax: Axes):
+    _themify(ax)
+    for position in ["top", "right", "left", "bottom"]:
+        assert not ax.spines[position].get_visible()
+
+
+def test_themify_tick_params(ax: Axes):
+    _themify(ax)
+    for tick in ax.xaxis.get_major_ticks() + ax.yaxis.get_major_ticks():
+        assert tick.tick1line.get_markersize() == 0
+        assert tick.label1.get_fontsize() == 8

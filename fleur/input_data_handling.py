@@ -2,7 +2,7 @@ import narwhals as nw
 from narwhals.dependencies import is_numpy_array, is_into_series
 
 
-class InputDataHandler:
+class _InputDataHandler:
     def __init__(self, x, y, data=None):
         # Case 1: x and y are strings referencing columns from a DataFrame
         if isinstance(x, str) and isinstance(y, str):

@@ -8,9 +8,8 @@ from numbers import Number
 from typing import Union, Optional, Iterable, List
 from narwhals.typing import SeriesT, Frame
 
-from .input_data_handling import InputDataHandler
-from fleur._utils import _count_n_decimals
-from fleur.utils import themify
+from .input_data_handling import _InputDataHandler
+from fleur._utils import _count_n_decimals, _themify
 
 
 class ScatterStats:
@@ -61,7 +60,7 @@ class ScatterStats:
                 "correlation_measure argument must be one of: 'pearson', 'kendall', 'spearman'."
             )
 
-        self._data_info = InputDataHandler(x=x, y=y, data=data).get_info()
+        self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
 
         x_name = self._data_info["x_name"]
         y_name = self._data_info["y_name"]
@@ -201,7 +200,7 @@ class ScatterStats:
         ax.scatter(self._x_np, self._y_np, **scatter_kws)
         ax.plot(x_values, y_values, **line_kws)
 
-        ax = themify(ax)
+        ax = _themify(ax)
 
         if marginal:
             if bins is None:
