@@ -75,14 +75,72 @@ A bunch of examples of things you can do with `fleur`:
 
 <br>
 
-- `ScatterStats()`
+## Correlation
 
-```python
-# mkdocs: render
-from fleur import ScatterStats
-from fleur import datasets
+=== "Default"
 
-df = datasets.load_iris()
+    ```py
+    # mkdocs: render
+    from fleur import ScatterStats
+    from fleur import datasets
 
-ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot()
-```
+    df = datasets.load_iris()
+
+    ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot()
+    ```
+
+=== "Bins"
+
+    ```py hl_lines="8"
+    # mkdocs: render
+    from fleur import ScatterStats
+    from fleur import datasets
+
+    df = datasets.load_iris()
+
+    ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(
+        bins=25
+    )
+    ```
+
+=== "Colors"
+
+    ```py hl_lines="8 9 10"
+    # mkdocs: render
+    from fleur import ScatterStats
+    from fleur import datasets
+
+    df = datasets.load_iris()
+
+    ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(
+        scatter_kws=dict(color="#c1121f", edgecolor="black"),
+        line_kws=dict(color="#c1121f"),
+        hist_kws=dict(color="#c1121f"),
+    )
+    ```
+
+=== "Confidence interval"
+
+    ```py hl_lines="8"
+    # mkdocs: render
+    from fleur import ScatterStats
+    from fleur import datasets
+
+    df = datasets.load_iris()
+
+    ScatterStats(x=df["sepal_length"], y=df["sepal_width"], ci=99).plot()
+    ```
+
+=== "Hide statistics"
+
+    ```py hl_lines="8"
+    # mkdocs: render
+    from fleur import ScatterStats
+    from fleur import datasets
+
+    df = datasets.load_iris()
+
+    ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(
+      show_stats=False
+    )
+    ```

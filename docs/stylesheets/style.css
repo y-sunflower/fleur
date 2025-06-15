@@ -21,3 +21,9 @@ h4 {
     background-color: var(--primary-color);
   }
 }
+
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.2em 0.5em !important;
+  text-align: center !important;
+}
