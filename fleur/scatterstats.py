@@ -125,6 +125,7 @@ class ScatterStats:
         area_kws: Union[dict, None] = None,
         hist_kws: Union[dict, None] = None,
         subplot_mosaic_kwargs: Union[dict, None] = None,
+        show_stats: bool = True,
     ) -> matplotlib.figure.Figure:
         r"""
         Plot a scatter plot of two variables, with a linear regression
@@ -138,6 +139,7 @@ class ScatterStats:
             area_kws: Additional parameters which will be passed to the `fill_between()` function in matplotlib.
             hist_kws: Additional parameters which will be passed to the `hist()` function in matplotlib.
             subplot_mosaic_kwargs: Additional keyword arguments to pass to `plt.subplot_mosaic()`. Default is `None`.
+            show_stats: If True, display statistics on the plot.
         """
         if not marginal and any([bins is not None, hist_kws is not None]):
             warnings.warn(
@@ -221,18 +223,19 @@ class ScatterStats:
             axs["B"].axis("off")
             axs["C"].axis("off")
 
-        annotation_params = dict(transform=fig.transFigure, va="top")
-        fig.text(x=0.1, y=0.95, s=self._expression, size=9, **annotation_params)
-        fig.text(
-            x=0.75,
-            y=0.05,
-            s=self._expression_model,
-            ha="right",
-            weight="bold",
-            style="normal",
-            size=12,
-            **annotation_params,
-        )
+        if show_stats:
+            annotation_params = dict(transform=fig.transFigure, va="top")
+            fig.text(x=0.1, y=0.95, s=self._expression, size=9, **annotation_params)
+            fig.text(
+                x=0.75,
+                y=0.05,
+                s=self._expression_model,
+                ha="right",
+                weight="bold",
+                style="normal",
+                size=12,
+                **annotation_params,
+            )
 
         return self.fig
 
