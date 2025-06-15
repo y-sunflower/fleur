@@ -18,10 +18,3 @@ format: gfm
 - requires python 3.10
 
 <br><br>
-
-## State
-
-| Functions      | Description                         | Parametric | Non-parametric | Robust | Bayesian |
-| -------------- | ----------------------------------- | ---------- | -------------- | ------ | -------- |
-| BetweenStats() | Between group/condition comparisons | ✅         | ❌             | ❌     | ❌       |
-| ScatterStats() | Correlation between two variables   | ✅         | ❌             | ❌     | ❌       |

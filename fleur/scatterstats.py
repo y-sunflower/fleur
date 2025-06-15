@@ -5,7 +5,7 @@ import numpy as np
 
 import warnings
 from numbers import Number
-from typing import Union, Optional, Iterable, Tuple, List
+from typing import Union, Optional, Iterable, List
 from narwhals.typing import SeriesT, Frame
 
 from .input_data_handling import InputDataHandler
@@ -36,6 +36,9 @@ class ScatterStats:
         x: Union[str, SeriesT, Iterable],
         y: Union[str, SeriesT, Iterable],
         data: Optional[Frame] = None,
+        alternative: str = "two-sided",
+        correlation_measure: str = "pearson",
+        ci: Number = 95,
     ):
         """
         Initialize a `ScatterStats()` instance.
@@ -44,57 +47,13 @@ class ScatterStats:
             x: Colname of `data` or a Series or array-like.
             y: Colname of `data` or a Series or array-like.
             data: An optional dataframe.
-        """
-        self._data_info = InputDataHandler(x=x, y=y, data=data).get_info()
-        self._is_fitted = False
-
-    def plot(
-        self,
-        marginal: bool = True,
-        ci: Number = 95,
-        alternative: str = "two-sided",
-        correlation_measure: str = "pearson",
-        bins: Union[int, List[int]] = None,
-        figsize: Tuple[float, float] = (8, 6),
-        scatter_kws: Union[dict, None] = None,
-        line_kws: Union[dict, None] = None,
-        area_kws: Union[dict, None] = None,
-        hist_kws: Union[dict, None] = None,
-        subplot_mosaic_kwargs: Union[dict, None] = None,
-        ax: Union[matplotlib.axes.Axes, None] = None,
-        **kwargs,
-    ) -> Union[matplotlib.axes.Axes, matplotlib.figure.Figure]:
-        r"""
-        Plot a scatter plot of two variables, with a linear regression
-        line and annotate it with main statistical results.
-
-        Args:
-            ci: Confidence level for the top label and the regression plot. The default value is 95 (for a 95% confidence level).
             alternative: Defines the alternative hypothesis. Default is 'two-sided'. Must be one of 'two-sided', 'less' and 'greater'.
             correlation_measure: The correlation measure to use. Default is 'pearson'. Must be one of 'pearson', 'kendall', 'spearman'.
-            bins: Number of bins for the marginal distributions. This can be an integer or a list of two integers (the first for the top distribution and the second for the other).
-            marginal: Whether to include marginal histograms. Default is `True`.
-            figsize: Dimensions of the matplotlib figure created. The default value is `(8, 6)`.
-            line_kws: Additional parameters which will be passed to the `plot()` function in matplotlib.
-            scatter_kws: Additional parameters which will be passed to the `scatter()` function in matplotlib.
-            area_kws: Additional parameters which will be passed to the `fill_between()` function in matplotlib.
-            hist_kws: Additional parameters which will be passed to the `hist()` function in matplotlib.
-            subplot_mosaic_kwargs: Additional keyword arguments to pass to `plt.subplot_mosaic()`. Default is `None`.
-            ax: The Axes to plot on. If `None`, use the current Axes using `plt.gca()`. Default is `None`.
-
-        Raises:
-            ValueError: if `alternative` is not one of "two-sided", "less", "greater".
+            ci: Confidence level for the top label and the regression plot. The default value is 95 (for a 95% confidence level).
         """
-
         if alternative not in ["two-sided", "less", "greater"]:
             raise ValueError(
                 "alternative argument must be one of: 'two-sided', 'less', 'greater'."
-            )
-
-        if not marginal and any([bins is not None, hist_kws is not None]):
-            warnings.warn(
-                "bins/hist_kws arguments are ignored when marginal=False.",
-                category=UserWarning,
             )
 
         if correlation_measure not in ["pearson", "kendall", "spearman"]:
@@ -102,50 +61,29 @@ class ScatterStats:
                 "correlation_measure argument must be one of: 'pearson', 'kendall', 'spearman'."
             )
 
-        default_subplot_mosaic_kwargs = dict(
-            width_ratios=(5, 1), height_ratios=(1, 5), figsize=figsize
-        )
-        if subplot_mosaic_kwargs is None:
-            subplot_mosaic_kwargs = {}
-        default_subplot_mosaic_kwargs.update(subplot_mosaic_kwargs)
-
-        if marginal:
-            scheme = """
-    B.
-    AC
-    """
-            fig, axs = plt.subplot_mosaic(scheme, **default_subplot_mosaic_kwargs)
-            fig.subplots_adjust(wspace=0, hspace=0)
-            ax = axs["A"]  # main Axes of the Figure
-        else:
-            if ax is None:
-                ax = plt.gca()
-            fig = plt.gcf()
-
-        self.fig = fig
-        self.ax = ax
+        self._data_info = InputDataHandler(x=x, y=y, data=data).get_info()
 
         x_name = self._data_info["x_name"]
         y_name = self._data_info["y_name"]
         df = self._data_info["dataframe"]
 
-        x_np = df[x_name].to_numpy()
-        y_np = df[y_name].to_numpy()
+        self._x_np = df[x_name].to_numpy()
+        self._y_np = df[y_name].to_numpy()
 
-        regression = st.linregress(x_np, y_np, alternative=alternative)
+        regression = st.linregress(self._x_np, self._y_np, alternative=alternative)
 
         self.n_obs = len(df)
         self.alpha = 1 - ci / 100
         self.dof = self.n_obs - 2
 
         if correlation_measure == "pearson":
-            correlation = st.pearsonr(x_np, y_np).statistic
+            correlation = st.pearsonr(self._x_np, self._y_np).statistic
             self._symbol_correl = "\\rho"
         elif correlation_measure == "kendall":
-            correlation = st.kendalltau(x_np, y_np).statistic
+            correlation = st.kendalltau(self._x_np, self._y_np).statistic
             self._symbol_correl = "\\tau"
         elif correlation_measure == "spearman":
-            correlation = st.spearmanr(x_np, y_np).statistic
+            correlation = st.spearmanr(self._x_np, self._y_np).statistic
             self._symbol_correl = "\\rho"
 
         self.pvalue = regression.pvalue
@@ -169,6 +107,67 @@ class ScatterStats:
         ]
         self._expression = "".join(expr_list)
 
+        expr_list = [
+            "$",
+            f"\\hat{{y}}_i = {self.intercept:.2f}",
+            f" {'+' if self.slope >= 0 else '-'} ",
+            f"{abs(self.slope):.2f}x_i",
+            "$",
+        ]
+        self._expression_model = "".join(expr_list)
+
+    def plot(
+        self,
+        *,
+        marginal: bool = True,
+        bins: Union[int, List[int]] = None,
+        scatter_kws: Union[dict, None] = None,
+        line_kws: Union[dict, None] = None,
+        area_kws: Union[dict, None] = None,
+        hist_kws: Union[dict, None] = None,
+        subplot_mosaic_kwargs: Union[dict, None] = None,
+    ) -> matplotlib.figure.Figure:
+        r"""
+        Plot a scatter plot of two variables, with a linear regression
+        line and annotate it with main statistical results.
+
+        Args:
+            bins: Number of bins for the marginal distributions. This can be an integer or a list of two integers (the first for the top distribution and the second for the other).
+            marginal: Whether to include marginal histograms. Default is `True`.
+            line_kws: Additional parameters which will be passed to the `plot()` function in matplotlib.
+            scatter_kws: Additional parameters which will be passed to the `scatter()` function in matplotlib.
+            area_kws: Additional parameters which will be passed to the `fill_between()` function in matplotlib.
+            hist_kws: Additional parameters which will be passed to the `hist()` function in matplotlib.
+            subplot_mosaic_kwargs: Additional keyword arguments to pass to `plt.subplot_mosaic()`. Default is `None`.
+        """
+        if not marginal and any([bins is not None, hist_kws is not None]):
+            warnings.warn(
+                "bins/hist_kws arguments are ignored when marginal=False.",
+                category=UserWarning,
+            )
+
+        default_subplot_mosaic_kwargs = dict(
+            width_ratios=(5, 1), height_ratios=(1, 5), figsize=(8, 6)
+        )
+        if subplot_mosaic_kwargs is None:
+            subplot_mosaic_kwargs = {}
+        default_subplot_mosaic_kwargs.update(subplot_mosaic_kwargs)
+
+        if marginal:
+            scheme = """
+    B.
+    AC
+    """
+            fig, axs = plt.subplot_mosaic(scheme, **default_subplot_mosaic_kwargs)
+            fig.subplots_adjust(wspace=0, hspace=0)
+            ax = axs["A"]  # main Axes of the Figure
+        else:
+            ax = plt.gca()
+            fig = plt.gcf()
+
+        self.fig = fig
+        self.ax = ax
+
         if scatter_kws is None:
             scatter_kws = {}
         if line_kws is None:
@@ -181,12 +180,12 @@ class ScatterStats:
         }
         area_default_kws.update(area_kws)
 
-        x_values = np.linspace(np.min(x_np), np.max(x_np), 100)
+        x_values = np.linspace(np.min(self._x_np), np.max(self._x_np), 100)
         y_values = self.slope * x_values + self.intercept
-        residuals = y_np - (self.slope * x_np + self.intercept)
+        residuals = self._y_np - (self.slope * self._x_np + self.intercept)
         rse = np.sqrt(np.sum(residuals**2) / self.dof)
-        x_mean = np.mean(x_np)
-        x_var = np.sum((x_np - x_mean) ** 2)
+        x_mean = np.mean(self._x_np)
+        x_var = np.sum((self._x_np - x_mean) ** 2)
         y_err = (
             self._t_critical
             * rse
@@ -199,7 +198,7 @@ class ScatterStats:
             y_values + y_err,
             **area_default_kws,
         )
-        ax.scatter(x_np, y_np, **scatter_kws)
+        ax.scatter(self._x_np, self._y_np, **scatter_kws)
         ax.plot(x_values, y_values, **line_kws)
 
         ax = themify(ax)
@@ -217,30 +216,18 @@ class ScatterStats:
             else:
                 binsB = binsC = bins
 
-            axs["B"].hist(x_np, bins=binsB, **hist_kws)
-            axs["C"].hist(y_np, orientation="horizontal", bins=binsC, **hist_kws)
+            axs["B"].hist(self._x_np, bins=binsB, **hist_kws)
+            axs["C"].hist(self._y_np, orientation="horizontal", bins=binsC, **hist_kws)
 
             axs["B"].axis("off")
             axs["C"].axis("off")
-
-        equation_sign = "+" if self.slope >= 0 else "-"
-
-        expr_list = [
-            "$",
-            f"\\hat{{y}}_i = {self.intercept:.2f}",
-            f" {equation_sign} ",
-            f"{abs(self.slope):.2f}x_i",
-            "$",
-        ]
-
-        self.model_expr = "".join(expr_list)
 
         annotation_params = dict(transform=fig.transFigure, va="top")
         fig.text(x=0.1, y=0.95, s=self._expression, size=9, **annotation_params)
         fig.text(
             x=0.75,
             y=0.05,
-            s=self.model_expr,
+            s=self._expression_model,
             ha="right",
             weight="bold",
             style="normal",
@@ -248,9 +235,7 @@ class ScatterStats:
             **annotation_params,
         )
 
-        self._is_fitted = True
-
-        return self
+        return self.fig
 
     def summary(self):
         """
@@ -261,10 +246,7 @@ class ScatterStats:
         Raises:
             RuntimeError: If `plot()` was not called before `summary()`.
         """
-        if not self._is_fitted:
-            raise RuntimeError("Must call 'plot()' before calling 'summary()'.")
-
-        print("Correlation stats\n_obs")
+        print("Correlation stats\n")
 
         clean_expression = (
             self._expression.replace("$", "")
@@ -276,16 +258,3 @@ class ScatterStats:
         info_about_test = "Student t test of the coefficient on x"
         print(f"Test: {info_about_test}")
         print(f"{clean_expression}")
-
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    from fleur import datasets
-
-    data = datasets.load_iris()
-
-    ss = ScatterStats(x="sepal_length", y="sepal_width", data=data)
-    fig = ss.plot(bins=20, ci=95, correlation_measure="pearson")
-    fig.savefig("cache.png", dpi=300)
-
-    ss.summary()
