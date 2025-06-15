@@ -19,9 +19,6 @@ def _infer_types(x, y, df):
         if isinstance(col_dtype, (nw.Categorical, nw.Enum, nw.String)):
             return True
 
-        if isinstance(col_dtype, nw.Object):
-            return True
-
         return False
 
     def is_numerical(column_name, df):
