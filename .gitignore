@@ -23,4 +23,3 @@ sandbox.*
 
 docs/README*
 !docs/README.qmd
-*_files/
