@@ -1,5 +1,13 @@
 # Between stats
 
+## State
+
+| Type           | No. of groups | Test           | Effect                        | Function used                   | Implemented |
+| -------------- | ------------- | -------------- | ----------------------------- | ------------------------------- | ----------- |
+| Parametric     | 2             | Student/Welch  | Cohen's d/Hedge's g           | Test:`scipy.stats.ttest_ind`    | ❌          |
+| Non-parametric | 2             | Mann-Whitney U | r (rank-biserial correlation) | Test:`scipy.stats.mannwhitneyu` | ❌          |
+| Robust         | 2             | Yuen           | Algina-Keselman-Penfield      | Test:`scipy.stats.ttest_ind`    | ❌          |
+
 ::: fleur.betweenstats.BetweenStats
 
 <br>
