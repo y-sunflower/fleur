@@ -1,4 +1,3 @@
-# Correlation
 
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
@@ -30,7 +29,9 @@ df = datasets.load_iris()
 fig = BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
 
-![](README_files/figure-commonmark/cell-2-output-1.png)
+![](README_files/figure-commonmark/cell-3-output-1.png)
+
+### Correlation
 
 ``` python
 from fleur import ScatterStats
@@ -41,7 +42,7 @@ df = datasets.load_iris()
 fig = ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 ```
 
-![](README_files/figure-commonmark/cell-3-output-1.png)
+![](README_files/figure-commonmark/cell-4-output-1.png)
 
 <br><br>
 

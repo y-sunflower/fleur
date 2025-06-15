@@ -4,6 +4,16 @@ format: gfm
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
+```{python}
+# | echo: false
+# | output: false
+
+import matplotlib.pyplot as plt
+
+plt.rcParams["figure.dpi"] = 200
+plt.rcParams["savefig.dpi"] = 200
+```
+
 ![Coverage](coverage-badge.svg)
 
 
