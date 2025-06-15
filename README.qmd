@@ -1,0 +1,62 @@
+---
+format: gfm
+---
+
+<!-- Automatically generated, uses README.qmd to modify README.md -->
+
+```{python}
+# | echo: false
+# | output: false
+
+import matplotlib.pyplot as plt
+
+plt.rcParams["figure.dpi"] = 200
+plt.rcParams["savefig.dpi"] = 200
+```
+
+![Coverage](coverage-badge.svg)
+
+
+# `fleur`: stats and plots holding hands
+
+`fleur` provides a set of tools to combine data visualization with statistics.
+
+> fleur is still in a very early stage and in beta version: expect regular breaking changes.
+
+[Documentation website](https://y-sunflower.github.io/fleur/)
+
+<br>
+
+## Quick start
+
+### Group comparison
+
+```{python}
+from fleur import BetweenStats
+from fleur import datasets
+
+df = datasets.load_iris()
+
+fig = BetweenStats(df["sepal_length"], df["species"]).plot()
+```
+
+### Correlation
+
+```{python}
+from fleur import ScatterStats
+from fleur import datasets
+
+df = datasets.load_iris()
+
+fig = ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+```
+
+<br><br>
+
+## Installation
+
+```bash
+pip install fleur
+```
+
+<br><br>

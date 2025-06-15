@@ -1,0 +1,29 @@
+:root {
+  --primary-color: #0096c7;
+}
+
+h2,
+h3,
+h4 {
+  margin-top: 3em !important;
+}
+
+.md-header {
+  background-color: var(--primary-color);
+}
+
+.md-tabs {
+  background-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .md-nav--primary .md-nav__title[for="__drawer"] {
+    background-color: var(--primary-color);
+  }
+}
+
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.2em 0.5em !important;
+  text-align: center !important;
+}
