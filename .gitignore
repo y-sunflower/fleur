@@ -20,3 +20,6 @@ env/
 
 *.zip
 sandbox.*
+
+docs/README*
+!docs/README.qmd
