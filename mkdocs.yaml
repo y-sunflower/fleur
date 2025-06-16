@@ -32,6 +32,7 @@ nav:
       - reference/scatterstats.md
       - reference/datasets.md
   - Contributing: contributing.md
+  - About: about.md
 
 extra_css:
   - stylesheets/style.css
