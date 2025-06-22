@@ -32,6 +32,7 @@ nav:
       - reference/scatterstats.md
       - reference/datasets.md
   - Contributing: contributing.md
+  - About: about.md
 
 extra_css:
   - stylesheets/style.css
@@ -48,6 +49,9 @@ markdown_extensions:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences

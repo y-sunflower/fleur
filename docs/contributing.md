@@ -30,7 +30,7 @@ git checkout -b my-feature
 - Set up your Python environment (ensure you have [uv installed](https://docs.astral.sh/uv/getting-started/installation/)):
 
 ```bash
-uv sync --all-extras --dev
+uv sync --all-groups
 uv pip install -e .
 ```
 

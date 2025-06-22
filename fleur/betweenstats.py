@@ -41,6 +41,7 @@ class BetweenStats:
         y: Union[str, SeriesT, Iterable],
         data: Optional[Frame] = None,
         paired: bool = False,
+        **kwargs,
     ):
         """
         Initialize a `BetweenStats()` instance.
@@ -50,6 +51,9 @@ class BetweenStats:
             y: Colname of `data` or a Series or array-like.
             data: An optional dataframe.
             paired: If True, perform paired t-test (only for 2 groups).
+            kwargs: Additional arguments passed to the scipy test function.
+                Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
+                or `scipy.stats.f_oneway()`.
         """
         self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
         self._is_fitted = False
@@ -66,6 +70,18 @@ class BetweenStats:
         self.n_cat = df[cat_col].n_unique()
         self.n_obs = len(df)
 
+        self._fit(**kwargs)
+
+    def _fit(self, **kwargs):
+        """
+        Internal method to compute all the statistics and store
+        them as attributes.
+
+        Args:
+            kwargs: Additional arguments passed to the scipy test function.
+                Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
+                or `scipy.stats.f_oneway()`.
+        """
         if self.n_cat < 2:
             raise ValueError(
                 "You must have at least 2 distinct categories in your category column"
@@ -73,10 +89,10 @@ class BetweenStats:
         elif self.n_cat == 2:
             self.is_ANOVA = False
             if self.is_paired:
-                ttest = st.ttest_rel(self._result[0], self._result[1])
+                ttest = st.ttest_rel(self._result[0], self._result[1], **kwargs)
                 self.name = "Paired t-test"
             else:
-                ttest = st.ttest_ind(self._result[0], self._result[1])
+                ttest = st.ttest_ind(self._result[0], self._result[1], **kwargs)
                 self.name = "T-test"
             self.statistic = ttest.statistic
             self.pvalue = ttest.pvalue
@@ -89,7 +105,7 @@ class BetweenStats:
                     "Repeated measures ANOVA has not been implemented yet."
                 )
             else:
-                anova = st.f_oneway(*self._result)
+                anova = st.f_oneway(*self._result, **kwargs)
                 self.name = "One-way ANOVA"
             self.statistic = anova.statistic
             self.pvalue = anova.pvalue
