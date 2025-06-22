@@ -142,11 +142,15 @@ There are 2 cases here: whether we assume the data distribution is normal or not
     - Equal variance: if the groups have equal variances: **independent t-test**.
     - Unequal variance: if the groups have unequal variances: **Welch's t-test**.
 
+    In both cases, we use the [`scipy.stats.ttest_ind()`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html){target="_blank"} function.
+
 === "Non-parametric"
 
     Here we don't assume anything about the distribution and we need to use the **Mann-Whitney U test**.
 
     Note that the **Mann-Whitney U test** compares distributions and not means. But this makes sense since not assuming normality (e.g having skewed distributions, for instance) implies that comparing means is not the best way to compare groups, which is what we want to do at the end.
+
+    In this case, we use the [`scipy.stats.mannwhitneyu()`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html){target="_blank"} function.
 
 ### Dependent (paired) samples
 
