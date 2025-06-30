@@ -1,24 +1,15 @@
-Any kind of contribution is more than welcomed! There are several ways you can contribute:
-
-- Opening [GitHub issues](https://github.com/y-sunflower/fleur/issues) to list the bugs you've found
-- Implementation of new features or resolution of existing bugs
-- Enhancing the documentation
-
-## How `fleur` works
-
-Here how it wokrs
-
-## Setting up your environment
+The easiest way to get started is to use [uv](https://docs.astral.sh/uv/getting-started/installation/) and [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
 ### Install for development
 
 - Fork the repository to your own GitHub account.
 
-- Clone your forked repository to your local machine (ensure you have [Git installed](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)):
+- Clone your forked repository to your local machine:
 
 ```bash
-git clone https://github.com/your_name/fleur.git
+git clone https://github.com/YOURNAME/fleur.git
 cd fleur
+git remote add upstream https://github.com/y-sunflower/fleur.git
 ```
 
 - Create a new branch:
@@ -27,10 +18,11 @@ cd fleur
 git checkout -b my-feature
 ```
 
-- Set up your Python environment (ensure you have [uv installed](https://docs.astral.sh/uv/getting-started/installation/)):
+- Set up your Python environment:
 
 ```bash
 uv sync --all-groups
+uv run pre-commit install
 uv pip install -e .
 ```
 

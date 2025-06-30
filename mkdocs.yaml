@@ -31,7 +31,10 @@ nav:
       - reference/betweenstats.md
       - reference/scatterstats.md
       - reference/datasets.md
-  - Contributing: contributing.md
+  - Contributing:
+      - Contributing: dev/index.md
+      - Set Up Environement: dev/environment.md
+      - Code Structure: dev/code-structure.md
   - About: about.md
 
 extra_css:
