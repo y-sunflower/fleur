@@ -45,6 +45,7 @@ dev = [
     "pandas>=2.2.3",
     "pytest-cov>=6.1.1",
     "genbadge>=1.1.2",
+    "ty>=0.0.1a12",
 ]
 quarto = [
     "jupyter>=1.1.1",
@@ -60,3 +61,7 @@ Homepage = "https://y-sunflower.github.io/fleur/"
 Issues = "https://github.com/y-sunflower/fleur/issues"
 Documentation = "https://y-sunflower.github.io/fleur/"
 Repository = "https://github.com/y-sunflower/fleur"
+
+[tool.ty.src]
+include = ["fleur"]
+exclude = ["tests", "sandbox.py", "docs"]

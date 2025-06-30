@@ -1,15 +1,15 @@
 import narwhals as nw
-from narwhals.typing import IntoDataFrame
 import os
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List
+from narwhals.typing import DataFrameT
 
-PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
-AVAILABLE_DATASETS = ["iris", "mtcars"]
-AVAILABLE_OUTPUTS = ["pandas", "polars", "pyarrow", "modin", "cudf"]
+PACKAGE_DIR: str = os.path.dirname(os.path.abspath(__file__))
+AVAILABLE_DATASETS: List[str] = ["iris", "mtcars"]
+AVAILABLE_OUTPUTS: List[str] = ["pandas", "polars", "pyarrow", "modin", "cudf"]
 
 
-def _load_data(dataset_name: str, backend: str, **kwargs) -> IntoDataFrame:
+def _load_data(dataset_name: str, backend: str, **kwargs) -> DataFrameT:
     """
     Load one of the available datasets in fleur. This function is a simple wrapper
     around [`narwhals.read_csv()`](https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv)
@@ -23,8 +23,8 @@ def _load_data(dataset_name: str, backend: str, **kwargs) -> IntoDataFrame:
     Returns:
         A dataframe with the specified dataset.
     """
-    dataset_name = dataset_name.lower()
-    backend = backend.lower()
+    dataset_name: str = dataset_name.lower()
+    backend: str = backend.lower()
 
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError(
@@ -34,14 +34,14 @@ def _load_data(dataset_name: str, backend: str, **kwargs) -> IntoDataFrame:
     if backend not in AVAILABLE_OUTPUTS:
         raise ValueError(f"backend must be one of: {' ,'.join(AVAILABLE_OUTPUTS)}")
 
-    dataset_file = f"{dataset_name}.csv"
-    dataset_path = os.path.join(PACKAGE_DIR, "datasets", dataset_file)
-    df = nw.read_csv(dataset_path, backend=backend, **kwargs).to_native()
+    dataset_file: str = f"{dataset_name}.csv"
+    dataset_path: str = os.path.join(PACKAGE_DIR, "datasets", dataset_file)
+    df: DataFrameT = nw.read_csv(dataset_path, backend=backend, **kwargs).to_native()
 
     return df
 
 
-def load_iris(backend: str = "pandas", **kwargs: Optional[Dict]) -> IntoDataFrame:
+def load_iris(backend: str = "pandas", **kwargs: Optional[Dict]) -> DataFrameT:
     """
     Load the iris dataset.
 
@@ -55,7 +55,7 @@ def load_iris(backend: str = "pandas", **kwargs: Optional[Dict]) -> IntoDataFram
     return _load_data("iris", backend=backend, **kwargs)
 
 
-def load_mtcars(backend: str = "pandas", **kwargs: Optional[Dict]) -> IntoDataFrame:
+def load_mtcars(backend: str = "pandas", **kwargs: Optional[Dict]) -> DataFrameT:
     """
     Load the mtcars dataset.
 

@@ -31,7 +31,10 @@ nav:
       - reference/betweenstats.md
       - reference/scatterstats.md
       - reference/datasets.md
-  - Contributing: contributing.md
+  - Contributing:
+      - Contributing: dev/index.md
+      - Set Up Environement: dev/environment.md
+      - Code Structure: dev/code-structure.md
   - About: about.md
 
 extra_css:
@@ -39,6 +42,7 @@ extra_css:
 
 extra_javascript:
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascript/extra.js
 
 markdown_extensions:
   - pymdownx.arithmatex:

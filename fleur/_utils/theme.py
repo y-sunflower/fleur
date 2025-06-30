@@ -1,7 +1,7 @@
-import matplotlib as mpl
+from matplotlib.axes import Axes
 
 
-def _themify(ax: mpl.axes.Axes) -> mpl.axes.Axes:
+def _themify(ax: Axes) -> Axes:
     """
     Set the fleur theme to a matplotlib Axes.
 
