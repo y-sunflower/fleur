@@ -1,13 +1,5 @@
 # Between stats
 
-# State
-
-| Type           | No. of groups | Test           | Effect                        | Function used                   | Implemented |
-| -------------- | ------------- | -------------- | ----------------------------- | ------------------------------- | ----------- |
-| Parametric     | 2             | Student/Welch  | Cohen's d/Hedge's g           | Test:`scipy.stats.ttest_ind`    | ❌          |
-| Non-parametric | 2             | Mann-Whitney U | r (rank-biserial correlation) | Test:`scipy.stats.mannwhitneyu` | ❌          |
-| Robust         | 2             | Yuen           | Algina-Keselman-Penfield      | Test:`scipy.stats.ttest_ind`    | ❌          |
-
 # Reference
 
 ::: fleur.betweenstats.BetweenStats
@@ -144,6 +136,8 @@ There are 2 cases here: whether we assume the data distribution is normal or not
 
     In both cases, we use the [`scipy.stats.ttest_ind()`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html){target="_blank"} function.
 
+    ✔️ Implemented in `fleur`
+
 === "Non-parametric"
 
     Here we don't assume anything about the distribution and we need to use the **Mann-Whitney U test**.
@@ -152,15 +146,21 @@ There are 2 cases here: whether we assume the data distribution is normal or not
 
     In this case, we use the [`scipy.stats.mannwhitneyu()`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html){target="_blank"} function.
 
+    ✔️ Implemented in `fleur`
+
 ### Dependent (paired) samples
 
 === "Parametric"
 
     Here we assume the data distribution is normal and we need to use a **paired t-test**.
 
+    ✔️ Implemented in `fleur`
+
 === "Non-parametric"
 
     Here we don't assume anything about the distribution and we need to use the **Wilcoxon signed-rank test**.
+
+    ✔️ Implemented in `fleur`
 
 ## Comparing 3 or more groups
 

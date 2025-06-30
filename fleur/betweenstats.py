@@ -44,7 +44,7 @@ class BetweenStats:
         data: Optional[Frame] = None,
         paired: bool = False,
         method: str = "parametric",
-        **kwargs,
+        **kwargs: Any,
     ):
         """
         Initialize a `BetweenStats()` instance.
@@ -98,18 +98,32 @@ class BetweenStats:
                     test_output = st.ttest_rel(
                         self._result[0], self._result[1], **kwargs
                     )
+                    self.name = "T-test"
                     self.name = "Paired parametric t-test"
                 elif method == "nonparametric":
                     test_output = st.wilcoxon(
                         self._result[0], self._result[1], **kwargs
                     )
+                    self.name = "Wilcoxon signed-rank test"
                 else:
                     raise NotImplementedError(
                         'Only `method="parametric"` and `method="nonparametric"` are implemented.'
                     )
-            else:
-                test_output = st.ttest_ind(self._result[0], self._result[1], **kwargs)
-                self.name = "T-test"
+            else:  # not paired
+                if method == "parametric":
+                    test_output = st.ttest_ind(
+                        self._result[0], self._result[1], **kwargs
+                    )
+                    self.name = "T-test"
+                elif method == "nonparametric":
+                    test_output = st.mannwhitneyu(
+                        self._result[0], self._result[1], **kwargs
+                    )
+                    self.name = "Mann-Whitney U rank test"
+                else:
+                    raise NotImplementedError(
+                        'Only `method="parametric"` and `method="nonparametric"` are implemented.'
+                    )
 
             self.statistic = test_output.statistic
             self.pvalue = test_output.pvalue
