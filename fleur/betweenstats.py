@@ -11,6 +11,8 @@ from narwhals.typing import SeriesT, Frame
 from ._utils import _infer_types, _themify, _beeswarm
 from .input_data_handling import _InputDataHandler
 
+import warnings
+
 
 class BetweenStats:
     """
@@ -89,6 +91,11 @@ class BetweenStats:
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
                 or `scipy.stats.f_oneway()`.
         """
+        if "trim" in kwargs and method != "robust":
+            warnings.warn(
+                'Using `trim` argument without expliciting `method="robust"` is not recommended.'
+            )
+
         if self.n_cat < 2:
             raise ValueError(
                 "You must have at least 2 distinct categories in your category column"
@@ -109,7 +116,10 @@ class BetweenStats:
                     self.name = "Wilcoxon signed-rank test"
                 else:
                     raise NotImplementedError(
-                        'Only `method="parametric"` and `method="nonparametric"` are implemented.'
+                        (
+                            'Only `method="parametric"` and `method="nonparametric"` '
+                            "have been implemented for paired samples."
+                        )
                     )
             else:  # not paired
                 if method == "parametric":
@@ -122,9 +132,30 @@ class BetweenStats:
                         self._result[0], self._result[1], **kwargs
                     )
                     self.name = "Mann-Whitney U rank test"
+                elif method == "robust":
+                    trim_warn_message = (
+                        "Setting `method='robust'` without setting a value "
+                        "of `trim` above 0 is equivalent of using default "
+                        "`method='parametric'`. "
+                        "Remove `method='robust'` to hide this warning."
+                    )
+                    if "trim" not in kwargs:
+                        warnings.warn(trim_warn_message)
+                    else:
+                        trim: float = kwargs["trim"]
+                        if trim <= 0:
+                            warnings.warn(trim_warn_message)
+                    test_output = st.ttest_ind(
+                        self._result[0], self._result[1], **kwargs
+                    )
+                    self.name = "Yuen's t-test"
                 else:
                     raise NotImplementedError(
-                        'Only `method="parametric"` and `method="nonparametric"` are implemented.'
+                        (
+                            'Only `method="parametric"`, `method="nonparametric"` '
+                            'and `method="robust"` have been implemented for '
+                            "independant samples."
+                        )
                     )
 
             self.statistic = test_output.statistic

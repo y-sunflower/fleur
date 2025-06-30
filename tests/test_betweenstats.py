@@ -1,4 +1,5 @@
 import pytest
+import re
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
@@ -124,16 +125,109 @@ def test_raise_notimplemented_error(sample_data, method):
         BetweenStats(sample_data["x"], sample_data["y"], method=method)
 
 
-@pytest.mark.parametrize("method", ["robust", "bayes"])
-@pytest.mark.parametrize("paired", [True, False])
-def test_raise_notimplemented_error2(sample_data, method, paired):
+@pytest.mark.parametrize(
+    "method, paired, expected_exception, match",
+    [
+        (
+            "bayes",
+            False,
+            NotImplementedError,
+            (
+                'Only `method="parametric"`, `method="nonparametric"` '
+                'and `method="robust"` have been implemented for '
+                "independant samples."
+            ),
+        ),
+        (
+            "robust",
+            True,
+            NotImplementedError,
+            (
+                'Only `method="parametric"` and `method="nonparametric"` '
+                "have been implemented for paired samples."
+            ),
+        ),
+        (
+            "bayes",
+            True,
+            NotImplementedError,
+            (
+                'Only `method="parametric"` and `method="nonparametric"` '
+                "have been implemented for paired samples."
+            ),
+        ),
+    ],
+)
+def test_raise_notimplemented_error2(
+    sample_data, method, paired, expected_exception, match
+):
     sample_data = sample_data[sample_data["x"] != "setosa"]
 
-    with pytest.raises(
-        NotImplementedError,
-        match='Only `method="parametric"` and `method="nonparametric"` are implemented.',
-    ):
+    with pytest.raises(expected_exception, match=match):
         BetweenStats(sample_data["x"], sample_data["y"], method=method, paired=paired)
+
+
+@pytest.mark.parametrize(
+    "method, trim, warning_match",
+    [
+        (
+            "robust",
+            None,
+            (
+                "Setting `method='robust'` without setting a value "
+                "of `trim` above 0 is equivalent of using default "
+                "`method='parametric'`. "
+                "Remove `method='robust'` to hide this warning."
+            ),
+        ),
+        (
+            "robust",
+            0,
+            (
+                "Setting `method='robust'` without setting a value "
+                "of `trim` above 0 is equivalent of using default "
+                "`method='parametric'`. "
+                "Remove `method='robust'` to hide this warning."
+            ),
+        ),
+    ],
+)
+def test_warns_for_robust_method_without_trim(sample_data, method, trim, warning_match):
+    sample_data = sample_data[sample_data["x"] != "setosa"]
+
+    if trim is None:
+
+        def warn_call():
+            BetweenStats(sample_data["x"], sample_data["y"], method=method)
+    else:
+
+        def warn_call():
+            BetweenStats(sample_data["x"], sample_data["y"], trim=trim, method=method)
+
+    with pytest.warns(Warning, match=warning_match):
+        warn_call()
+
+
+def test_warn_trim_without_robust(sample_data):
+    sample_data = sample_data[sample_data["x"] != "setosa"]
+
+    with pytest.warns(
+        UserWarning,
+        match='Using `trim` argument without expliciting `method="robust"` is not recommended.',
+    ):
+        BetweenStats(sample_data["x"], sample_data["y"], method="parametric", trim=0.2)
+
+    with pytest.raises(
+        TypeError,
+        match=re.escape("mannwhitneyu() got an unexpected keyword argument 'trim'"),
+    ):
+        with pytest.warns(
+            UserWarning,
+            match='Using `trim` argument without expliciting `method="robust"` is not recommended.',
+        ):
+            BetweenStats(
+                sample_data["x"], sample_data["y"], method="nonparametric", trim=0.2
+            )
 
 
 def test_error_invalid_orientation(sample_data):

@@ -84,27 +84,6 @@ BetweenStats(df["sepal_length"], df["species"]).plot(show_stats=False)
 ```
 
 <br>
-
-- Print summary statistics
-
-```python
-# mkdocs: render
-from fleur import BetweenStats
-from fleur import datasets
-
-df = datasets.load_iris()
-
-BetweenStats(df["sepal_length"], df["species"]).summary()
-```
-
-```raw
-Between stats comparison
-
-Test: One-way ANOVA with 3 groups
-F(2, 147) = 119.26, p = 0.0000, n_obs = 150
-```
-
-<br>
 <br>
 
 # Statistical details
