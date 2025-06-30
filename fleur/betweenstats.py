@@ -130,8 +130,17 @@ class BetweenStats:
 
             self.statistic = test_output.statistic
             self.pvalue = test_output.pvalue
-            self.dof = int(test_output.df)
-            self.main_stat = f"t_{{Student}}({self.dof}) = {self.statistic:.2f}"
+            if hasattr(test_output, "df"):  # only for t-tests
+                self.dof = int(test_output.df)
+                self.main_stat = f"t_{{Student}}({self.dof}) = {self.statistic:.2f}"
+            else:
+                self.dof = None  # or omit this line if not needed
+                # Use appropriate stat name
+                if self.name == "Wilcoxon signed-rank test":
+                    stat_name = "W"
+                elif self.name == "Mann-Whitney U rank test":
+                    stat_name = "U"
+                self.main_stat = f"{stat_name} = {self.statistic:.2f}"
 
         else:  # n >= 3
             self.is_ANOVA = True

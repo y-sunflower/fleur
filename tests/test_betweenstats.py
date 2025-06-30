@@ -58,18 +58,45 @@ def test_summary_prints(capsys, sample_data):
     assert captured.out.startswith("Between stats comparison")
 
 
+@pytest.mark.parametrize("method", ["parametric", "nonparametric"])
+def test_three_categories(sample_data, method):
+    bs = BetweenStats(
+        sample_data["x"],
+        sample_data["y"],
+        paired=False,
+        method=method,
+    )
+
+    if method == "parametric":
+        assert bs.name == "One-way ANOVA"
+    elif method == "nonparametric":
+        assert bs.name == "Kruskal-Wallis H-test"
+
+
+@pytest.mark.parametrize("method", ["parametric", "nonparametric"])
 @pytest.mark.parametrize("paired", [True, False])
-def test_not_two_categories(sample_data, paired):
+def test_two_categories(sample_data, paired, method):
     sample_data = sample_data[sample_data["x"] != "setosa"]
 
-    bs = BetweenStats(sample_data["x"], sample_data["y"], paired=paired)
+    bs = BetweenStats(
+        sample_data["x"],
+        sample_data["y"],
+        paired=paired,
+        method=method,
+    )
 
     assert hasattr(bs, "dof")
 
     if paired:
-        assert bs.name == "Paired t-test"
+        if method == "parametric":
+            assert bs.name == "Paired t-test"
+        elif method == "nonparametric":
+            assert bs.name == "Wilcoxon signed-rank test"
     else:
-        assert bs.name == "T-test"
+        if method == "parametric":
+            assert bs.name == "T-test"
+        elif method == "nonparametric":
+            assert bs.name == "Mann-Whitney U rank test"
 
 
 def test_not_enough_categories(sample_data):
@@ -82,12 +109,19 @@ def test_not_enough_categories(sample_data):
         BetweenStats(sample_data["x"], sample_data["y"])
 
 
-def test_raise_notimplemented_error(sample_data):
+@pytest.mark.parametrize("method", ["robust", "bayes"])
+def test_raise_notimplemented_error(sample_data, method):
     with pytest.raises(
         NotImplementedError,
         match="Repeated measures ANOVA has not been implemented yet.",
     ):
         BetweenStats(sample_data["x"], sample_data["y"], paired=True)
+
+    with pytest.raises(
+        NotImplementedError,
+        match='Only `method="parametric"` and `method="nonparametric"` are implemented.',
+    ):
+        BetweenStats(sample_data["x"], sample_data["y"], method=method)
 
 
 @pytest.mark.parametrize("method", ["robust", "bayes"])
