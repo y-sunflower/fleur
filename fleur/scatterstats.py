@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
-import matplotlib
+from matplotlib.figure import Figure
 import scipy.stats as st
 import numpy as np
 
 import warnings
-from numbers import Number
 from typing import Union, Optional, Iterable, List
 from narwhals.typing import SeriesT, Frame
 
@@ -37,7 +36,7 @@ class ScatterStats:
         data: Optional[Frame] = None,
         alternative: str = "two-sided",
         correlation_measure: str = "pearson",
-        ci: Number = 95,
+        ci: int | float = 95,
     ):
         """
         Initialize a `ScatterStats()` instance.
@@ -119,14 +118,14 @@ class ScatterStats:
         self,
         *,
         marginal: bool = True,
-        bins: Union[int, List[int]] = None,
+        bins: Optional[Union[int, List[int]]] = None,
         scatter_kws: Union[dict, None] = None,
         line_kws: Union[dict, None] = None,
         area_kws: Union[dict, None] = None,
         hist_kws: Union[dict, None] = None,
         subplot_mosaic_kwargs: Union[dict, None] = None,
         show_stats: bool = True,
-    ) -> matplotlib.figure.Figure:
+    ) -> Figure:
         r"""
         Plot a scatter plot of two variables, with a linear regression
         line and annotate it with main statistical results.
@@ -211,7 +210,7 @@ class ScatterStats:
             if hist_kws is None:
                 hist_kws = {}
 
-            if isinstance(bins, List):
+            if isinstance(bins, list):
                 binsB = bins[0]
                 binsC = bins[1]
             else:

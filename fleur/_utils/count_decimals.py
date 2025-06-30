@@ -1,7 +1,4 @@
-from numbers import Number
-
-
-def _count_n_decimals(f: Number) -> int:
+def _count_n_decimals(f: int | float) -> int:
     """
     Counts the number of decimal places in a floating-point number.
 
@@ -10,7 +7,7 @@ def _count_n_decimals(f: Number) -> int:
     :raises: TypeError
     """
 
-    if not isinstance(f, Number):
+    if not isinstance(f, (float, int)):
         raise TypeError(f"f must be a number, not: {type(f)}")
 
     s = f"{f}"
