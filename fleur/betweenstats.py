@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
-import matplotlib
 import scipy.stats as st
 import numpy as np
 
-from typing import Union, Optional, Iterable
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from matplotlib.collections import PolyCollection
+from typing import Union, Optional, Iterable, Any, Dict, List, cast, AnyStr
 from narwhals.typing import SeriesT, Frame
 
 from ._utils import _infer_types, _themify
@@ -41,6 +43,7 @@ class BetweenStats:
         y: Union[str, SeriesT, Iterable],
         data: Optional[Frame] = None,
         paired: bool = False,
+        method: str = "parametric",
         **kwargs,
     ):
         """
@@ -49,18 +52,19 @@ class BetweenStats:
         Args:
             x: Colname of `data` or a Series or array-like.
             y: Colname of `data` or a Series or array-like.
-            data: An optional dataframe.
+            data: An optional dataframe used if `x` and `y` are colnames.
             paired: If True, perform paired t-test (only for 2 groups).
+            method: A character specifying the type of statistical approach:
+                "parametric" (default), "nonparametric", "robust", "bayes".
             kwargs: Additional arguments passed to the scipy test function.
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
-                or `scipy.stats.f_oneway()`.
+                `scipy.stats.f_oneway()`, `scipy.stats.wilcoxon()`
         """
         self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
-        self._is_fitted = False
         self.is_paired = paired
 
-        x_name = self._data_info["x_name"]
-        y_name = self._data_info["y_name"]
+        x_name: str = self._data_info["x_name"]
+        y_name: str = self._data_info["y_name"]
         df = self._data_info["dataframe"]
 
         cat_col, num_col = _infer_types(x_name, y_name, df)
@@ -70,9 +74,9 @@ class BetweenStats:
         self.n_cat = df[cat_col].n_unique()
         self.n_obs = len(df)
 
-        self._fit(**kwargs)
+        self._fit(method=method, **kwargs)
 
-    def _fit(self, **kwargs):
+    def _fit(self, method: str, **kwargs: Any):
         """
         Internal method to compute all the statistics and store
         them as attributes.
@@ -88,16 +92,30 @@ class BetweenStats:
             )
         elif self.n_cat == 2:
             self.is_ANOVA = False
+
             if self.is_paired:
-                ttest = st.ttest_rel(self._result[0], self._result[1], **kwargs)
-                self.name = "Paired t-test"
+                if method == "parametric":
+                    test_output = st.ttest_rel(
+                        self._result[0], self._result[1], **kwargs
+                    )
+                    self.name = "Paired parametric t-test"
+                elif method == "nonparametric":
+                    test_output = st.wilcoxon(
+                        self._result[0], self._result[1], **kwargs
+                    )
+                else:
+                    raise NotImplementedError(
+                        'Only `method="parametric"` and `method="nonparametric"` are implemented.'
+                    )
             else:
-                ttest = st.ttest_ind(self._result[0], self._result[1], **kwargs)
+                test_output = st.ttest_ind(self._result[0], self._result[1], **kwargs)
                 self.name = "T-test"
-            self.statistic = ttest.statistic
-            self.pvalue = ttest.pvalue
-            self.dof = int(ttest.df)
+
+            self.statistic = test_output.statistic
+            self.pvalue = test_output.pvalue
+            self.dof = int(test_output.df)
             self.main_stat = f"t_{{Student}}({self.dof}) = {self.statistic:.2f}"
+
         else:  # n >= 3
             self.is_ANOVA = True
             if self.is_paired:
@@ -105,17 +123,17 @@ class BetweenStats:
                     "Repeated measures ANOVA has not been implemented yet."
                 )
             else:
-                anova = st.f_oneway(*self._result, **kwargs)
+                test_output = st.f_oneway(*self._result, **kwargs)
                 self.name = "One-way ANOVA"
-            self.statistic = anova.statistic
-            self.pvalue = anova.pvalue
+            self.statistic = test_output.statistic
+            self.pvalue = test_output.pvalue
             self.dof_between = self.n_cat - 1
             self.dof_within = self.n_obs - self.n_cat
             self.main_stat = (
                 f"F({self.dof_between}, {self.dof_within}) = {self.statistic:.2f}"
             )
 
-        expr_list = [
+        expr_list: List[AnyStr] = [
             "$",
             f"{self.main_stat}, ",
             f"p = {self.pvalue:.4f}, ",
@@ -136,8 +154,8 @@ class BetweenStats:
         violin_kws: Union[dict, None] = None,
         box_kws: Union[dict, None] = None,
         scatter_kws: Union[dict, None] = None,
-        ax: Union[matplotlib.axes.Axes, None] = None,
-    ) -> matplotlib.figure.Figure:
+        ax: Optional[Axes] = None,
+    ) -> Figure:
         """
         Plot and fit the `BetweenStats` class to data and render a statistical
         comparison plot. It detects how many groups you have and apply the required
@@ -164,7 +182,9 @@ class BetweenStats:
             )
 
         if colors is None:
-            colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][: self.n_cat]
+            colors: List = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+                : self.n_cat
+            ]
         else:
             if len(colors) < self.n_cat:
                 raise ValueError(
@@ -172,27 +192,30 @@ class BetweenStats:
                     f"not {len(colors)}"
                 )
         if ax is None:
-            ax = plt.gca()
+            ax: Axes = plt.gca()
         if violin_kws is None:
-            violin_kws = {}
+            violin_kws: Dict = {}
         if box_kws is None:
-            box_kws = {}
+            box_kws: Dict = {}
         if scatter_kws is None:
-            scatter_kws = {}
-        violin_default_kws = {"orientation": orientation, "showextrema": False}
+            scatter_kws: Dict = {}
+        violin_default_kws: Dict = {"orientation": orientation, "showextrema": False}
         violin_default_kws.update(violin_kws)
-        box_default_kws = {"orientation": orientation}
+        box_default_kws: Dict = {"orientation": orientation}
         box_default_kws.update(box_kws)
-        scatter_default_kws = {"alpha": 0.5}
+        scatter_default_kws: Dict = {"alpha": 0.5}
         scatter_default_kws.update(scatter_kws)
 
         if violin:
-            violin_artists = ax.violinplot(self._result, **violin_default_kws)
-            for patch, color in zip(violin_artists["bodies"], colors):
+            violin_artists: Dict = ax.violinplot(self._result, **violin_default_kws)
+            bodies: List[PolyCollection] = cast(
+                List[PolyCollection], violin_artists["bodies"]
+            )
+            for patch, color in zip(bodies, colors):
                 patch.set(color=color)
 
         if box:
-            box_style = {"color": "#3b3b3b"}
+            box_style: Dict = {"color": "#3b3b3b"}
             ax.boxplot(
                 self._result,
                 boxprops=box_style,
@@ -215,13 +238,13 @@ class BetweenStats:
                     ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
         if show_stats:
-            annotation_params = dict(transform=ax.transAxes, va="top")
+            annotation_params: Dict = dict(transform=ax.transAxes, va="top")
             ax.text(x=0.05, y=1.09, s=self._expression, size=9, **annotation_params)
 
-        ax = _themify(ax)
+        ax: Axes = _themify(ax)
 
-        ticks = [i + 1 for i in range(len(self._sample_sizes))]
-        labels = [
+        ticks: List = [i + 1 for i in range(len(self._sample_sizes))]
+        labels: List = [
             f"{label}\nn = {n}"
             for n, label in zip(self._sample_sizes, self._cat_labels)
         ]
@@ -243,11 +266,11 @@ class BetweenStats:
         """
         print("Between stats comparison\n")
 
-        info_about_test = [
+        info_about_test: List[AnyStr] = [
             f"{self.name} ",
             f"with {self.n_cat} groups" if self.is_ANOVA else "",
         ]
-        info_about_test = "".join(info_about_test)
+        info_about_test: str = "".join(info_about_test)
 
         clean_expression = (
             self._expression.replace("$", "").replace("{", "").replace("}", "")
