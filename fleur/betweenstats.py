@@ -60,6 +60,10 @@ class BetweenStats:
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
                 `scipy.stats.f_oneway()`, `scipy.stats.wilcoxon()`
         """
+        valid_methods: List[str] = ["parametric", "nonparametric", "robust", "bayes"]
+        if method not in valid_methods:
+            raise ValueError(f"`method` must be one of {valid_methods}, not {method}")
+
         self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
         self.is_paired = paired
 
@@ -98,8 +102,7 @@ class BetweenStats:
                     test_output = st.ttest_rel(
                         self._result[0], self._result[1], **kwargs
                     )
-                    self.name = "T-test"
-                    self.name = "Paired parametric t-test"
+                    self.name = "Paired t-test"
                 elif method == "nonparametric":
                     test_output = st.wilcoxon(
                         self._result[0], self._result[1], **kwargs
@@ -136,9 +139,17 @@ class BetweenStats:
                 raise NotImplementedError(
                     "Repeated measures ANOVA has not been implemented yet."
                 )
-            else:
-                test_output = st.f_oneway(*self._result, **kwargs)
-                self.name = "One-way ANOVA"
+            else:  # not paired
+                if method == "parametric":
+                    test_output = st.f_oneway(*self._result, **kwargs)
+                    self.name = "One-way ANOVA"
+                elif method == "nonparametric":
+                    test_output = st.kruskal(*self._result, **kwargs)
+                    self.name = "Kruskal-Wallis H-test"
+                else:
+                    raise NotImplementedError(
+                        'Only `method="parametric"` and `method="nonparametric"` are implemented.'
+                    )
             self.statistic = test_output.statistic
             self.pvalue = test_output.pvalue
             self.dof_between = self.n_cat - 1
@@ -191,9 +202,7 @@ class BetweenStats:
             A matplotlib Figure.
         """
         if orientation not in ["vertical", "horizontal"]:
-            raise ValueError(
-                "orientation argument must be one of: 'vertical', 'horizontal'."
-            )
+            raise ValueError("`orientation` must be one of: 'vertical', 'horizontal'.")
 
         if colors is None:
             colors: List = plt.rcParams["axes.prop_cycle"].by_key()["color"][

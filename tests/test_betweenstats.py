@@ -82,7 +82,7 @@ def test_not_enough_categories(sample_data):
         BetweenStats(sample_data["x"], sample_data["y"])
 
 
-def test_error_paired_anova(sample_data):
+def test_raise_notimplemented_error(sample_data):
     with pytest.raises(
         NotImplementedError,
         match="Repeated measures ANOVA has not been implemented yet.",
@@ -90,12 +90,32 @@ def test_error_paired_anova(sample_data):
         BetweenStats(sample_data["x"], sample_data["y"], paired=True)
 
 
+@pytest.mark.parametrize("method", ["robust", "bayes"])
+@pytest.mark.parametrize("paired", [True, False])
+def test_raise_notimplemented_error2(sample_data, method, paired):
+    sample_data = sample_data[sample_data["x"] != "setosa"]
+
+    with pytest.raises(
+        NotImplementedError,
+        match='Only `method="parametric"` and `method="nonparametric"` are implemented.',
+    ):
+        BetweenStats(sample_data["x"], sample_data["y"], method=method, paired=paired)
+
+
 def test_error_invalid_orientation(sample_data):
     with pytest.raises(
         ValueError,
-        match="orientation argument must be one of: 'vertical', 'horizontal'.",
+        match="`orientation` must be one of: 'vertical', 'horizontal'.",
     ):
         BetweenStats(sample_data["x"], sample_data["y"]).plot(orientation="invalid")
+
+
+def test_error_invalid_method(sample_data):
+    with pytest.raises(
+        ValueError,
+        match=r"^`method` must be one of",
+    ):
+        BetweenStats(sample_data["x"], sample_data["y"], method="invalid")
 
 
 def test_error_invalid_colors(sample_data):
