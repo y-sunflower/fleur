@@ -7,14 +7,17 @@ format: gfm
 ```{python}
 # | echo: false
 # | output: false
+from fleur import BetweenStats, ScatterStats, datasets
 
-import matplotlib.pyplot as plt
+df = datasets.load_iris()
 
-plt.rcParams["figure.dpi"] = 200
-plt.rcParams["savefig.dpi"] = 200
+fig = BetweenStats(df["sepal_length"], df["species"]).plot()
+fig.savefig("img/quickstart-betweenstats.png", dpi=200)
+
+fig = ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+fig.savefig("img/quickstart-scatterstats.png", dpi=200)
 ```
 
-![Coverage](coverage-badge.svg)
 
 
 # `fleur`: stats and plots holding hands
@@ -25,6 +28,8 @@ plt.rcParams["savefig.dpi"] = 200
 
 [Documentation website](https://y-sunflower.github.io/fleur/)
 
+![Coverage](coverage-badge.svg)
+
 <br>
 
 ## Quick start
@@ -32,24 +37,30 @@ plt.rcParams["savefig.dpi"] = 200
 ### Group comparison
 
 ```{python}
+# | output: false
 from fleur import BetweenStats
 from fleur import datasets
 
 df = datasets.load_iris()
 
-fig = BetweenStats(df["sepal_length"], df["species"]).plot()
+BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
+
+![](docs/img/quickstart-betweenstats.png)
 
 ### Correlation
 
 ```{python}
+# | output: false
 from fleur import ScatterStats
 from fleur import datasets
 
 df = datasets.load_iris()
 
-fig = ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 ```
+
+![](docs/img/quickstart-scatterstats.png)
 
 <br><br>
 

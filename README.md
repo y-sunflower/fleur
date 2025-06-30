@@ -1,10 +1,7 @@
+# `fleur`: stats and plots holding hands
 
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
-
-![Coverage](coverage-badge.svg)
-
-# `fleur`: stats and plots holding hands
 
 `fleur` provides a set of tools to combine data visualization with
 statistics.
@@ -13,6 +10,8 @@ statistics.
 > regular breaking changes.
 
 [Documentation website](https://y-sunflower.github.io/fleur/)
+
+![Coverage](coverage-badge.svg)
 
 <br>
 
@@ -26,10 +25,10 @@ from fleur import datasets
 
 df = datasets.load_iris()
 
-fig = BetweenStats(df["sepal_length"], df["species"]).plot()
+BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
 
-![](README_files/figure-commonmark/cell-3-output-1.png)
+![](docs/img/quickstart-betweenstats.png)
 
 ### Correlation
 
@@ -39,10 +38,10 @@ from fleur import datasets
 
 df = datasets.load_iris()
 
-fig = ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 ```
 
-![](README_files/figure-commonmark/cell-4-output-1.png)
+![](docs/img/quickstart-scatterstats.png)
 
 <br><br>
 
