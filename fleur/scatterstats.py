@@ -8,7 +8,7 @@ import warnings
 from typing import Iterable, Literal
 from narwhals.typing import SeriesT, Frame
 
-from .input_data_handling import _InputDataHandler
+from ._utils import _InputDataHandler
 from fleur._utils import _count_n_decimals, _themify
 
 

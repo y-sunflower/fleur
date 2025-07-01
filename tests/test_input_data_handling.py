@@ -5,7 +5,7 @@ import numpy as np
 
 from typing import Dict
 
-from fleur.input_data_handling import _InputDataHandler
+from fleur._utils import _InputDataHandler
 
 import pytest
 
