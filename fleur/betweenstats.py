@@ -73,6 +73,8 @@ class BetweenStats:
         df = self._data_info["dataframe"]
 
         cat_col, num_col = _infer_types(x_name, y_name, df)
+        self._cat_col = cat_col
+        self._num_col = num_col
         self._result = [sub_df[num_col].to_list() for _, sub_df in df.group_by(cat_col)]
         self._sample_sizes = [len(sub_df) for _, sub_df in df.group_by(cat_col)]
         self._cat_labels = df[cat_col].unique().to_list()
