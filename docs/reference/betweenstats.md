@@ -137,6 +137,10 @@ Again, there are parametric and non-parametric approaches depending on the assum
 
     Use the **Kruskal-Wallis test**, which does not assume normality and compares the overall distributions across groups.
 
+=== "Robust ❌"
+
+    TODO
+
 ### Dependent (repeated measures) samples
 
 === "Parametric ❌"
@@ -146,3 +150,7 @@ Again, there are parametric and non-parametric approaches depending on the assum
 === "Non-parametric ❌"
 
     If normality is not assumed, use the **Friedman test**, which compares distributions across related groups without assuming normality.
+
+=== "Robust ❌"
+
+    TODO

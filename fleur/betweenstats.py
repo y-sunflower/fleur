@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.collections import PolyCollection
-from typing import Union, Optional, Iterable, Any, Dict, List, cast, AnyStr, Literal
+from typing import Union, Optional, Iterable, Any, Dict, List, cast, Literal
 from narwhals.typing import SeriesT, Frame
 
 from ._utils import _infer_types, _themify, _beeswarm
@@ -91,6 +91,8 @@ class BetweenStats:
         them as attributes.
 
         Args:
+            approach: A character specifying the type of statistical approach:
+                "parametric" (default), "nonparametric", "robust", "bayes".
             kwargs: Additional arguments passed to the scipy test function.
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
                 or `scipy.stats.f_oneway()`.
@@ -201,7 +203,7 @@ class BetweenStats:
                 f"F({self.dof_between}, {self.dof_within}) = {self.statistic:.2f}"
             )
 
-        expr_list: List[AnyStr] = [
+        expr_list: List[str] = [
             "$",
             f"{self.main_stat}, ",
             f"p = {self.pvalue:.4f}, ",
@@ -337,7 +339,7 @@ class BetweenStats:
         """
         print("Between stats comparison\n")
 
-        info_about_test: List[AnyStr] = [
+        info_about_test: List[str] = [
             f"{self.name} ",
             f"with {self.n_cat} groups" if self.is_ANOVA else "",
         ]
