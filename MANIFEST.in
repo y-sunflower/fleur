@@ -1,1 +1,1 @@
-include fleur/datasets/*.csv
+include fleur/data/*.csv

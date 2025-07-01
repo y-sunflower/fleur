@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def _beeswarm(y, nbins=None, width=0.25):
+def _beeswarm(y, width):
     """
     Computes x-coordinates for a beeswarm plot, given a set of y-values.
 
@@ -14,7 +14,7 @@ def _beeswarm(y, nbins=None, width=0.25):
         np.ndarray: x-offsets corresponding to each y-value.
     """
     y = np.asarray(y)
-    nbins = nbins or int(np.ceil(len(y) / 6))
+    nbins = int(np.ceil(len(y) / 6))
 
     counts, bin_edges = np.histogram(y, bins=nbins)
     max_bin_count = counts.max()

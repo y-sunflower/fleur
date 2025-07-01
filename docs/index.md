@@ -10,14 +10,19 @@
 
 ## Examples
 
+Currently, `fleur` has 2 things that you can benefit:
+
+- `BetweenStats`: a class for group comparisons
+- `ScatterStats`: a class for numerical correlation
+
 === "Group comparison"
 
     ```py
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot()
     ```
@@ -27,9 +32,9 @@
     ```py
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
     ```

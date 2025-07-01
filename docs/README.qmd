@@ -7,9 +7,9 @@ format: gfm
 ```{python}
 # | echo: false
 # | output: false
-from fleur import BetweenStats, ScatterStats, datasets
+from fleur import BetweenStats, ScatterStats, data
 
-df = datasets.load_iris()
+df = data.load_iris()
 
 fig = BetweenStats(df["sepal_length"], df["species"]).plot()
 fig.savefig("img/quickstart-betweenstats.png", dpi=200)
@@ -39,9 +39,9 @@ fig.savefig("img/quickstart-scatterstats.png", dpi=200)
 ```{python}
 # | output: false
 from fleur import BetweenStats
-from fleur import datasets
+from fleur import data
 
-df = datasets.load_iris()
+df = data.load_iris()
 
 BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
@@ -53,9 +53,9 @@ BetweenStats(df["sepal_length"], df["species"]).plot()
 ```{python}
 # | output: false
 from fleur import ScatterStats
-from fleur import datasets
+from fleur import data
 
-df = datasets.load_iris()
+df = data.load_iris()
 
 ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 ```

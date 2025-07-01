@@ -11,9 +11,9 @@
     ```py
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot()
     ```
@@ -23,9 +23,9 @@
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
        colors=["#005f73", "#ee9b00", "#9b2226"]
@@ -37,9 +37,9 @@
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
        orientation="horizontal"
@@ -51,9 +51,9 @@
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
       show_stats=False
@@ -65,9 +65,9 @@
     ```py hl_lines="8 9 10"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
       box=False,
@@ -137,6 +137,10 @@ Again, there are parametric and non-parametric approaches depending on the assum
 
     Use the **Kruskal-Wallis test**, which does not assume normality and compares the overall distributions across groups.
 
+=== "Robust ❌"
+
+    TODO
+
 ### Dependent (repeated measures) samples
 
 === "Parametric ❌"
@@ -146,3 +150,7 @@ Again, there are parametric and non-parametric approaches depending on the assum
 === "Non-parametric ❌"
 
     If normality is not assumed, use the **Friedman test**, which compares distributions across related groups without assuming normality.
+
+=== "Robust ❌"
+
+    TODO

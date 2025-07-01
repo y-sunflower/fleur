@@ -1,6 +1,5 @@
 # `fleur`: stats and plots holding hands
 
-
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
 `fleur` provides a set of tools to combine data visualization with
@@ -19,11 +18,11 @@ statistics.
 
 ### Group comparison
 
-``` python
+```python
 from fleur import BetweenStats
-from fleur import datasets
+from fleur import data
 
-df = datasets.load_iris()
+df = data.load_iris()
 
 BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
@@ -32,11 +31,11 @@ BetweenStats(df["sepal_length"], df["species"]).plot()
 
 ### Correlation
 
-``` python
+```python
 from fleur import ScatterStats
-from fleur import datasets
+from fleur import data
 
-df = datasets.load_iris()
+df = data.load_iris()
 
 ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 ```
@@ -47,7 +46,7 @@ ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 
 ## Installation
 
-``` bash
+```bash
 pip install fleur
 ```
 
