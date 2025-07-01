@@ -3,25 +3,25 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 from fleur import ScatterStats
-from fleur import datasets
+from fleur import data
 
 
 @pytest.fixture
 def sample_data():
-    df = datasets.load_iris()
+    df = data.load_iris()
     df = df.rename(columns={"sepal_width": "x", "sepal_length": "y"})
     return df
 
 
 @pytest.mark.parametrize("alternative", ["two-sided", "less", "greater"])
-@pytest.mark.parametrize("correlation_measure", ["pearson", "kendall", "spearman"])
+@pytest.mark.parametrize("effect_size", ["pearson", "kendall", "spearman"])
 @pytest.mark.parametrize("bins", [None, 10, [10, 10], [10, 20]])
-def test_default(sample_data, alternative, correlation_measure, bins):
+def test_default(sample_data, alternative, effect_size, bins):
     ss = ScatterStats(
         sample_data["x"],
         sample_data["y"],
         alternative=alternative,
-        correlation_measure=correlation_measure,
+        effect_size=effect_size,
     )
 
     fig = ss.plot(bins=bins)
@@ -84,20 +84,12 @@ def test_raise_warning(sample_data):
         )
 
 
-def test_error_alternative(sample_data):
+def test_effect_size_invalid(sample_data):
     with pytest.raises(
         ValueError,
-        match="alternative argument must be one of: 'two-sided', 'less', 'greater'.",
+        match="effect_size argument must be one of: 'pearson', 'kendall', 'spearman'.",
     ):
-        ScatterStats(sample_data["x"], sample_data["y"], alternative="invalid")
-
-
-def test_correlation_measure_invalid(sample_data):
-    with pytest.raises(
-        ValueError,
-        match="correlation_measure argument must be one of: 'pearson', 'kendall', 'spearman'.",
-    ):
-        ScatterStats(sample_data["x"], sample_data["y"], correlation_measure="invalid")
+        ScatterStats(sample_data["x"], sample_data["y"], effect_size="invalid")
 
 
 def test_summary_prints(capsys, sample_data):

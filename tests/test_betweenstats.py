@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 from fleur import BetweenStats
-import fleur.datasets as datasets
+import fleur.data as data
 
 
 @pytest.fixture
 def sample_data():
-    df = datasets.load_iris()
+    df = data.load_iris()
     df = df.rename(columns={"species": "x", "sepal_length": "y"})
     return df
 

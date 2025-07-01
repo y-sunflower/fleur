@@ -15,7 +15,7 @@
     ```py
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -27,7 +27,7 @@
     ```py
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 

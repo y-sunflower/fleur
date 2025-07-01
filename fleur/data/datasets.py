@@ -35,7 +35,7 @@ def _load_data(dataset_name: str, backend: str, **kwargs) -> DataFrameT:
         raise ValueError(f"backend must be one of: {' ,'.join(AVAILABLE_OUTPUTS)}")
 
     dataset_file: str = f"{dataset_name}.csv"
-    dataset_path: str = os.path.join(PACKAGE_DIR, "datasets", dataset_file)
+    dataset_path: str = os.path.join(PACKAGE_DIR, dataset_file)
     df: DataFrameT = nw.read_csv(dataset_path, backend=backend, **kwargs).to_native()
 
     return df

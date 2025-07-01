@@ -11,7 +11,7 @@
     ```py
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -23,7 +23,7 @@
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -37,7 +37,7 @@
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -51,7 +51,7 @@
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -65,7 +65,7 @@
     ```py hl_lines="8 9 10"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 

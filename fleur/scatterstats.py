@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 import scipy.stats as st
 import numpy as np
 
 import warnings
-from typing import Union, Optional, Iterable, List
+from typing import Iterable, Literal
 from narwhals.typing import SeriesT, Frame
 
 from .input_data_handling import _InputDataHandler
@@ -31,11 +32,11 @@ class ScatterStats:
 
     def __init__(
         self,
-        x: Union[str, SeriesT, Iterable],
-        y: Union[str, SeriesT, Iterable],
-        data: Optional[Frame] = None,
+        x: str | SeriesT | Iterable,
+        y: str | SeriesT | Iterable,
+        data: Frame | None = None,
         alternative: str = "two-sided",
-        correlation_measure: str = "pearson",
+        effect_size: str = "pearson",
         ci: int | float = 95,
     ):
         """
@@ -45,43 +46,52 @@ class ScatterStats:
             x: Colname of `data` or a Series or array-like.
             y: Colname of `data` or a Series or array-like.
             data: An optional dataframe.
-            alternative: Defines the alternative hypothesis. Default is 'two-sided'. Must be one of 'two-sided', 'less' and 'greater'.
-            correlation_measure: The correlation measure to use. Default is 'pearson'. Must be one of 'pearson', 'kendall', 'spearman'.
-            ci: Confidence level for the top label and the regression plot. The default value is 95 (for a 95% confidence level).
+            alternative: Defines the alternative hypothesis. Default
+                is 'two-sided'. Must be one of 'two-sided', 'less' and 'greater'.
+            effect_size: The correlation measure to use.
+                Default is 'pearson'. Must be one of 'pearson',
+                'kendall', 'spearman'.
+            ci: Confidence level for the label and the regression
+                plot. The default value is 95 (for a 95% confidence
+                level).
         """
-        if alternative not in ["two-sided", "less", "greater"]:
+        if effect_size not in ["pearson", "kendall", "spearman"]:
             raise ValueError(
-                "alternative argument must be one of: 'two-sided', 'less', 'greater'."
-            )
-
-        if correlation_measure not in ["pearson", "kendall", "spearman"]:
-            raise ValueError(
-                "correlation_measure argument must be one of: 'pearson', 'kendall', 'spearman'."
+                "effect_size argument must be one of: 'pearson', 'kendall', 'spearman'."
             )
 
         self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
 
-        x_name = self._data_info["x_name"]
-        y_name = self._data_info["y_name"]
+        x_name: str = self._data_info["x_name"]
+        y_name: str = self._data_info["y_name"]
         df = self._data_info["dataframe"]
 
         self._x_np = df[x_name].to_numpy()
         self._y_np = df[y_name].to_numpy()
+        self.n_obs = len(df)
 
+        self._fit(alternative=alternative, effect_size=effect_size, ci=ci)
+
+    def _fit(self, alternative: str, effect_size: str, ci: int | float):
         regression = st.linregress(self._x_np, self._y_np, alternative=alternative)
 
-        self.n_obs = len(df)
         self.alpha = 1 - ci / 100
         self.dof = self.n_obs - 2
 
-        if correlation_measure == "pearson":
-            correlation = st.pearsonr(self._x_np, self._y_np).statistic
+        if effect_size == "pearson":
+            correlation = st.pearsonr(
+                self._x_np, self._y_np, alternative=alternative
+            ).statistic
             self._symbol_correl = "\\rho"
-        elif correlation_measure == "kendall":
-            correlation = st.kendalltau(self._x_np, self._y_np).statistic
+        elif effect_size == "kendall":
+            correlation = st.kendalltau(
+                self._x_np, self._y_np, alternative=alternative
+            ).statistic
             self._symbol_correl = "\\tau"
-        elif correlation_measure == "spearman":
-            correlation = st.spearmanr(self._x_np, self._y_np).statistic
+        elif effect_size == "spearman":
+            correlation = st.spearmanr(
+                self._x_np, self._y_np, alternative=alternative
+            ).statistic
             self._symbol_correl = "\\rho"
 
         self.pvalue = regression.pvalue
@@ -92,20 +102,20 @@ class ScatterStats:
         self.ci_lower = self.slope - self._t_critical * self.stderr_slope
         self.ci_upper = self.slope + self._t_critical * self.stderr_slope
 
-        ci_decimal = _count_n_decimals(ci)
+        ci_decimal: int = _count_n_decimals(ci)
 
-        expr_list = [
+        expr_list: list[str] = [
             "$",
             f"t_{{Student}}({self.dof}) = {self.slope:.2f}, ",
             f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{self.ci_lower:.2f}, {self.ci_upper:.2f}], ",
             f"p = {self.pvalue:.4f}, ",
-            f"{self._symbol_correl}_{{{correlation_measure.title()}}} = {correlation:.2f}, ",
+            f"{self._symbol_correl}_{{{effect_size.title()}}} = {correlation:.2f}, ",
             f"n_{{obs}} = {self.n_obs}",
             "$",
         ]
         self._expression = "".join(expr_list)
 
-        expr_list = [
+        expr_list: list[str] = [
             "$",
             f"\\hat{{y}}_i = {self.intercept:.2f}",
             f" {'+' if self.slope >= 0 else '-'} ",
@@ -118,12 +128,12 @@ class ScatterStats:
         self,
         *,
         marginal: bool = True,
-        bins: Optional[Union[int, List[int]]] = None,
-        scatter_kws: Union[dict, None] = None,
-        line_kws: Union[dict, None] = None,
-        area_kws: Union[dict, None] = None,
-        hist_kws: Union[dict, None] = None,
-        subplot_mosaic_kwargs: Union[dict, None] = None,
+        bins: int | list[int] | None = None,
+        scatter_kws: dict | None = None,
+        line_kws: dict | None = None,
+        area_kws: dict | None = None,
+        hist_kws: dict | None = None,
+        subplot_mosaic_kwargs: dict | None = None,
         show_stats: bool = True,
     ) -> Figure:
         r"""
@@ -146,11 +156,11 @@ class ScatterStats:
                 category=UserWarning,
             )
 
-        default_subplot_mosaic_kwargs = dict(
+        default_subplot_mosaic_kwargs: dict = dict(
             width_ratios=(5, 1), height_ratios=(1, 5), figsize=(8, 6)
         )
         if subplot_mosaic_kwargs is None:
-            subplot_mosaic_kwargs = {}
+            subplot_mosaic_kwargs: dict = {}
         default_subplot_mosaic_kwargs.update(subplot_mosaic_kwargs)
 
         if marginal:
@@ -160,10 +170,10 @@ class ScatterStats:
     """
             fig, axs = plt.subplot_mosaic(scheme, **default_subplot_mosaic_kwargs)
             fig.subplots_adjust(wspace=0, hspace=0)
-            ax = axs["A"]  # main Axes of the Figure
+            ax: Axes = axs["A"]  # main Axes of the Figure
         else:
-            ax = plt.gca()
-            fig = plt.gcf()
+            ax: Axes = plt.gca()
+            fig: Figure = plt.gcf()
 
         self.fig = fig
         self.ax = ax
@@ -201,18 +211,18 @@ class ScatterStats:
         ax.scatter(self._x_np, self._y_np, **scatter_kws)
         ax.plot(x_values, y_values, **line_kws)
 
-        ax = _themify(ax)
+        ax: Axes = _themify(ax)
 
         if marginal:
             if bins is None:
-                bins = 12
+                bins: Literal[12] = 12
 
             if hist_kws is None:
-                hist_kws = {}
+                hist_kws: dict = {}
 
             if isinstance(bins, list):
-                binsB = bins[0]
-                binsC = bins[1]
+                binsB: int = bins[0]
+                binsC: int = bins[1]
             else:
                 binsB = binsC = bins
 
@@ -223,7 +233,7 @@ class ScatterStats:
             axs["C"].axis("off")
 
         if show_stats:
-            annotation_params = dict(transform=fig.transFigure, va="top")
+            annotation_params: dict = dict(transform=fig.transFigure, va="top")
             fig.text(x=0.1, y=0.95, s=self._expression, size=9, **annotation_params)
             fig.text(
                 x=0.75,

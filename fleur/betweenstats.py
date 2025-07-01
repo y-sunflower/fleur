@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.collections import PolyCollection
-from typing import Union, Optional, Iterable, Any, Dict, List, cast, Literal
+from typing import Iterable, Any, cast, Literal
 from narwhals.typing import SeriesT, Frame
 
 from ._utils import _infer_types, _themify, _beeswarm
@@ -40,9 +40,9 @@ class BetweenStats:
 
     def __init__(
         self,
-        x: Union[str, SeriesT, Iterable],
-        y: Union[str, SeriesT, Iterable],
-        data: Optional[Frame] = None,
+        x: str | SeriesT | Iterable,
+        y: str | SeriesT | Iterable,
+        data: Frame | None = None,
         paired: bool = False,
         approach: str = "parametric",
         **kwargs: Any,
@@ -61,7 +61,7 @@ class BetweenStats:
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
                 `scipy.stats.f_oneway()`, `scipy.stats.wilcoxon()`
         """
-        valid_approachs: List[str] = ["parametric", "nonparametric", "robust", "bayes"]
+        valid_approachs: list[str] = ["parametric", "nonparametric", "robust", "bayes"]
         if approach not in valid_approachs:
             raise ValueError(
                 f"`approach` must be one of {valid_approachs}, not {approach}"
@@ -203,7 +203,7 @@ class BetweenStats:
                 f"F({self.dof_between}, {self.dof_within}) = {self.statistic:.2f}"
             )
 
-        expr_list: List[str] = [
+        expr_list: list[str] = [
             "$",
             f"{self.main_stat}, ",
             f"p = {self.pvalue:.4f}, ",
@@ -216,16 +216,16 @@ class BetweenStats:
         self,
         *,
         orientation: str = "vertical",
-        colors: Optional[list] = None,
+        colors: list | None = None,
         show_stats: bool = True,
         jitter_amount: float = 0.25,
         violin: bool = True,
         box: bool = True,
         scatter: bool = True,
-        violin_kws: Union[dict, None] = None,
-        box_kws: Union[dict, None] = None,
-        scatter_kws: Union[dict, None] = None,
-        ax: Optional[Axes] = None,
+        violin_kws: dict | None = None,
+        box_kws: dict | None = None,
+        scatter_kws: dict | None = None,
+        ax: Axes | None = None,
     ) -> Figure:
         """
         Plot and fit the `BetweenStats` class to data and render a statistical
@@ -254,7 +254,7 @@ class BetweenStats:
             raise ValueError("`orientation` must be one of: 'vertical', 'horizontal'.")
 
         if colors is None:
-            colors: List = plt.rcParams["axes.prop_cycle"].by_key()["color"][
+            colors: list = plt.rcParams["axes.prop_cycle"].by_key()["color"][
                 : self.n_cat
             ]
         else:
@@ -267,28 +267,28 @@ class BetweenStats:
         if ax is None:
             ax: Axes = plt.gca()
         if violin_kws is None:
-            violin_kws: Dict = {}
+            violin_kws: dict = {}
         if box_kws is None:
-            box_kws: Dict = {}
+            box_kws: dict = {}
         if scatter_kws is None:
-            scatter_kws: Dict = {}
-        violin_default_kws: Dict = {"orientation": orientation, "showextrema": False}
+            scatter_kws: dict = {}
+        violin_default_kws: dict = {"orientation": orientation, "showextrema": False}
         violin_default_kws.update(violin_kws)
-        box_default_kws: Dict = {"orientation": orientation}
+        box_default_kws: dict = {"orientation": orientation}
         box_default_kws.update(box_kws)
-        scatter_default_kws: Dict = {"alpha": 0.5}
+        scatter_default_kws: dict = {"alpha": 0.5}
         scatter_default_kws.update(scatter_kws)
 
         if violin:
-            violin_artists: Dict = ax.violinplot(self._result, **violin_default_kws)
-            bodies: List[PolyCollection] = cast(
-                List[PolyCollection], violin_artists["bodies"]
+            violin_artists: dict = ax.violinplot(self._result, **violin_default_kws)
+            bodies: list[PolyCollection] = cast(
+                list[PolyCollection], violin_artists["bodies"]
             )
             for patch, color in zip(bodies, colors):
                 patch.set(color=color)
 
         if box:
-            box_style: Dict = {"color": "#3b3b3b"}
+            box_style: dict = {"color": "#3b3b3b"}
             ax.boxplot(
                 self._result,
                 boxprops=box_style,
@@ -311,13 +311,13 @@ class BetweenStats:
                     ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
         if show_stats:
-            annotation_params: Dict = dict(transform=ax.transAxes, va="top")
+            annotation_params: dict = dict(transform=ax.transAxes, va="top")
             ax.text(x=0.05, y=1.09, s=self._expression, size=9, **annotation_params)
 
         ax: Axes = _themify(ax)
 
-        ticks: List = [i + 1 for i in range(len(self._sample_sizes))]
-        labels: List = [
+        ticks: list[int] = [i + 1 for i in range(len(self._sample_sizes))]
+        labels: list[str] = [
             f"{label}\nn = {n}"
             for n, label in zip(self._sample_sizes, self._cat_labels)
         ]
@@ -339,7 +339,7 @@ class BetweenStats:
         """
         print("Between stats comparison\n")
 
-        info_about_test: List[str] = [
+        info_about_test: list[str] = [
             f"{self.name} ",
             f"with {self.n_cat} groups" if self.is_ANOVA else "",
         ]

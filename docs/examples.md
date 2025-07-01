@@ -9,7 +9,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -21,7 +21,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -35,7 +35,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -49,7 +49,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -63,7 +63,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8 9"
     # mkdocs: render
     from fleur import BetweenStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -82,7 +82,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -94,7 +94,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -108,7 +108,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8 9 10"
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -124,7 +124,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 
@@ -136,7 +136,7 @@ A bunch of examples of things you can do with `fleur`:
     ```py hl_lines="8"
     # mkdocs: render
     from fleur import ScatterStats
-    from fleur import datasets
+    from fleur import data
 
     df = datasets.load_iris()
 

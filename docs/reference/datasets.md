@@ -4,8 +4,8 @@
 
 <br>
 
-::: fleur.datasets.load_iris
+::: fleur.data.load_iris
 
 <br>
 
-::: fleur.datasets.load_mtcars
+::: fleur.data.load_mtcars
