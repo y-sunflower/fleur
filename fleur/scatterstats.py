@@ -179,12 +179,12 @@ class ScatterStats:
         self.ax = ax
 
         if scatter_kws is None:
-            scatter_kws = {}
+            scatter_kws: dict = {}
         if line_kws is None:
-            line_kws = {}
+            line_kws: dict = {}
         if area_kws is None:
-            area_kws = {}
-        area_default_kws = {
+            area_kws: dict = {}
+        area_default_kws: dict = {
             "color": plt.rcParams["axes.prop_cycle"].by_key()["color"][0],
             "alpha": 0.2,
         }
@@ -247,25 +247,3 @@ class ScatterStats:
             )
 
         return self.fig
-
-    def summary(self):
-        """
-        Print a text summary of the statistical test performed.
-
-        Displays the formatted test statistic with p-value, CI, etc.
-
-        Raises:
-            RuntimeError: If `plot()` was not called before `summary()`.
-        """
-        print("Correlation stats\n")
-
-        clean_expression = (
-            self._expression.replace("$", "")
-            .replace("{", "")
-            .replace("}", "")
-            .replace("/", "")
-        )
-
-        info_about_test = "Student t test of the coefficient on x"
-        print(f"Test: {info_about_test}")
-        print(f"{clean_expression}")

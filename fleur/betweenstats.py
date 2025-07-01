@@ -329,24 +329,3 @@ class BetweenStats:
         self.ax = ax
 
         return plt.gcf()
-
-    def summary(self):
-        """
-        Print a text summary of the statistical test performed.
-
-        Displays the type of test conducted (t-test or ANOVA), number of groups,
-        and the formatted test statistic with p-value and sample size.
-        """
-        print("Between stats comparison\n")
-
-        info_about_test: list[str] = [
-            f"{self.name} ",
-            f"with {self.n_cat} groups" if self.is_ANOVA else "",
-        ]
-        info_about_test: str = "".join(info_about_test)
-
-        clean_expression = (
-            self._expression.replace("$", "").replace("{", "").replace("}", "")
-        )
-        print(f"Test: {info_about_test}")
-        print(clean_expression)

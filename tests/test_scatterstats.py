@@ -90,10 +90,3 @@ def test_effect_size_invalid(sample_data):
         match="effect_size argument must be one of: 'pearson', 'kendall', 'spearman'.",
     ):
         ScatterStats(sample_data["x"], sample_data["y"], effect_size="invalid")
-
-
-def test_summary_prints(capsys, sample_data):
-    ss = ScatterStats(sample_data["x"], sample_data["y"])
-    ss.summary()
-    captured = capsys.readouterr()
-    assert captured.out.startswith("Correlation stats")

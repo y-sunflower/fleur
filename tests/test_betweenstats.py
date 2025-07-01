@@ -52,13 +52,6 @@ def test_expected_attributes(sample_data, orientation, show_stats):
     plt.close(fig)
 
 
-def test_summary_prints(capsys, sample_data):
-    bs = BetweenStats(sample_data["x"], sample_data["y"])
-    bs.summary()
-    captured = capsys.readouterr()
-    assert captured.out.startswith("Between stats comparison")
-
-
 @pytest.mark.parametrize("approach", ["parametric", "nonparametric"])
 def test_three_categories(sample_data, approach):
     bs = BetweenStats(
