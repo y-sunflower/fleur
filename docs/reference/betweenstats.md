@@ -13,7 +13,7 @@
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot()
     ```
@@ -25,7 +25,7 @@
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
        colors=["#005f73", "#ee9b00", "#9b2226"]
@@ -39,7 +39,7 @@
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
        orientation="horizontal"
@@ -53,7 +53,7 @@
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
       show_stats=False
@@ -67,7 +67,7 @@
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
       box=False,

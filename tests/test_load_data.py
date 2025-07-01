@@ -3,8 +3,7 @@ import pandas as pd
 import polars as pl
 import os
 
-from fleur.data import load_iris, load_mtcars
-from fleur.data.datasets import _load_data
+from fleur.data import load_iris, load_mtcars, _load_data
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_FILE = "iris.csv"

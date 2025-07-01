@@ -17,7 +17,7 @@
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot()
     ```
@@ -29,7 +29,7 @@
     from fleur import ScatterStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
     ```

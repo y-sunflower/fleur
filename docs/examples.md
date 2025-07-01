@@ -11,7 +11,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot()
     ```
@@ -23,7 +23,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
        colors=["#005f73", "#ee9b00", "#9b2226"]
@@ -37,7 +37,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
        orientation="horizontal"
@@ -51,7 +51,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
       show_stats=False
@@ -65,7 +65,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import BetweenStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     BetweenStats(df["sepal_length"], df["species"]).plot(
       box=False,
@@ -84,7 +84,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import ScatterStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot()
     ```
@@ -96,7 +96,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import ScatterStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(
         bins=25
@@ -110,7 +110,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import ScatterStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(
         scatter_kws=dict(color="#c1121f", edgecolor="black"),
@@ -126,7 +126,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import ScatterStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(x=df["sepal_length"], y=df["sepal_width"], ci=99).plot()
     ```
@@ -138,7 +138,7 @@ A bunch of examples of things you can do with `fleur`:
     from fleur import ScatterStats
     from fleur import data
 
-    df = datasets.load_iris()
+    df = data.load_iris()
 
     ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(
       show_stats=False
