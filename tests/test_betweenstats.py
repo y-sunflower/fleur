@@ -59,44 +59,44 @@ def test_summary_prints(capsys, sample_data):
     assert captured.out.startswith("Between stats comparison")
 
 
-@pytest.mark.parametrize("method", ["parametric", "nonparametric"])
-def test_three_categories(sample_data, method):
+@pytest.mark.parametrize("approach", ["parametric", "nonparametric"])
+def test_three_categories(sample_data, approach):
     bs = BetweenStats(
         sample_data["x"],
         sample_data["y"],
         paired=False,
-        method=method,
+        approach=approach,
     )
 
-    if method == "parametric":
+    if approach == "parametric":
         assert bs.name == "One-way ANOVA"
-    elif method == "nonparametric":
+    elif approach == "nonparametric":
         assert bs.name == "Kruskal-Wallis H-test"
 
 
-@pytest.mark.parametrize("method", ["parametric", "nonparametric"])
+@pytest.mark.parametrize("approach", ["parametric", "nonparametric"])
 @pytest.mark.parametrize("paired", [True, False])
-def test_two_categories(sample_data, paired, method):
+def test_two_categories(sample_data, paired, approach):
     sample_data = sample_data[sample_data["x"] != "setosa"]
 
     bs = BetweenStats(
         sample_data["x"],
         sample_data["y"],
         paired=paired,
-        method=method,
+        approach=approach,
     )
 
     assert hasattr(bs, "dof")
 
     if paired:
-        if method == "parametric":
+        if approach == "parametric":
             assert bs.name == "Paired t-test"
-        elif method == "nonparametric":
+        elif approach == "nonparametric":
             assert bs.name == "Wilcoxon signed-rank test"
     else:
-        if method == "parametric":
+        if approach == "parametric":
             assert bs.name == "T-test"
-        elif method == "nonparametric":
+        elif approach == "nonparametric":
             assert bs.name == "Mann-Whitney U rank test"
 
 
@@ -110,8 +110,8 @@ def test_not_enough_categories(sample_data):
         BetweenStats(sample_data["x"], sample_data["y"])
 
 
-@pytest.mark.parametrize("method", ["robust", "bayes"])
-def test_raise_notimplemented_error(sample_data, method):
+@pytest.mark.parametrize("approach", ["robust", "bayes"])
+def test_raise_notimplemented_error(sample_data, approach):
     with pytest.raises(
         NotImplementedError,
         match="Repeated measures ANOVA has not been implemented yet.",
@@ -120,21 +120,21 @@ def test_raise_notimplemented_error(sample_data, method):
 
     with pytest.raises(
         NotImplementedError,
-        match='Only `method="parametric"` and `method="nonparametric"` are implemented.',
+        match='Only `approach="parametric"` and `approach="nonparametric"` are implemented.',
     ):
-        BetweenStats(sample_data["x"], sample_data["y"], method=method)
+        BetweenStats(sample_data["x"], sample_data["y"], approach=approach)
 
 
 @pytest.mark.parametrize(
-    "method, paired, expected_exception, match",
+    "approach, paired, expected_exception, match",
     [
         (
             "bayes",
             False,
             NotImplementedError,
             (
-                'Only `method="parametric"`, `method="nonparametric"` '
-                'and `method="robust"` have been implemented for '
+                'Only `approach="parametric"`, `approach="nonparametric"` '
+                'and `approach="robust"` have been implemented for '
                 "independant samples."
             ),
         ),
@@ -143,7 +143,7 @@ def test_raise_notimplemented_error(sample_data, method):
             True,
             NotImplementedError,
             (
-                'Only `method="parametric"` and `method="nonparametric"` '
+                'Only `approach="parametric"` and `approach="nonparametric"` '
                 "have been implemented for paired samples."
             ),
         ),
@@ -152,57 +152,63 @@ def test_raise_notimplemented_error(sample_data, method):
             True,
             NotImplementedError,
             (
-                'Only `method="parametric"` and `method="nonparametric"` '
+                'Only `approach="parametric"` and `approach="nonparametric"` '
                 "have been implemented for paired samples."
             ),
         ),
     ],
 )
 def test_raise_notimplemented_error2(
-    sample_data, method, paired, expected_exception, match
+    sample_data, approach, paired, expected_exception, match
 ):
     sample_data = sample_data[sample_data["x"] != "setosa"]
 
     with pytest.raises(expected_exception, match=match):
-        BetweenStats(sample_data["x"], sample_data["y"], method=method, paired=paired)
+        BetweenStats(
+            sample_data["x"], sample_data["y"], approach=approach, paired=paired
+        )
 
 
 @pytest.mark.parametrize(
-    "method, trim, warning_match",
+    "approach, trim, warning_match",
     [
         (
             "robust",
             None,
             (
-                "Setting `method='robust'` without setting a value "
+                "Setting `approach='robust'` without setting a value "
                 "of `trim` above 0 is equivalent of using default "
-                "`method='parametric'`. "
-                "Remove `method='robust'` to hide this warning."
+                "`approach='parametric'`. "
+                "Remove `approach='robust'` to hide this warning."
             ),
         ),
         (
             "robust",
             0,
             (
-                "Setting `method='robust'` without setting a value "
+                "Setting `approach='robust'` without setting a value "
                 "of `trim` above 0 is equivalent of using default "
-                "`method='parametric'`. "
-                "Remove `method='robust'` to hide this warning."
+                "`approach='parametric'`. "
+                "Remove `approach='robust'` to hide this warning."
             ),
         ),
     ],
 )
-def test_warns_for_robust_method_without_trim(sample_data, method, trim, warning_match):
+def test_warns_for_robust_approach_without_trim(
+    sample_data, approach, trim, warning_match
+):
     sample_data = sample_data[sample_data["x"] != "setosa"]
 
     if trim is None:
 
         def warn_call():
-            BetweenStats(sample_data["x"], sample_data["y"], method=method)
+            BetweenStats(sample_data["x"], sample_data["y"], approach=approach)
     else:
 
         def warn_call():
-            BetweenStats(sample_data["x"], sample_data["y"], trim=trim, method=method)
+            BetweenStats(
+                sample_data["x"], sample_data["y"], trim=trim, approach=approach
+            )
 
     with pytest.warns(Warning, match=warning_match):
         warn_call()
@@ -213,9 +219,11 @@ def test_warn_trim_without_robust(sample_data):
 
     with pytest.warns(
         UserWarning,
-        match='Using `trim` argument without expliciting `method="robust"` is not recommended.',
+        match='Using `trim` argument without expliciting `approach="robust"` is not recommended.',
     ):
-        BetweenStats(sample_data["x"], sample_data["y"], method="parametric", trim=0.2)
+        BetweenStats(
+            sample_data["x"], sample_data["y"], approach="parametric", trim=0.2
+        )
 
     with pytest.raises(
         TypeError,
@@ -223,10 +231,10 @@ def test_warn_trim_without_robust(sample_data):
     ):
         with pytest.warns(
             UserWarning,
-            match='Using `trim` argument without expliciting `method="robust"` is not recommended.',
+            match='Using `trim` argument without expliciting `approach="robust"` is not recommended.',
         ):
             BetweenStats(
-                sample_data["x"], sample_data["y"], method="nonparametric", trim=0.2
+                sample_data["x"], sample_data["y"], approach="nonparametric", trim=0.2
             )
 
 
@@ -238,12 +246,12 @@ def test_error_invalid_orientation(sample_data):
         BetweenStats(sample_data["x"], sample_data["y"]).plot(orientation="invalid")
 
 
-def test_error_invalid_method(sample_data):
+def test_error_invalid_approach(sample_data):
     with pytest.raises(
         ValueError,
-        match=r"^`method` must be one of",
+        match=r"^`approach` must be one of",
     ):
-        BetweenStats(sample_data["x"], sample_data["y"], method="invalid")
+        BetweenStats(sample_data["x"], sample_data["y"], approach="invalid")
 
 
 def test_error_invalid_colors(sample_data):

@@ -31,8 +31,8 @@ class BetweenStats:
         is_ANOVA (bool): True if test is ANOVA, False if t-test.
         is_paired (bool): Whether a paired test was used.
         dof (int): Degrees of freedom for t-tests.
-        dof_between (int): Between-group degrees of freedom (for ANOVA).
-        dof_within (int): Within-group degrees of freedom (for ANOVA).
+        dof_between (int): Between-group degrees of freedom for ANOVA.
+        dof_within (int): Within-group degrees of freedom for ANOVA.
         n_cat (int): Number of unique categories in the group column.
         n_obs (int): Total number of observations.
         ax (matplotlib.axes.Axes): The matplotlib axes used for plotting.
@@ -44,7 +44,7 @@ class BetweenStats:
         y: Union[str, SeriesT, Iterable],
         data: Optional[Frame] = None,
         paired: bool = False,
-        method: str = "parametric",
+        approach: str = "parametric",
         **kwargs: Any,
     ):
         """
@@ -55,15 +55,17 @@ class BetweenStats:
             y: Colname of `data` or a Series or array-like.
             data: An optional dataframe used if `x` and `y` are colnames.
             paired: If True, perform paired t-test (only for 2 groups).
-            method: A character specifying the type of statistical approach:
+            approach: A character specifying the type of statistical approach:
                 "parametric" (default), "nonparametric", "robust", "bayes".
             kwargs: Additional arguments passed to the scipy test function.
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
                 `scipy.stats.f_oneway()`, `scipy.stats.wilcoxon()`
         """
-        valid_methods: List[str] = ["parametric", "nonparametric", "robust", "bayes"]
-        if method not in valid_methods:
-            raise ValueError(f"`method` must be one of {valid_methods}, not {method}")
+        valid_approachs: List[str] = ["parametric", "nonparametric", "robust", "bayes"]
+        if approach not in valid_approachs:
+            raise ValueError(
+                f"`approach` must be one of {valid_approachs}, not {approach}"
+            )
 
         self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
         self.is_paired = paired
@@ -81,9 +83,9 @@ class BetweenStats:
         self.n_cat = df[cat_col].n_unique()
         self.n_obs = len(df)
 
-        self._fit(method=method, **kwargs)
+        self._fit(approach=approach, **kwargs)
 
-    def _fit(self, method: str, **kwargs: Any):
+    def _fit(self, approach: str, **kwargs: Any):
         """
         Internal method to compute all the statistics and store
         them as attributes.
@@ -93,9 +95,9 @@ class BetweenStats:
                 Either `scipy.stats.ttest_rel()`, `scipy.stats.ttest_ind()`,
                 or `scipy.stats.f_oneway()`.
         """
-        if "trim" in kwargs and method != "robust":
+        if "trim" in kwargs and approach != "robust":
             warnings.warn(
-                'Using `trim` argument without expliciting `method="robust"` is not recommended.'
+                'Using `trim` argument without expliciting `approach="robust"` is not recommended.'
             )
 
         if self.n_cat < 2:
@@ -106,12 +108,12 @@ class BetweenStats:
             self.is_ANOVA = False
 
             if self.is_paired:
-                if method == "parametric":
+                if approach == "parametric":
                     test_output = st.ttest_rel(
                         self._result[0], self._result[1], **kwargs
                     )
                     self.name = "Paired t-test"
-                elif method == "nonparametric":
+                elif approach == "nonparametric":
                     test_output = st.wilcoxon(
                         self._result[0], self._result[1], **kwargs
                     )
@@ -119,27 +121,27 @@ class BetweenStats:
                 else:
                     raise NotImplementedError(
                         (
-                            'Only `method="parametric"` and `method="nonparametric"` '
+                            'Only `approach="parametric"` and `approach="nonparametric"` '
                             "have been implemented for paired samples."
                         )
                     )
             else:  # not paired
-                if method == "parametric":
+                if approach == "parametric":
                     test_output = st.ttest_ind(
                         self._result[0], self._result[1], **kwargs
                     )
                     self.name = "T-test"
-                elif method == "nonparametric":
+                elif approach == "nonparametric":
                     test_output = st.mannwhitneyu(
                         self._result[0], self._result[1], **kwargs
                     )
                     self.name = "Mann-Whitney U rank test"
-                elif method == "robust":
+                elif approach == "robust":
                     trim_warn_message = (
-                        "Setting `method='robust'` without setting a value "
+                        "Setting `approach='robust'` without setting a value "
                         "of `trim` above 0 is equivalent of using default "
-                        "`method='parametric'`. "
-                        "Remove `method='robust'` to hide this warning."
+                        "`approach='parametric'`. "
+                        "Remove `approach='robust'` to hide this warning."
                     )
                     if "trim" not in kwargs:
                         warnings.warn(trim_warn_message)
@@ -154,8 +156,8 @@ class BetweenStats:
                 else:
                     raise NotImplementedError(
                         (
-                            'Only `method="parametric"`, `method="nonparametric"` '
-                            'and `method="robust"` have been implemented for '
+                            'Only `approach="parametric"`, `approach="nonparametric"` '
+                            'and `approach="robust"` have been implemented for '
                             "independant samples."
                         )
                     )
@@ -181,15 +183,15 @@ class BetweenStats:
                     "Repeated measures ANOVA has not been implemented yet."
                 )
             else:  # not paired
-                if method == "parametric":
+                if approach == "parametric":
                     test_output = st.f_oneway(*self._result, **kwargs)
                     self.name = "One-way ANOVA"
-                elif method == "nonparametric":
+                elif approach == "nonparametric":
                     test_output = st.kruskal(*self._result, **kwargs)
                     self.name = "Kruskal-Wallis H-test"
                 else:
                     raise NotImplementedError(
-                        'Only `method="parametric"` and `method="nonparametric"` are implemented.'
+                        'Only `approach="parametric"` and `approach="nonparametric"` are implemented.'
                     )
             self.statistic = test_output.statistic
             self.pvalue = test_output.pvalue
@@ -214,6 +216,7 @@ class BetweenStats:
         orientation: str = "vertical",
         colors: Optional[list] = None,
         show_stats: bool = True,
+        jitter_amount: float = 0.25,
         violin: bool = True,
         box: bool = True,
         scatter: bool = True,
@@ -231,13 +234,16 @@ class BetweenStats:
             orientation: 'vertical' or 'horizontal' orientation of plots.
             colors: List of colors for each group.
             show_stats: If True, display statistics on the plot.
+            jitter_amount: Controls the horizontal spread of dots to prevent
+                overlap; 0 aligns them, higher values increase spacing.
             violin: Whether to include violin plot.
             box: Whether to include box plot.
             scatter: Whether to include scatter plot of raw data.
             violin_kws: Keyword args for violinplot customization.
             box_kws: Keyword args for boxplot customization.
             scatter_kws: Keyword args for scatter plot customization.
-            ax (matplotlib.axes.Axes, ): Existing Axes to plot on. If None, uses current Axes.
+            ax (matplotlib.axes.Axes, ): Existing Axes to plot on. If None, uses
+                current Axes.
 
         Returns:
             A matplotlib Figure.
@@ -255,6 +261,7 @@ class BetweenStats:
                     f"`colors` argument must have at least {self.n_cat} elements, "
                     f"not {len(colors)}"
                 )
+
         if ax is None:
             ax: Axes = plt.gca()
         if violin_kws is None:
@@ -293,7 +300,7 @@ class BetweenStats:
             for i, (values, label, color) in enumerate(
                 zip(self._result, self._cat_labels, colors)
             ):
-                x_offsets = _beeswarm(values)
+                x_offsets = _beeswarm(values, width=jitter_amount)
                 x_coords = np.full(len(values), i + 1) + x_offsets
 
                 if orientation == "vertical":
