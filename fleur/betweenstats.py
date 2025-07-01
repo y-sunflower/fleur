@@ -8,8 +8,7 @@ from matplotlib.collections import PolyCollection
 from typing import Iterable, Any, cast, Literal
 from narwhals.typing import SeriesT, Frame
 
-from ._utils import _infer_types, _themify, _beeswarm
-from ._utils import _InputDataHandler
+from ._utils import _infer_types, _themify, _beeswarm, _InputDataHandler
 
 import warnings
 
@@ -173,9 +172,9 @@ class BetweenStats:
                 self.dof = None  # or omit this line if not needed
                 # Use appropriate stat name
                 if self.name == "Wilcoxon signed-rank test":
-                    stat_name: Literal["W"] = "W"
+                    stat_name: Literal["W_{{Wilcoxon}}"] = "W_{{Wilcoxon}}"
                 elif self.name == "Mann-Whitney U rank test":
-                    stat_name: Literal["U"] = "U"
+                    stat_name: Literal["U_{{Mann-Whitney}}"] = "U_{{Mann-Whitney}}"
                 self.main_stat = f"{stat_name} = {self.statistic:.2f}"
 
         else:  # n >= 3

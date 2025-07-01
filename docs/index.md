@@ -10,6 +10,11 @@
 
 ## Examples
 
+Currently, `fleur` has 2 things that you can benefit:
+
+- `BetweenStats`: a class for group comparisons
+- `ScatterStats`: a class for numerical correlation
+
 === "Group comparison"
 
     ```py

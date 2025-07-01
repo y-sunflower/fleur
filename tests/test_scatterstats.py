@@ -71,16 +71,16 @@ def test_style_params(sample_data):
 
 def test_raise_warning(sample_data):
     with pytest.warns(
-        UserWarning, match="bins/hist_kws arguments are ignored when marginal=False."
+        UserWarning, match="bins/hist_kws arguments are ignored when hist=False."
     ):
-        ScatterStats(sample_data["x"], sample_data["y"]).plot(bins=20, marginal=False)
+        ScatterStats(sample_data["x"], sample_data["y"]).plot(bins=20, hist=False)
 
     with pytest.warns(
-        UserWarning, match="bins/hist_kws arguments are ignored when marginal=False."
+        UserWarning, match="bins/hist_kws arguments are ignored when hist=False."
     ):
         ScatterStats(sample_data["x"], sample_data["y"]).plot(
             hist_kws={"color": "red"},
-            marginal=False,
+            hist=False,
         )
 
 

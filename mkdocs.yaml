@@ -26,7 +26,10 @@ plugins:
 
 nav:
   - Home: index.md
-  - Examples: examples.md
+  - Examples:
+      - examples/quick-start.md
+      - examples/betweenstats.md
+      - examples/scatterstats.md
   - Reference:
       - reference/betweenstats.md
       - reference/scatterstats.md

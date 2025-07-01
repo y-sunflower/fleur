@@ -4,12 +4,12 @@ from matplotlib.axes import Axes
 import scipy.stats as st
 import numpy as np
 
-import warnings
 from typing import Iterable, Literal
 from narwhals.typing import SeriesT, Frame
 
-from ._utils import _InputDataHandler
-from fleur._utils import _count_n_decimals, _themify
+from fleur._utils import _count_n_decimals, _themify, _InputDataHandler
+
+import warnings
 
 
 class ScatterStats:
@@ -18,7 +18,8 @@ class ScatterStats:
 
     Attributes:
         n_obs (int): Total number of observations.
-        alpha (float): Probability of rejecting a true null hypothesis
+        correlation (float): Value of the correlation (Pearson, etc).
+        alpha (float): Probability of rejecting a true null hypothesis.
         dof (int): Degrees of freedom for t-test.
         pvalue (float): P-value of the t-test.
         intercept (float): The intercept (estimation of beta2) in the model.
@@ -79,21 +80,22 @@ class ScatterStats:
         self.dof = self.n_obs - 2
 
         if effect_size == "pearson":
-            correlation = st.pearsonr(
+            correlation_output: float = st.pearsonr(
                 self._x_np, self._y_np, alternative=alternative
-            ).statistic
+            )
             self._symbol_correl = "\\rho"
         elif effect_size == "kendall":
-            correlation = st.kendalltau(
+            correlation_output: float = st.kendalltau(
                 self._x_np, self._y_np, alternative=alternative
-            ).statistic
+            )
             self._symbol_correl = "\\tau"
         elif effect_size == "spearman":
-            correlation = st.spearmanr(
+            correlation_output: float = st.spearmanr(
                 self._x_np, self._y_np, alternative=alternative
-            ).statistic
+            )
             self._symbol_correl = "\\rho"
 
+        self.correlation = correlation_output.statistic
         self.pvalue = regression.pvalue
         self.intercept = regression.intercept
         self.slope = regression.slope
@@ -109,7 +111,7 @@ class ScatterStats:
             f"t_{{Student}}({self.dof}) = {self.slope:.2f}, ",
             f"CI_{{{ci:.{ci_decimal}f}\\%}} = [{self.ci_lower:.2f}, {self.ci_upper:.2f}], ",
             f"p = {self.pvalue:.4f}, ",
-            f"{self._symbol_correl}_{{{effect_size.title()}}} = {correlation:.2f}, ",
+            f"{self._symbol_correl}_{{{effect_size.title()}}} = {self.correlation:.2f}, ",
             f"n_{{obs}} = {self.n_obs}",
             "$",
         ]
@@ -127,8 +129,11 @@ class ScatterStats:
     def plot(
         self,
         *,
-        marginal: bool = True,
         bins: int | list[int] | None = None,
+        hist: bool = True,
+        scatter: bool = True,
+        line: bool = True,
+        area: bool = True,
         scatter_kws: dict | None = None,
         line_kws: dict | None = None,
         area_kws: dict | None = None,
@@ -142,7 +147,10 @@ class ScatterStats:
 
         Args:
             bins: Number of bins for the marginal distributions. This can be an integer or a list of two integers (the first for the top distribution and the second for the other).
-            marginal: Whether to include marginal histograms. Default is `True`.
+            hist: Whether to include histograms of marginal distributions.
+            scatter: Whether to include the scatter plot.
+            line: Whether to include the line of the regression.
+            area: Whether to include the area of the confidence interval.
             line_kws: Additional parameters which will be passed to the `plot()` function in matplotlib.
             scatter_kws: Additional parameters which will be passed to the `scatter()` function in matplotlib.
             area_kws: Additional parameters which will be passed to the `fill_between()` function in matplotlib.
@@ -150,9 +158,9 @@ class ScatterStats:
             subplot_mosaic_kwargs: Additional keyword arguments to pass to `plt.subplot_mosaic()`. Default is `None`.
             show_stats: If True, display statistics on the plot.
         """
-        if not marginal and any([bins is not None, hist_kws is not None]):
+        if not hist and any([bins is not None, hist_kws is not None]):
             warnings.warn(
-                "bins/hist_kws arguments are ignored when marginal=False.",
+                "bins/hist_kws arguments are ignored when hist=False.",
                 category=UserWarning,
             )
 
@@ -163,7 +171,7 @@ class ScatterStats:
             subplot_mosaic_kwargs: dict = {}
         default_subplot_mosaic_kwargs.update(subplot_mosaic_kwargs)
 
-        if marginal:
+        if hist:
             scheme = """
     B.
     AC
@@ -202,18 +210,21 @@ class ScatterStats:
             * np.sqrt(1 / self.n_obs + (x_values - x_mean) ** 2 / x_var)
         )
 
-        ax.fill_between(
-            x_values,
-            y_values - y_err,
-            y_values + y_err,
-            **area_default_kws,
-        )
-        ax.scatter(self._x_np, self._y_np, **scatter_kws)
-        ax.plot(x_values, y_values, **line_kws)
+        if area:
+            ax.fill_between(
+                x_values,
+                y_values - y_err,
+                y_values + y_err,
+                **area_default_kws,
+            )
+        if scatter:
+            ax.scatter(self._x_np, self._y_np, **scatter_kws)
+        if line:
+            ax.plot(x_values, y_values, **line_kws)
 
         ax: Axes = _themify(ax)
 
-        if marginal:
+        if hist:
             if bins is None:
                 bins: Literal[12] = 12
 
