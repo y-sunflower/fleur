@@ -1,7 +1,8 @@
 import pytest
 import re
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 
 from fleur import BetweenStats
 import fleur.data as data
@@ -16,9 +17,7 @@ def sample_data():
 
 def test_default(sample_data):
     fig = BetweenStats(sample_data["x"], sample_data["y"]).plot()
-    assert isinstance(fig, mpl.figure.Figure), (
-        f"Expected a matplotlib Figure, not: {type(fig)}"
-    )
+    assert isinstance(fig, Figure), f"Expected a matplotlib Figure, not: {type(fig)}"
     plt.close(fig)
 
 
@@ -30,12 +29,40 @@ def test_custom_ax(sample_data):
     plt.close(fig)
 
 
+@pytest.mark.parametrize("violin", [True, False])
+@pytest.mark.parametrize("box", [True, False])
+@pytest.mark.parametrize("scatter", [True, False])
+@pytest.mark.parametrize("colors", [None, ["#005f73", "#ee9b00", "#9b2226"]])
+@pytest.mark.parametrize("jitter_amount", [0, 0.25, 1])
 @pytest.mark.parametrize("orientation", ["horizontal", "vertical"])
 @pytest.mark.parametrize("show_stats", [True, False])
-def test_expected_attributes(sample_data, orientation, show_stats):
+@pytest.mark.parametrize("show_means", [True, False])
+def test_plot_expected_attributes(
+    sample_data,
+    orientation,
+    show_stats,
+    show_means,
+    violin,
+    box,
+    scatter,
+    colors,
+    jitter_amount,
+):
     fig, ax = plt.subplots()
     bs = BetweenStats(sample_data["x"], sample_data["y"])
-    bs.plot(orientation=orientation, show_stats=show_stats, ax=ax)
+    fig_out = bs.plot(
+        orientation=orientation,
+        show_stats=show_stats,
+        show_means=show_means,
+        ax=ax,
+        violin=violin,
+        box=box,
+        scatter=scatter,
+        colors=colors,
+        jitter_amount=jitter_amount,
+    )
+    assert bs.name == "One-way"
+    assert fig_out == fig
 
     assert hasattr(bs, "ax")
     assert hasattr(bs, "statistic")
@@ -46,8 +73,20 @@ def test_expected_attributes(sample_data, orientation, show_stats):
     assert hasattr(bs, "name")
     assert hasattr(bs, "dof_between")
     assert hasattr(bs, "dof_within")
+    assert hasattr(bs, "means")
+    assert hasattr(bs, "test_output")
+    assert hasattr(bs, "is_paired")
+    assert hasattr(bs, "is_ANOVA")
 
-    assert bs.name == "One-way ANOVA"
+    assert isinstance(fig_out, Figure)
+    assert isinstance(ax, Axes)
+    assert isinstance(bs.statistic, float)
+    assert isinstance(bs.pvalue, float)
+    assert isinstance(bs.main_stat, str)
+    assert isinstance(bs.n_cat, int)
+    assert isinstance(bs.n_obs, int)
+    assert isinstance(bs.is_paired, bool)
+    assert isinstance(bs.is_ANOVA, bool)
 
     plt.close(fig)
 
@@ -62,9 +101,9 @@ def test_three_categories(sample_data, approach):
     )
 
     if approach == "parametric":
-        assert bs.name == "One-way ANOVA"
+        assert bs.name == "One-way"
     elif approach == "nonparametric":
-        assert bs.name == "Kruskal-Wallis H-test"
+        assert bs.name == "Kruskal-Wallis"
 
 
 @pytest.mark.parametrize("approach", ["parametric", "nonparametric"])
@@ -85,12 +124,12 @@ def test_two_categories(sample_data, paired, approach):
         if approach == "parametric":
             assert bs.name == "Paired t-test"
         elif approach == "nonparametric":
-            assert bs.name == "Wilcoxon signed-rank test"
+            assert bs.name == "Wilcoxon"
     else:
         if approach == "parametric":
-            assert bs.name == "T-test"
+            assert bs.name == "Student"
         elif approach == "nonparametric":
-            assert bs.name == "Mann-Whitney U rank test"
+            assert bs.name == "Mann-Whitney"
 
 
 def test_not_enough_categories(sample_data):
@@ -116,6 +155,11 @@ def test_raise_notimplemented_error(sample_data, approach):
         match='Only `approach="parametric"` and `approach="nonparametric"` are implemented.',
     ):
         BetweenStats(sample_data["x"], sample_data["y"], approach=approach)
+
+    with pytest.raises(
+        NotImplementedError, match="Welch's ANOVA is not implemented yet."
+    ):
+        BetweenStats(sample_data["x"], sample_data["y"], equal_var=False).plot()
 
 
 @pytest.mark.parametrize(
@@ -172,7 +216,8 @@ def test_raise_notimplemented_error2(
                 "Setting `approach='robust'` without setting a value "
                 "of `trim` above 0 is equivalent of using default "
                 "`approach='parametric'`. "
-                "Remove `approach='robust'` to hide this warning."
+                "Remove `approach='robust'` or set a value of `trim` "
+                "to hide this warning."
             ),
         ),
         (
@@ -182,7 +227,8 @@ def test_raise_notimplemented_error2(
                 "Setting `approach='robust'` without setting a value "
                 "of `trim` above 0 is equivalent of using default "
                 "`approach='parametric'`. "
-                "Remove `approach='robust'` to hide this warning."
+                "Remove `approach='robust'` or set a value of `trim` "
+                "to hide this warning."
             ),
         ),
     ],
