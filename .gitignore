@@ -23,3 +23,5 @@ sandbox.*
 
 docs/README*
 !docs/README.qmd
+
+.coverage

@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.collections import PolyCollection
-from typing import Iterable, Any, cast, Literal
+from typing import Iterable, Any, cast
 from narwhals.typing import SeriesT, Frame
 
 from ._utils import _infer_types, _themify, _beeswarm, _InputDataHandler
@@ -34,6 +34,8 @@ class BetweenStats:
         dof_within (int): Within-group degrees of freedom for ANOVA.
         n_cat (int): Number of unique categories in the group column.
         n_obs (int): Total number of observations.
+        means (list): A list with means.
+        test_output: The output of the statistical test.
         ax (matplotlib.axes.Axes): The matplotlib axes used for plotting.
     """
 
@@ -111,15 +113,17 @@ class BetweenStats:
 
             if self.is_paired:
                 if approach == "parametric":
-                    test_output = st.ttest_rel(
+                    self.test_output = st.ttest_rel(
                         self._result[0], self._result[1], **kwargs
                     )
+                    self._letter = "t"
                     self.name = "Paired t-test"
                 elif approach == "nonparametric":
-                    test_output = st.wilcoxon(
+                    self.test_output = st.wilcoxon(
                         self._result[0], self._result[1], **kwargs
                     )
-                    self.name = "Wilcoxon signed-rank test"
+                    self._letter = "T"
+                    self.name = "Wilcoxon"
                 else:
                     raise NotImplementedError(
                         (
@@ -129,21 +133,31 @@ class BetweenStats:
                     )
             else:  # not paired
                 if approach == "parametric":
-                    test_output = st.ttest_ind(
+                    self.test_output = st.ttest_ind(
                         self._result[0], self._result[1], **kwargs
                     )
-                    self.name = "T-test"
+                    self._letter = "t"
+                    if "equal_var" in kwargs:
+                        equal_var: bool = kwargs["equal_var"]
+                        if equal_var:
+                            self.name = "Student"
+                        else:
+                            self.name = "Welch"
+                    else:
+                        self.name = "Student"
                 elif approach == "nonparametric":
-                    test_output = st.mannwhitneyu(
+                    self.test_output = st.mannwhitneyu(
                         self._result[0], self._result[1], **kwargs
                     )
-                    self.name = "Mann-Whitney U rank test"
+                    self._letter = "U"
+                    self.name = "Mann-Whitney"
                 elif approach == "robust":
                     trim_warn_message = (
                         "Setting `approach='robust'` without setting a value "
                         "of `trim` above 0 is equivalent of using default "
                         "`approach='parametric'`. "
-                        "Remove `approach='robust'` to hide this warning."
+                        "Remove `approach='robust'` or set a value of `trim` "
+                        "to hide this warning."
                     )
                     if "trim" not in kwargs:
                         warnings.warn(trim_warn_message)
@@ -151,10 +165,11 @@ class BetweenStats:
                         trim: float = kwargs["trim"]
                         if trim <= 0:
                             warnings.warn(trim_warn_message)
-                    test_output = st.ttest_ind(
+                    self.test_output = st.ttest_ind(
                         self._result[0], self._result[1], **kwargs
                     )
-                    self.name = "Yuen's t-test"
+                    self._letter = "t"
+                    self.name = "Yuen"
                 else:
                     raise NotImplementedError(
                         (
@@ -164,19 +179,17 @@ class BetweenStats:
                         )
                     )
 
-            self.statistic = test_output.statistic
-            self.pvalue = test_output.pvalue
-            if hasattr(test_output, "df"):  # only for t-tests
-                self.dof = int(test_output.df)
+            self.statistic = self.test_output.statistic
+            self.pvalue = self.test_output.pvalue
+            if hasattr(self.test_output, "df"):  # only for t-tests
+                self.dof = int(self.test_output.df)
                 self.main_stat = f"t_{{Student}}({self.dof}) = {self.statistic:.2f}"
             else:
-                self.dof = None  # or omit this line if not needed
-                # Use appropriate stat name
-                if self.name == "Wilcoxon signed-rank test":
-                    stat_name: Literal["W_{{Wilcoxon}}"] = "W_{{Wilcoxon}}"
-                elif self.name == "Mann-Whitney U rank test":
-                    stat_name: Literal["U_{{Mann-Whitney}}"] = "U_{{Mann-Whitney}}"
-                self.main_stat = f"{stat_name} = {self.statistic:.2f}"
+                self.dof = None
+                if self.name == "Wilcoxon":
+                    self._letter = "W"
+                elif self.name == "Mann-Whitney":
+                    self._letter = "U"
 
         else:  # n >= 3
             self.is_ANOVA = True
@@ -186,22 +199,32 @@ class BetweenStats:
                 )
             else:  # not paired
                 if approach == "parametric":
-                    test_output = st.f_oneway(*self._result, **kwargs)
-                    self.name = "One-way ANOVA"
+                    if "equal_var" in kwargs:
+                        if not kwargs["equal_var"]:
+                            raise NotImplementedError(
+                                "Welch's ANOVA is not implemented yet."
+                            )
+                    else:
+                        self.name = "One-way"
+                    self.test_output = st.f_oneway(*self._result, **kwargs)
+                    self._letter = "F"
                 elif approach == "nonparametric":
-                    test_output = st.kruskal(*self._result, **kwargs)
-                    self.name = "Kruskal-Wallis H-test"
+                    self.test_output = st.kruskal(*self._result, **kwargs)
+                    self._letter = "H"
+                    self.name = "Kruskal-Wallis"
                 else:
                     raise NotImplementedError(
                         'Only `approach="parametric"` and `approach="nonparametric"` are implemented.'
                     )
-            self.statistic = test_output.statistic
-            self.pvalue = test_output.pvalue
+            self.statistic = self.test_output.statistic
+            self.pvalue = self.test_output.pvalue
             self.dof_between = self.n_cat - 1
             self.dof_within = self.n_obs - self.n_cat
             self.main_stat = (
                 f"F({self.dof_between}, {self.dof_within}) = {self.statistic:.2f}"
             )
+
+        self.main_stat = f"{self._letter}_{{{self.name}}} = {self.statistic:.2f}"
 
         expr_list: list[str] = [
             "$",
@@ -350,7 +373,7 @@ class BetweenStats:
         if show_means:
             shift = 1.3
             for i, mean in enumerate(self.means):
-                label = f"$\hat{{\mu}}_{{mean}} = {mean:.2f}$"
+                label = f"$\\hat{{\\mu}}_{{mean}} = {mean:.2f}$"
                 if orientation == "vertical":
                     ax.text(
                         x=i + shift,
