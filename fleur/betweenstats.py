@@ -226,6 +226,13 @@ class BetweenStats:
         violin_kws: dict | None = None,
         box_kws: dict | None = None,
         scatter_kws: dict | None = None,
+        mean_kws: dict | None = dict(
+            fontsize=7,
+            color="black",
+            bbox=dict(boxstyle="round", facecolor="#fefae0", alpha=0.7),
+            zorder=50,
+        ),
+        mean_line_kws: dict | None = dict(ls="--", lw=0.6, color="black"),
         ax: Axes | None = None,
     ) -> Figure:
         """
@@ -246,6 +253,9 @@ class BetweenStats:
             violin_kws: Keyword args for violinplot customization.
             box_kws: Keyword args for boxplot customization.
             scatter_kws: Keyword args for scatter plot customization.
+            mean_kws: Keyword args for mean labels customization.
+            mean_line_kws: Keyword arguments for the line connecting the mean
+                point and the mean label.
             ax (matplotlib.axes.Axes, ): Existing Axes to plot on. If None, uses
                 current Axes.
 
@@ -338,13 +348,6 @@ class BetweenStats:
         self.ax = ax
 
         if show_means:
-            mean_args = dict(
-                fontsize=7,
-                color="black",
-                bbox=dict(boxstyle="round", facecolor="#fefae0", alpha=0.7),
-                zorder=50,
-            )
-            line_args = dict(ls="--", lw=0.6, color="black")
             shift = 1.3
             for i, mean in enumerate(self.means):
                 label = f"$\hat{{\mu}}_{{mean}} = {mean:.2f}$"
@@ -355,9 +358,9 @@ class BetweenStats:
                         s=label,
                         va="center",
                         ha="left",
-                        **mean_args,
+                        **mean_kws,
                     )
-                    ax.plot([i + 1, i + shift], [mean, mean], **line_args)
+                    ax.plot([i + 1, i + shift], [mean, mean], **mean_line_kws)
                 else:  # horizontal
                     ax.text(
                         x=mean,
@@ -365,8 +368,8 @@ class BetweenStats:
                         s=label,
                         va="bottom",
                         ha="center",
-                        **mean_args,
+                        **mean_kws,
                     )
-                    ax.plot([mean, mean], [i + 1, i + shift], **line_args)
+                    ax.plot([mean, mean], [i + 1, i + shift], **mean_line_kws)
 
         return plt.gcf()
