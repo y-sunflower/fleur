@@ -347,7 +347,7 @@ class BetweenStats:
             line_args = dict(ls="--", lw=0.6, color="black")
             shift = 1.3
             for i, mean in enumerate(self.means):
-                label = f"$\mu_{{mean}} = {mean:.2f}$"
+                label = f"$\hat{{\mu}}_{{mean}} = {mean:.2f}$"
                 if orientation == "vertical":
                     ax.text(
                         x=i + shift,
