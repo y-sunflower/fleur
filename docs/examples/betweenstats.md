@@ -54,6 +54,20 @@ BetweenStats(df["sepal_length"], df["species"]).plot(
 )
 ```
 
+- Remove means from plot
+
+```py hl_lines="8"
+# mkdocs: render
+from fleur import BetweenStats
+from fleur import data
+
+df = data.load_iris()
+
+BetweenStats(df["sepal_length"], df["species"]).plot(
+    show_means=False
+)
+```
+
 - Hide specific elements
 
 ```py hl_lines="8 9 10"

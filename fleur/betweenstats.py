@@ -81,6 +81,7 @@ class BetweenStats:
         self._cat_labels = df[cat_col].unique().to_list()
         self.n_cat = df[cat_col].n_unique()
         self.n_obs = len(df)
+        self.means = [np.mean(group) for group in self._result]
 
         self._fit(approach=approach, **kwargs)
 
@@ -217,6 +218,7 @@ class BetweenStats:
         orientation: str = "vertical",
         colors: list | None = None,
         show_stats: bool = True,
+        show_means: bool = True,
         jitter_amount: float = 0.25,
         violin: bool = True,
         box: bool = True,
@@ -224,6 +226,13 @@ class BetweenStats:
         violin_kws: dict | None = None,
         box_kws: dict | None = None,
         scatter_kws: dict | None = None,
+        mean_kws: dict | None = dict(
+            fontsize=7,
+            color="black",
+            bbox=dict(boxstyle="round", facecolor="#fefae0", alpha=0.7),
+            zorder=50,
+        ),
+        mean_line_kws: dict | None = dict(ls="--", lw=0.6, color="black"),
         ax: Axes | None = None,
     ) -> Figure:
         """
@@ -234,7 +243,8 @@ class BetweenStats:
         Args:
             orientation: 'vertical' or 'horizontal' orientation of plots.
             colors: List of colors for each group.
-            show_stats: If True, display statistics on the plot.
+            show_stats: If True, adds statistics on the plot.
+            show_means: If True, adds mean labels on the plot.
             jitter_amount: Controls the horizontal spread of dots to prevent
                 overlap; 0 aligns them, higher values increase spacing.
             violin: Whether to include violin plot.
@@ -243,6 +253,9 @@ class BetweenStats:
             violin_kws: Keyword args for violinplot customization.
             box_kws: Keyword args for boxplot customization.
             scatter_kws: Keyword args for scatter plot customization.
+            mean_kws: Keyword args for mean labels customization.
+            mean_line_kws: Keyword arguments for the line connecting the mean
+                point and the mean label.
             ax (matplotlib.axes.Axes, ): Existing Axes to plot on. If None, uses
                 current Axes.
 
@@ -309,6 +322,13 @@ class BetweenStats:
                 else:  # "horizontal"
                     ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
+        mean_scatter_kwargs = dict(color="#c1121f", s=100, zorder=50)
+        for pos, mean in zip(range(1, len(self._result) + 1), self.means):
+            if orientation == "vertical":
+                ax.scatter(pos, mean, **mean_scatter_kwargs)
+            else:  # horizontal
+                ax.scatter(mean, pos, **mean_scatter_kwargs)
+
         if show_stats:
             annotation_params: dict = dict(transform=ax.transAxes, va="top")
             ax.text(x=0.05, y=1.09, s=self._expression, size=9, **annotation_params)
@@ -326,5 +346,30 @@ class BetweenStats:
             ax.set_yticks(ticks, labels=labels)
 
         self.ax = ax
+
+        if show_means:
+            shift = 1.3
+            for i, mean in enumerate(self.means):
+                label = f"$\hat{{\mu}}_{{mean}} = {mean:.2f}$"
+                if orientation == "vertical":
+                    ax.text(
+                        x=i + shift,
+                        y=mean,
+                        s=label,
+                        va="center",
+                        ha="left",
+                        **mean_kws,
+                    )
+                    ax.plot([i + 1, i + shift], [mean, mean], **mean_line_kws)
+                else:  # horizontal
+                    ax.text(
+                        x=mean,
+                        y=i + shift,
+                        s=label,
+                        va="bottom",
+                        ha="center",
+                        **mean_kws,
+                    )
+                    ax.plot([mean, mean], [i + 1, i + shift], **mean_line_kws)
 
         return plt.gcf()
