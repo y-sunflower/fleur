@@ -81,6 +81,7 @@ class BetweenStats:
         self._cat_labels = df[cat_col].unique().to_list()
         self.n_cat = df[cat_col].n_unique()
         self.n_obs = len(df)
+        self.means = [np.mean(group) for group in self._result]
 
         self._fit(approach=approach, **kwargs)
 
@@ -217,6 +218,7 @@ class BetweenStats:
         orientation: str = "vertical",
         colors: list | None = None,
         show_stats: bool = True,
+        show_means: bool = True,
         jitter_amount: float = 0.25,
         violin: bool = True,
         box: bool = True,
@@ -234,7 +236,8 @@ class BetweenStats:
         Args:
             orientation: 'vertical' or 'horizontal' orientation of plots.
             colors: List of colors for each group.
-            show_stats: If True, display statistics on the plot.
+            show_stats: If True, adds statistics on the plot.
+            show_means: If True, adds mean labels on the plot.
             jitter_amount: Controls the horizontal spread of dots to prevent
                 overlap; 0 aligns them, higher values increase spacing.
             violin: Whether to include violin plot.
@@ -309,6 +312,13 @@ class BetweenStats:
                 else:  # "horizontal"
                     ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
+        mean_scatter_kwargs = dict(color="#c1121f", s=100, zorder=50)
+        for pos, mean in zip(range(1, len(self._result) + 1), self.means):
+            if orientation == "vertical":
+                ax.scatter(pos, mean, **mean_scatter_kwargs)
+            else:  # horizontal
+                ax.scatter(mean, pos, **mean_scatter_kwargs)
+
         if show_stats:
             annotation_params: dict = dict(transform=ax.transAxes, va="top")
             ax.text(x=0.05, y=1.09, s=self._expression, size=9, **annotation_params)
@@ -326,5 +336,37 @@ class BetweenStats:
             ax.set_yticks(ticks, labels=labels)
 
         self.ax = ax
+
+        if show_means:
+            mean_args = dict(
+                fontsize=7,
+                color="black",
+                bbox=dict(boxstyle="round", facecolor="#fefae0", alpha=0.7),
+                zorder=50,
+            )
+            line_args = dict(ls="--", lw=0.6, color="black")
+            shift = 1.3
+            for i, mean in enumerate(self.means):
+                label = f"$\mu_{{mean}} = {mean:.2f}$"
+                if orientation == "vertical":
+                    ax.text(
+                        x=i + shift,
+                        y=mean,
+                        s=label,
+                        va="center",
+                        ha="left",
+                        **mean_args,
+                    )
+                    ax.plot([i + 1, i + shift], [mean, mean], **line_args)
+                else:  # horizontal
+                    ax.text(
+                        x=mean,
+                        y=i + shift,
+                        s=label,
+                        va="bottom",
+                        ha="center",
+                        **mean_args,
+                    )
+                    ax.plot([mean, mean], [i + 1, i + shift], **line_args)
 
         return plt.gcf()
