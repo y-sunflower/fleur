@@ -1,4 +1,5 @@
 from matplotlib.axes import Axes
+import matplotlib.pyplot as plt
 
 
 def _themify(ax: Axes) -> Axes:
@@ -15,3 +16,14 @@ def _themify(ax: Axes) -> Axes:
     ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
     ax.tick_params(size=0, labelsize=8)
     return ax
+
+
+def _get_first_n_colors(colors, n_cat):
+    if colors is None:
+        colors: list = plt.rcParams["axes.prop_cycle"].by_key()["color"][:n_cat]
+    else:
+        if len(colors) < n_cat:
+            raise ValueError(
+                f"`colors` argument must have at least {n_cat} elements, "
+                f"not {len(colors)}"
+            )

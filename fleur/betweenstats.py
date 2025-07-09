@@ -8,7 +8,13 @@ from matplotlib.collections import PolyCollection
 from typing import Iterable, Any, cast
 from narwhals.typing import SeriesT, Frame
 
-from ._utils import _infer_types, _themify, _beeswarm, _InputDataHandler
+from ._utils import (
+    _infer_types,
+    _themify,
+    _beeswarm,
+    _InputDataHandler,
+    _get_first_n_colors,
+)
 
 import warnings
 
@@ -288,16 +294,7 @@ class BetweenStats:
         if orientation not in ["vertical", "horizontal"]:
             raise ValueError("`orientation` must be one of: 'vertical', 'horizontal'.")
 
-        if colors is None:
-            colors: list = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-                : self.n_cat
-            ]
-        else:
-            if len(colors) < self.n_cat:
-                raise ValueError(
-                    f"`colors` argument must have at least {self.n_cat} elements, "
-                    f"not {len(colors)}"
-                )
+        colors = _get_first_n_colors(colors, self.n_cat)
 
         if ax is None:
             ax: Axes = plt.gca()
