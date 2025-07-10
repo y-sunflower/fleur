@@ -76,24 +76,24 @@ class BarStats:
             ax: Axes = plt.gca()
         ax: Axes = _themify(ax)
 
-        bottom = None
+        bottom: None = None
 
-        colors = _get_first_n_colors(colors, self.n_cat)
+        colors: list[str] = _get_first_n_colors(colors, self.n_cat)
 
-        for idx, vs_value in enumerate(self._df_proportion.columns):
+        for i, vs_value in enumerate(self._df_proportion.columns[1:]):
             if orientation == "horizontal":
                 ax.barh(
-                    self._df_proportion.index,
+                    list(range(self.n_cat)),
                     self._df_proportion[vs_value],
                     left=bottom,
-                    color=colors[idx],
+                    color=colors[i],
                 )
             else:  # orientation == "vertical"
                 ax.bar(
-                    self._df_proportion.index,
+                    list(range(self.n_cat)),
                     self._df_proportion[vs_value],
                     bottom=bottom,
-                    color=colors[idx],
+                    color=colors[i],
                 )
 
             if bottom is None:
@@ -101,15 +101,13 @@ class BarStats:
             else:
                 bottom += self._df_proportion[vs_value]
 
-        return self.fig
-
 
 if __name__ == "__main__":
     from fleur import data
 
-    df = data.load_mtcars("polars")
+    df = data.load_mtcars("pandas")
     fig, ax = plt.subplots()
 
-    BarStats("vs", "cyl", df).plot(ax=ax)
+    BarStats(x="cyl", y="vs", data=df).plot(ax=ax)
 
     fig.savefig("cache.png", dpi=300)

@@ -27,3 +27,5 @@ def _get_first_n_colors(colors, n_cat):
                 f"`colors` argument must have at least {n_cat} elements, "
                 f"not {len(colors)}"
             )
+
+    return colors
