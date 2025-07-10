@@ -41,13 +41,30 @@ def test_output_scheme(backend):
 @pytest.mark.parametrize(
     ["x", "y"],
     [
-        ([1, 2, 3], [1, 2, 3]),
         (pd.Series([1, 2, 3]), pd.Series([1, 2, 3])),
         (pl.Series([1, 2, 3]), pl.Series([1, 2, 3])),
+    ],
+)
+def test_different_x_and_y_input_series(x, y):
+    info_df = _InputDataHandler(x, y).get_info()
+
+    assert info_df["x"] == nw.from_native(x, allow_series=True)
+    assert info_df["y"] == nw.from_native(y, allow_series=True)
+
+    assert isinstance(info_df["x"], nw.Series)
+    assert isinstance(info_df["y"], nw.Series)
+
+    assert info_df["source"] == "series"
+
+
+@pytest.mark.parametrize(
+    ["x", "y"],
+    [
+        ([1, 2, 3], [1, 2, 3]),
         (np.array([1, 2, 3]), np.array([1, 2, 3])),
     ],
 )
-def test_different_x_and_y_inputs(x, y):
+def test_different_x_and_y_input_arrays(x, y):
     info_df = _InputDataHandler(x, y).get_info()
 
     assert info_df["x"] == nw.new_series("x", x, backend="pandas")
@@ -56,7 +73,7 @@ def test_different_x_and_y_inputs(x, y):
     assert isinstance(info_df["x"], nw.Series)
     assert isinstance(info_df["y"], nw.Series)
 
-    assert info_df["source"] in ["series", "array"]
+    assert info_df["source"] == "array"
 
 
 def test_raise_type_error():

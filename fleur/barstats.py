@@ -35,15 +35,19 @@ class BarStats:
 
         x_name: str = self._data_info["x_name"]
         y_name: str = self._data_info["y_name"]
-        df: Frame = self._data_info["dataframe"]
+        df: Frame = self._data_info["dataframe"].with_columns(
+            nw.col(x_name).cast(nw.String).cast(nw.Categorical),
+            nw.col(y_name).cast(nw.String).cast(nw.Categorical),
+        )
 
-        df.with_columns(nw.col("bar").cast(nw.Enum))
+        y_levels: list = df[y_name].unique().to_list()
 
-        self.df_proportion = (
-            df.group_by([x_name, y_name], observed=True)
-            .size()
-            .unstack(fill_value=0)
-            .apply(lambda x: x / x.sum(), axis=1)
+        self._df_proportion = (
+            df.group_by(x_name, y_name)
+            .agg(nw.len())
+            .pivot(values="len", index=x_name, on=y_name)
+            .with_columns(nw.selectors.numeric().fill_null(0))
+            .with_columns(nw.col(*y_levels) / nw.sum_horizontal(nw.col(*y_levels)))
         )
 
         self.n_obs = len(df)
@@ -76,26 +80,26 @@ class BarStats:
 
         colors = _get_first_n_colors(colors, self.n_cat)
 
-        for idx, vs_value in enumerate(self.df_proportion.columns):
+        for idx, vs_value in enumerate(self._df_proportion.columns):
             if orientation == "horizontal":
                 ax.barh(
-                    self.df_proportion.index,
-                    self.df_proportion[vs_value],
+                    self._df_proportion.index,
+                    self._df_proportion[vs_value],
                     left=bottom,
                     color=colors[idx],
                 )
             else:  # orientation == "vertical"
                 ax.bar(
-                    self.df_proportion.index,
-                    self.df_proportion[vs_value],
+                    self._df_proportion.index,
+                    self._df_proportion[vs_value],
                     bottom=bottom,
                     color=colors[idx],
                 )
 
             if bottom is None:
-                bottom = self.df_proportion[vs_value]
+                bottom = self._df_proportion[vs_value]
             else:
-                bottom += self.df_proportion[vs_value]
+                bottom += self._df_proportion[vs_value]
 
         return self.fig
 
@@ -106,6 +110,6 @@ if __name__ == "__main__":
     df = data.load_mtcars("polars")
     fig, ax = plt.subplots()
 
-    BarStats(x="vs", y="cyl", data=df).plot(ax=ax)
+    BarStats("vs", "cyl", df).plot(ax=ax)
 
     fig.savefig("cache.png", dpi=300)

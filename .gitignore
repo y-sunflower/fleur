@@ -19,7 +19,7 @@ env/
 *cache*
 
 *.zip
-sandbox.*
+sandbox*.*
 
 docs/README*
 !docs/README.qmd
