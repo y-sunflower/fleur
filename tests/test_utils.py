@@ -9,7 +9,7 @@ import pandas as pd
 
 
 def test_version():
-    assert fleur.__version__ == "0.0.3"
+    assert fleur.__version__ == "0.0.4"
 
 
 def test_count_n_decimals():

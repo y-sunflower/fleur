@@ -1,7 +1,7 @@
 [project]
 name = "fleur"
 description = "Combining statistics with visualization for Python"
-version = "0.0.3"
+version = "0.0.4"
 license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["statistics", "visualization", "data", "annotations", "reproductibility"]
