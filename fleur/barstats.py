@@ -40,7 +40,7 @@ class BarStats:
         x: str | SeriesT | Iterable,
         y: str | SeriesT | Iterable,
         data: Frame | None = None,
-        approach: str = "parametric",
+        approach: str = "freq",
         paired: bool = False,
         **kwargs: Any,
     ):
@@ -52,11 +52,11 @@ class BarStats:
             y: Colname of `data` or a Series or array-like (categorical).
             data: An optional dataframe.
             approach: A character specifying the type of statistical approach:
-                "parametric" (default), "nonparametric", "robust", "bayes".
+                "freq" (default) or "bayes".
             paired: Whether comparing the same observations or not.
             kwargs: Additional arguments passed to the scipy test function.
         """
-        valid_approachs: list[str] = ["parametric", "nonparametric", "robust", "bayes"]
+        valid_approachs: list[str] = ["freq", "bayes"]
         if approach not in valid_approachs:
             raise ValueError(
                 f"`approach` must be one of {valid_approachs}, not {approach}"
@@ -104,10 +104,10 @@ class BarStats:
 
         Args:
             approach: A character specifying the type of statistical approach:
-                "parametric" (default), "nonparametric", "robust", "bayes".
+                "freq" (default) or "bayes".
             kwargs: Additional arguments passed to the scipy test function.
         """
-        if approach in ["parametric", "nonparametric"]:
+        if approach == "freq":
             if self.is_paired:
                 # if binary (2 levels) variable, use McNemar's test
                 # if 3 levels or more, use Stuart-Maxwell test
@@ -129,24 +129,18 @@ class BarStats:
                 if is_2x2 or is_chi2_assumption_violated:
                     self.test_name = "Fisher's exact"
                     self._letter = "p"
-                    self.cramers_v = None  # Chi-square specific
-                    self.statistic = (
-                        None  # Fisher's doesn't have a single 'statistic' like chi2
-                    )
+                    self.cramers_v = None
+                    self.statistic = None
 
-                    # Run Fisher's test and get the result object
                     test_output = st.fisher_exact(self.contingency_table, **kwargs)
-                    # CORRECTLY extract the p-value from the object
                     self.pvalue = test_output.pvalue
 
-                    # Handle output based on table size (2x2 vs RxC)
                     if is_2x2:
-                        # CORRECTLY extract the odds ratio from the .statistic attribute
                         self.odds_ratio = test_output.statistic
                         self.main_stat = f"OR = {self.odds_ratio:.3f}"
                         expr_list: list[str] = [
                             "$",
-                            "Fisher's exact test, ",
+                            "Fisher's~exact~test, ",
                             f"p = {self.pvalue:.4f}, ",
                             f"OR = {self.odds_ratio:.3f}, ",
                             f"n_{{obs}} = {self.n_obs}",
@@ -154,11 +148,12 @@ class BarStats:
                         ]
                     else:  # RxC table
                         self.odds_ratio = None
-                        # This line now works because self.pvalue is a float
+                        self.prob_dens = test_output.statistic
                         self.main_stat = f"p = {self.pvalue:.4f}"
                         expr_list: list[str] = [
                             "$",
-                            "Fisher's exact test, ",
+                            "Fisher's~exact~test, ",
+                            f"Likelihood = {self.prob_dens}, ",
                             f"p = {self.pvalue:.4f}, ",
                             f"n_{{obs}} = {self.n_obs}",
                             "$",
@@ -171,7 +166,9 @@ class BarStats:
                     self.dof = dof
                     self.test_name = "Chi-square"
                     self._letter = "\\chi^2"
-                    self.main_stat = f"\\chi^2({self.dof}) = {self.statistic:.3f}"
+                    self.main_stat = (
+                        f"\\chi^2_{{Pearson}}({self.dof}) = {self.statistic:.3f}"
+                    )
 
                     min_dim = min(self.contingency_table.shape) - 1
                     self.cramers_v = np.sqrt(self.statistic / (self.n_obs * min_dim))
@@ -179,19 +176,14 @@ class BarStats:
                         "$",
                         f"{self.main_stat}, ",
                         f"p = {self.pvalue:.4f}, ",
-                        f"Cramer's V = {self.cramers_v:.3f}, ",
+                        f"V_{{Cramer}} = {self.cramers_v:.2f}, ",
                         f"n_{{obs}} = {self.n_obs}",
                         "$",
                     ]
 
                 self.expression = "".join(expr_list)
         else:
-            raise NotImplementedError(
-                (
-                    'Only `approach="parametric"` and `approach="nonparametric"` '
-                    "have been implemented."
-                )
-            )
+            raise NotImplementedError('Only `approach="freq"` has been implemented.')
 
     def plot(
         self,
@@ -262,11 +254,11 @@ class BarStats:
         if orientation == "vertical":
             ax.set_xticks(range(self.n_cat), labels=labels)
             ax.set_xlabel(self._x_name)
-            ax.set_ylabel("Proportion" if hasattr(self, "_df_proportion") else "Count")
+            ax.set_ylabel("Proportion" if plot_type == "stacked" else "Count")
         else:  # horizontal
             ax.set_yticks(range(self.n_cat), labels=labels)
             ax.set_ylabel(self._x_name)
-            ax.set_xlabel("Proportion" if hasattr(self, "_df_proportion") else "Count")
+            ax.set_xlabel("Proportion" if plot_type == "stacked" else "Count")
 
         ax.legend(self._y_levels, title=self._y_name, loc="upper right")
 
@@ -291,6 +283,10 @@ class BarStats:
                     label=y_level,
                     **bar_kws,
                 )
+                ticks = ax.get_xticks()
+                ticks = [x for x in ticks if 0 <= x <= 1]
+                ticks_labels: list[str] = [f"{tick * 100:.0f}%" for tick in ticks]
+                ax.set_xticks(ticks, labels=ticks_labels)
             else:  # vertical
                 ax.bar(
                     list(range(self.n_cat)),
@@ -300,6 +296,10 @@ class BarStats:
                     label=y_level,
                     **bar_kws,
                 )
+                ticks = ax.get_yticks()
+                ticks = [x for x in ticks if 0 <= x <= 1]
+                ticks_labels: list[str] = [f"{tick * 100:.0f}%" for tick in ticks]
+                ax.set_yticks(ticks, labels=ticks_labels)
 
             if bottom is None:
                 bottom = values
