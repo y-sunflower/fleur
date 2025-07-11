@@ -10,7 +10,6 @@ from narwhals.typing import SeriesT, Frame
 
 from ._utils import (
     _infer_types,
-    _themify,
     _beeswarm,
     _InputDataHandler,
     _get_first_n_colors,
@@ -353,7 +352,7 @@ class BetweenStats:
             annotation_params: dict = dict(transform=ax.transAxes, va="top")
             ax.text(x=0.05, y=1.09, s=self._expression, size=9, **annotation_params)
 
-        ax: Axes = _themify(ax)
+        ax: Axes = self._themify(ax)
 
         ticks: list[int] = [i + 1 for i in range(len(self._sample_sizes))]
         labels: list[str] = [
@@ -393,3 +392,18 @@ class BetweenStats:
                     ax.plot([mean, mean], [i + 1, i + shift], **mean_line_kws)
 
         return plt.gcf()
+
+    def _themify(self, ax: Axes) -> Axes:
+        """
+        Set the theme to a matplotlib Axes.
+
+        Args
+            ax: The matplotlib Axes to which you want to apply the theme.
+
+        Returns
+            The matplotlib Axes.
+        """
+        ax.grid(color="#525252", alpha=0.2, zorder=-5)
+        ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
+        ax.tick_params(size=0, labelsize=8)
+        return ax

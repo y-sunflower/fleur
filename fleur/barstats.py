@@ -8,9 +8,7 @@ import scipy.stats as st
 from typing import Iterable, Any
 from narwhals.typing import SeriesT, Frame
 
-from fleur._utils import _themify, _InputDataHandler, _get_first_n_colors
-
-import warnings
+from fleur._utils import _InputDataHandler, _get_first_n_colors
 
 
 class BarStats:
@@ -117,50 +115,66 @@ class BarStats:
                     "Paired group comparison has not been implemented yet."
                 )
             else:  # not paired
-                test = "Fisher"
-                if test == "Fisher":
-                    if self.contingency_table.shape != (2, 2):
-                        raise ValueError(
-                            "Fisher's exact test can only be used with 2x2 contingency tables"
-                        )
-                    self.test_output = st.fisher_exact(self.contingency_table, **kwargs)
-                    self.statistic = None
-                    self.pvalue = self.test_output[1]
-                    self.odds_ratio = self.test_output[0]
+                chi2_stat, p_val, dof, expected_freqs = st.chi2_contingency(
+                    self.contingency_table, **kwargs
+                )
+                self.expected_frequencies = expected_freqs
+
+                # use Fisher's test if the table is 2x2 OR if chi-square assumptions are not met.
+                is_2x2: bool = self.contingency_table.shape == (2, 2)
+                is_chi2_assumption_violated: bool[bool] = np.any(
+                    self.expected_frequencies < 5
+                )
+
+                if is_2x2 or is_chi2_assumption_violated:
                     self.test_name = "Fisher's exact"
                     self._letter = "p"
-                    self.main_stat = f"OR = {self.odds_ratio:.3f}"
-                    self.expected_frequencies = None
-                    self.cramers_v = None
-
-                    expr_list: list[str] = [
-                        "$",
-                        "Fisher's exact test, ",
-                        f"p = {self.pvalue:.4f}, ",
-                        f"OR = {self.odds_ratio:.3f}, ",
-                        f"n_{{obs}} = {self.n_obs}",
-                        "$",
-                    ]
-                else:  # test is chi2
-                    self.test_output = st.chi2_contingency(
-                        self.contingency_table, **kwargs
+                    self.cramers_v = None  # Chi-square specific
+                    self.statistic = (
+                        None  # Fisher's doesn't have a single 'statistic' like chi2
                     )
-                    self.statistic = self.test_output[0]
-                    self.pvalue = self.test_output[1]
-                    self.dof = self.test_output[2]
-                    self.expected_frequencies = self.test_output[3]
+
+                    # Run Fisher's test and get the result object
+                    test_output = st.fisher_exact(self.contingency_table, **kwargs)
+                    # CORRECTLY extract the p-value from the object
+                    self.pvalue = test_output.pvalue
+
+                    # Handle output based on table size (2x2 vs RxC)
+                    if is_2x2:
+                        # CORRECTLY extract the odds ratio from the .statistic attribute
+                        self.odds_ratio = test_output.statistic
+                        self.main_stat = f"OR = {self.odds_ratio:.3f}"
+                        expr_list: list[str] = [
+                            "$",
+                            "Fisher's exact test, ",
+                            f"p = {self.pvalue:.4f}, ",
+                            f"OR = {self.odds_ratio:.3f}, ",
+                            f"n_{{obs}} = {self.n_obs}",
+                            "$",
+                        ]
+                    else:  # RxC table
+                        self.odds_ratio = None
+                        # This line now works because self.pvalue is a float
+                        self.main_stat = f"p = {self.pvalue:.4f}"
+                        expr_list: list[str] = [
+                            "$",
+                            "Fisher's exact test, ",
+                            f"p = {self.pvalue:.4f}, ",
+                            f"n_{{obs}} = {self.n_obs}",
+                            "$",
+                        ]
+
+                else:  # chi-square
+                    self.test_output = (chi2_stat, p_val, dof, expected_freqs)
+                    self.statistic = chi2_stat
+                    self.pvalue = p_val
+                    self.dof = dof
                     self.test_name = "Chi-square"
                     self._letter = "\\chi^2"
                     self.main_stat = f"\\chi^2({self.dof}) = {self.statistic:.3f}"
 
-                    if np.any(self.expected_frequencies < 5):
-                        warnings.warn(
-                            "Some expected frequencies are less than 5. Consider using Fisher's exact test."
-                        )
-
                     min_dim = min(self.contingency_table.shape) - 1
                     self.cramers_v = np.sqrt(self.statistic / (self.n_obs * min_dim))
-
                     expr_list: list[str] = [
                         "$",
                         f"{self.main_stat}, ",
@@ -217,7 +231,7 @@ class BarStats:
         if bar_kws is None:
             bar_kws: dict = {}
 
-        ax: Axes = _themify(ax)
+        ax: Axes = self._themify(ax, orientation)
 
         colors: list[str] = _get_first_n_colors(colors, self.n_levels)
 
@@ -328,6 +342,25 @@ class BarStats:
                     label=y_level,
                     **bar_kws,
                 )
+
+    def _themify(self, ax: Axes, orientation: str) -> Axes:
+        """
+        Set the theme to a matplotlib Axes.
+
+        Args
+            ax: The matplotlib Axes to which you want to apply the theme.
+
+        Returns
+            The matplotlib Axes.
+        """
+        grid_params: dict = dict(color="#525252", alpha=0.2, zorder=-5)
+        if orientation == "horizontal":
+            ax.grid(axis="x", **grid_params)
+        else:
+            ax.grid(axis="y", **grid_params)
+        ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
+        ax.tick_params(size=0, labelsize=8)
+        return ax
 
 
 if __name__ == "__main__":
