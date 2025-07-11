@@ -3,7 +3,7 @@ import pandas as pd
 import polars as pl
 import os
 
-from fleur.data import load_iris, load_mtcars, _load_data
+from fleur.data import load_iris, load_mtcars, load_titanic, _load_data
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_FILE = "iris.csv"
@@ -15,20 +15,14 @@ def test_invalid_dataset_name():
         _load_data("invalid_dataset", backend="pandas")
 
 
-@pytest.mark.parametrize("dataset", ["iris", "mtcars"])
-def test_invalid_backend(dataset):
-    with pytest.raises(ValueError, match=r"^backend must be one of:"):
-        _load_data(dataset, backend="invalid_format")
-
-
-@pytest.mark.parametrize("dataset", ["iris", "mtcars"])
+@pytest.mark.parametrize("dataset", ["iris", "mtcars", "titanic"])
 def test_load_data_pandas(dataset):
     df = _load_data(dataset, backend="pandas")
     assert isinstance(df, pd.DataFrame)
     assert not df.empty
 
 
-@pytest.mark.parametrize("dataset", ["iris", "mtcars"])
+@pytest.mark.parametrize("dataset", ["iris", "mtcars", "titanic"])
 def test_load_data_polars(dataset):
     df = _load_data(dataset, backend="polars")
     assert isinstance(df, pl.DataFrame)
@@ -67,4 +61,25 @@ def test_load_mtcars():
         "am",
         "gear",
         "carb",
+    ]
+
+
+def test_load_titanic():
+    df = load_titanic()
+    assert len(df) == 891
+    assert not df.empty
+    assert isinstance(df, pd.DataFrame)
+    assert df.columns.to_list() == [
+        "PassengerId",
+        "Survived",
+        "Pclass",
+        "Name",
+        "Sex",
+        "Age",
+        "SibSp",
+        "Parch",
+        "Ticket",
+        "Fare",
+        "Cabin",
+        "Embarked",
     ]

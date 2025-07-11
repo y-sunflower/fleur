@@ -9,3 +9,7 @@
 <br>
 
 ::: fleur.data.load_mtcars
+
+<br>
+
+::: fleur.data.load_titanic
