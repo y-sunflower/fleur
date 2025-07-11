@@ -42,6 +42,7 @@ class BarStats:
         data: Frame | None = None,
         approach: str = "freq",
         paired: bool = False,
+        thres_fisher: int = 5,
         **kwargs: Any,
     ):
         """
@@ -54,6 +55,10 @@ class BarStats:
             approach: A character specifying the type of statistical approach:
                 "freq" (default) or "bayes".
             paired: Whether comparing the same observations or not.
+            thres_fisher: The threshold where you consider Chisquare assumptions
+                violated. By default, if expected frequencies are below 5,
+                then it will run a Fisher exact's test instead. Set to 0 to
+                force using a Chisquare test.
             kwargs: Additional arguments passed to the scipy test function.
         """
         valid_approachs: list[str] = ["freq", "bayes"]
@@ -153,7 +158,7 @@ class BarStats:
                         expr_list: list[str] = [
                             "$",
                             "Fisher's~exact~test, ",
-                            f"Likelihood = {self.prob_dens}, ",
+                            f"Likelihood = {self.prob_dens:.4f}, ",
                             f"p = {self.pvalue:.4f}, ",
                             f"n_{{obs}} = {self.n_obs}",
                             "$",

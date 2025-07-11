@@ -10,10 +10,11 @@
 
 ## Examples
 
-Currently, `fleur` has 2 things that you can benefit:
+Currently, `fleur` has 3 things that you can benefit:
 
 - `BetweenStats`: a class for group comparisons
 - `ScatterStats`: a class for numerical correlation
+- `BarStats`: a class for categorical data comparisons
 
 === "Group comparison"
 
@@ -37,6 +38,18 @@ Currently, `fleur` has 2 things that you can benefit:
     df = data.load_iris()
 
     ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+    ```
+
+=== "Categorical data"
+
+    ```py
+    # mkdocs: render
+    from fleur import BarStats
+    from fleur import data
+
+    df = data.load_mtcars()
+
+    BarStats(df["cyl"], df["vs"]).plot()
     ```
 
 ## Installation

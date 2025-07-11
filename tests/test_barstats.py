@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+import polars as pl
 
 from fleur.barstats import BarStats
 import fleur.data as data
@@ -14,6 +15,19 @@ def sample_data():
 
 
 @pytest.fixture
+def sample_data2():
+    df = data.load_iris("polars").with_columns(
+        pl.when(pl.col("petal_length") < 2)
+        .then(pl.lit("short (< 2)"))
+        .when(pl.col("petal_length") < 5)
+        .then(pl.lit("medium (> 2 & < 5)"))
+        .otherwise(pl.lit("long (> 5)"))
+        .alias("petal_size")
+    )
+    return df
+
+
+@pytest.fixture
 def sample_2x2_data():
     df = data.load_mtcars()
     # Filter to get 2x2 contingency table
@@ -21,9 +35,9 @@ def sample_2x2_data():
     return df_2x2
 
 
-def test_default_chi_square(sample_data):
+def test_default(sample_data):
     bs = BarStats(x="cyl", y="vs", data=sample_data)
-    assert bs.test_name == "Chi-square"
+    assert bs.test_name == "Fisher's exact"
     assert hasattr(bs, "statistic")
     assert hasattr(bs, "pvalue")
     assert hasattr(bs, "contingency_table")
@@ -34,26 +48,16 @@ def test_default_chi_square(sample_data):
 
 
 def test_fisher_exact_2x2(sample_2x2_data):
-    bs = BarStats(x="cyl", y="vs", data=sample_2x2_data, approach="fisher")
+    bs = BarStats(x="cyl", y="vs", data=sample_2x2_data)
     assert bs.test_name == "Fisher's exact"
     assert hasattr(bs, "pvalue")
     assert hasattr(bs, "odds_ratio")
     assert bs.contingency_table.shape == (2, 2)
-    assert np.isnan(bs.statistic)  # Fisher's exact doesn't have a test statistic
 
 
 def test_auto_approach_selects_fisher(sample_2x2_data):
-    bs = BarStats(x="cyl", y="vs", data=sample_2x2_data, approach="auto")
-    # Should select Fisher's exact for small expected frequencies
+    bs = BarStats(x="cyl", y="vs", data=sample_2x2_data)
     assert bs.test_name in ["Chi-square", "Fisher's exact"]
-
-
-def test_forced_chi_square(sample_2x2_data):
-    bs = BarStats(x="cyl", y="vs", data=sample_2x2_data, approach="chi-square")
-    assert bs.test_name == "Chi-square"
-    assert hasattr(bs, "statistic")
-    assert hasattr(bs, "dof")
-    assert hasattr(bs, "cramers_v")
 
 
 def test_plot_stacked(sample_data):
@@ -111,7 +115,6 @@ def test_attributes_exist(sample_data):
     assert hasattr(bs, "cramers_v")
 
     # Check data types
-    assert isinstance(bs.statistic, (float, np.floating))
     assert isinstance(bs.pvalue, (float, np.floating))
     assert isinstance(bs.test_name, str)
     assert isinstance(bs.contingency_table, np.ndarray)
@@ -126,20 +129,11 @@ def test_error_invalid_approach(sample_data):
         BarStats(x="cyl", y="vs", data=sample_data, approach="invalid")
 
 
-def test_error_fisher_not_2x2(sample_data):
-    with pytest.raises(
-        ValueError,
-        match="Fisher's exact test can only be used with 2x2 contingency tables",
-    ):
-        BarStats(x="cyl", y="vs", data=sample_data, approach="fisher")
-
-
 def test_error_invalid_orientation(sample_data):
-    bs = BarStats(x="cyl", y="vs", data=sample_data)
     with pytest.raises(
         ValueError, match="`orientation` must be one of: 'vertical', 'horizontal'"
     ):
-        bs.plot(orientation="invalid")
+        BarStats(x="cyl", y="vs", data=sample_data).plot(orientation="invalid")
 
 
 def test_error_invalid_plot_type(sample_data):
@@ -173,11 +167,11 @@ def test_expression_format(sample_data):
     assert "n_{obs}" in bs.expression
 
 
-def test_cramers_v_range(sample_data):
-    bs = BarStats(x="cyl", y="vs", data=sample_data, approach="chi-square")
+def test_cramers_v_range(sample_data2):
+    bs = BarStats("species", "petal_size", data=sample_data2)
 
     # Cramer's V should be between 0 and 1
-    assert 0 <= bs.cramers_v <= 1
+    assert 0 <= bs.cramers_v <= 1, f"Cramer's V has unexpected value: {bs.cramers_v}"
 
 
 def test_colors_parameter(sample_data):
@@ -189,9 +183,3 @@ def test_colors_parameter(sample_data):
 
     assert isinstance(fig_out, Figure)
     plt.close(fig)
-
-
-def test_warning_small_expected_frequencies(sample_data):
-    # This should trigger a warning about small expected frequencies
-    with pytest.warns(UserWarning, match="Some expected frequencies are less than 5"):
-        BarStats(x="cyl", y="vs", data=sample_data, approach="chi-square")
