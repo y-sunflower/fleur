@@ -1,13 +1,20 @@
-# `fleur`: stats and plots holding hands
-
+# `fleur`: combining statistics with visualization
 
 <!-- Automatically generated, uses README.qmd to modify README.md -->
 
-`fleur` provides a set of tools to combine data visualization with
-statistics.
+<img src="https://github.com/JosephBARBIERDARNAL/static/blob/main/python-libs/fleur/image.png?raw=true" alt="fleur logo" align="right" width="150px"/>
 
-> fleur is still in a very early stage and in beta version: expect
-> regular breaking changes.
+With `fleur` (_pronounced “flur”_), statistics and data visualization
+are done at the same time. It’s meant as a modern tool for highly
+detailed statistical annotations in plots with high customization
+capabilities.
+
+It’s lightweight in the sense that it only requires foundational
+libraries: `matplotlib`, `scipy` and `narwhals`. Learn more [about
+fleur](./about.md).
+
+> [!WARNING]
+> fleur is still in a very early stage: expect regular breaking changes.
 
 [Documentation website](https://y-sunflower.github.io/fleur/)
 
@@ -19,7 +26,7 @@ statistics.
 
 ### Group comparison
 
-``` python
+```python
 from fleur import BetweenStats
 from fleur import data
 
@@ -32,7 +39,7 @@ BetweenStats(df["sepal_length"], df["species"]).plot()
 
 ### Correlation
 
-``` python
+```python
 from fleur import ScatterStats
 from fleur import data
 
@@ -47,7 +54,7 @@ ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 
 ## Installation
 
-``` bash
+```bash
 pip install fleur
 ```
 

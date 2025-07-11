@@ -1,10 +1,10 @@
 [project]
 name = "fleur"
-description = "Description"
+description = "Combining statistics with visualization for Python"
 version = "0.0.3"
 license = "MIT"
 license-files = ["LICENSE"]
-keywords = ["stats", "visualization"]
+keywords = ["statistics", "visualization", "data", "annotations", "reproductibility"]
 authors = [
   { name="Joseph Barbier", email="joseph.barbierdarnal@gmail.com" },
 ]
