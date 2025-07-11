@@ -13,7 +13,7 @@ It’s lightweight in the sense that it only requires foundational
 libraries: `matplotlib`, `scipy` and `narwhals`. Learn more [about
 fleur](./about.md).
 
-> \[!WARNING\] fleur is still in a very early stage: expect regular
+> [!WARNING] fleur is still in a very early stage: expect regular
 > breaking changes.
 
 [Documentation website](https://y-sunflower.github.io/fleur/)
