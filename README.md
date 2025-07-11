@@ -13,8 +13,8 @@ It’s lightweight in the sense that it only requires foundational
 libraries: `matplotlib`, `scipy` and `narwhals`. Learn more [about
 fleur](./about.md).
 
-> [!WARNING]
-> fleur is still in a very early stage: expect regular breaking changes.
+> \[!WARNING\] fleur is still in a very early stage: expect regular
+> breaking changes.
 
 [Documentation website](https://y-sunflower.github.io/fleur/)
 
@@ -35,7 +35,7 @@ df = data.load_iris()
 BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
 
-![](docs/img/quickstart-betweenstats.png)
+![](https://github.com/y-sunflower/fleur/blob/main/docs/img/quickstart-betweenstats.png)
 
 ### Correlation
 
@@ -48,7 +48,7 @@ df = data.load_iris()
 ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
 ```
 
-![](docs/img/quickstart-scatterstats.png)
+![](https://github.com/y-sunflower/fleur/blob/main/docs/img/quickstart-scatterstats.png)
 
 <br><br>
 
