@@ -33,6 +33,7 @@ nav:
   - Reference:
       - reference/betweenstats.md
       - reference/scatterstats.md
+      - reference/barstats.md
       - reference/datasets.md
   - Contributing:
       - Contributing: dev/index.md

@@ -253,7 +253,8 @@ class BarStats:
         if show_counts:
             totals = self.contingency_table.sum(axis=1)
             labels = [
-                f"{label}\nn = {total}" for label, total in zip(self._x_levels, totals)
+                f"{label}\nn = {int(total)}"
+                for label, total in zip(self._x_levels, totals)
             ]
         else:
             labels = self._x_levels
@@ -366,7 +367,7 @@ class BarStats:
 if __name__ == "__main__":
     from fleur import data
 
-    df = data.load_mtcars("pandas")
+    df = data.load_mtcars()
     fig, ax = plt.subplots()
 
     bs = BarStats(x="cyl", y="vs", data=df)
