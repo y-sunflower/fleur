@@ -61,7 +61,7 @@ class BetweenStats:
             x: Colname of `data` or a Series or array-like.
             y: Colname of `data` or a Series or array-like.
             data: An optional dataframe used if `x` and `y` are colnames.
-            paired: If True, perform paired t-test (only for 2 groups).
+            paired: Whether comparing the same observations or not.
             approach: A character specifying the type of statistical approach:
                 "parametric" (default), "nonparametric", "robust", "bayes".
             kwargs: Additional arguments passed to the scipy test function.

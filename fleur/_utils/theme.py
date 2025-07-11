@@ -18,9 +18,9 @@ def _themify(ax: Axes) -> Axes:
     return ax
 
 
-def _get_first_n_colors(colors, n_cat):
+def _get_first_n_colors(colors: list[str] | None, n_cat: int) -> list[str]:
     if colors is None:
-        colors: list = plt.rcParams["axes.prop_cycle"].by_key()["color"][:n_cat]
+        colors: list[str] = plt.rcParams["axes.prop_cycle"].by_key()["color"][:n_cat]
     else:
         if len(colors) < n_cat:
             raise ValueError(

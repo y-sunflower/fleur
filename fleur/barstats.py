@@ -42,7 +42,8 @@ class BarStats:
         x: str | SeriesT | Iterable,
         y: str | SeriesT | Iterable,
         data: Frame | None = None,
-        approach: str = "auto",
+        approach: str = "parametric",
+        paired: bool = False,
         **kwargs: Any,
     ):
         """
@@ -52,16 +53,15 @@ class BarStats:
             x: Colname of `data` or a Series or array-like (categorical).
             y: Colname of `data` or a Series or array-like (categorical).
             data: An optional dataframe.
-            approach: Statistical approach to use:
-                "auto" (default): Automatically choose between chi-square and Fisher's exact
-                "chi-square": Force chi-square test
-                "fisher": Force Fisher's exact test
+            approach: A character specifying the type of statistical approach:
+                "parametric" (default), "nonparametric", "robust", "bayes".
+            paired: Whether comparing the same observations or not.
             kwargs: Additional arguments passed to the scipy test function.
         """
-        valid_approaches: list[str] = ["auto", "chi-square", "fisher"]
-        if approach not in valid_approaches:
+        valid_approachs: list[str] = ["parametric", "nonparametric", "robust", "bayes"]
+        if approach not in valid_approachs:
             raise ValueError(
-                f"`approach` must be one of {valid_approaches}, not {approach}"
+                f"`approach` must be one of {valid_approachs}, not {approach}"
             )
 
         self._data_info = _InputDataHandler(x=x, y=y, data=data).get_info()
@@ -73,39 +73,29 @@ class BarStats:
             nw.col(y_name).cast(nw.String).cast(nw.Categorical),
         )
 
+        self.is_paired = paired
+        self.n_obs = len(df)
+        self.n_cat = df[x_name].n_unique()
+        self.n_levels = df[y_name].n_unique()
         self._x_name = x_name
         self._y_name = y_name
         self._df = df
 
-        # Get unique levels for both variables
         self._x_levels: list = df[x_name].unique().to_list()
         self._y_levels: list = df[y_name].unique().to_list()
 
-        # Create contingency table
-        contingency_df = (
+        self.contingency_df = (
             df.group_by(x_name, y_name)
             .agg(nw.len())
             .pivot(values="len", index=x_name, on=y_name)
             .with_columns(nw.selectors.numeric().fill_null(0))
         )
-
-        # Convert to numpy array for statistical tests
-        self.contingency_table = contingency_df.select(
+        self.contingency_table = self.contingency_df.select(
             nw.selectors.numeric()
         ).to_numpy()
-
-        # Create proportion table for plotting
-        self._df_proportion = contingency_df.with_columns(
+        self._df_proportion = self.contingency_df.with_columns(
             nw.col(*self._y_levels) / nw.sum_horizontal(nw.col(*self._y_levels))
         )
-
-        self.n_obs = len(df)
-        self.n_cat = df[x_name].n_unique()
-        self.n_levels = df[y_name].n_unique()
-
-        # Store category labels for plotting
-        self._x_labels = self._x_levels
-        self._y_labels = self._y_levels
 
         self._fit(approach=approach, **kwargs)
 
@@ -115,85 +105,79 @@ class BarStats:
         them as attributes.
 
         Args:
-            approach: Statistical approach to use ("auto", "chi-square", "fisher").
+            approach: A character specifying the type of statistical approach:
+                "parametric" (default), "nonparametric", "robust", "bayes".
             kwargs: Additional arguments passed to the scipy test function.
         """
-        # Determine which test to use
-        if approach == "auto":
-            # Use Fisher's exact test for 2x2 tables with small expected frequencies
-            # Use chi-square test otherwise
-            if self.contingency_table.shape == (2, 2):
-                expected = st.contingency.expected_freq(self.contingency_table)
-                if np.any(expected < 5):
-                    approach = "fisher"
-                else:
-                    approach = "chi-square"
-            else:
-                approach = "chi-square"
-
-        # Perform the statistical test
-        if approach == "fisher":
-            if self.contingency_table.shape != (2, 2):
-                raise ValueError(
-                    "Fisher's exact test can only be used with 2x2 contingency tables"
+        if approach in ["parametric", "nonparametric"]:
+            if self.is_paired:
+                # if binary (2 levels) variable, use McNemar's test
+                # if 3 levels or more, use Stuart-Maxwell test
+                raise NotImplementedError(
+                    "Paired group comparison has not been implemented yet."
                 )
+            else:  # not paired
+                test = "Fisher"
+                if test == "Fisher":
+                    if self.contingency_table.shape != (2, 2):
+                        raise ValueError(
+                            "Fisher's exact test can only be used with 2x2 contingency tables"
+                        )
+                    self.test_output = st.fisher_exact(self.contingency_table, **kwargs)
+                    self.statistic = None
+                    self.pvalue = self.test_output[1]
+                    self.odds_ratio = self.test_output[0]
+                    self.test_name = "Fisher's exact"
+                    self._letter = "p"
+                    self.main_stat = f"OR = {self.odds_ratio:.3f}"
+                    self.expected_frequencies = None
+                    self.cramers_v = None
 
-            # Fisher's exact test
-            self.test_output = st.fisher_exact(self.contingency_table, **kwargs)
-            self.statistic = np.nan  # Fisher's exact doesn't have a test statistic
-            self.pvalue = self.test_output[1]
-            self.odds_ratio = self.test_output[0]
-            self.test_name = "Fisher's exact"
-            self._letter = "p"
-            self.main_stat = f"OR = {self.odds_ratio:.3f}"
-            self.expected_frequencies = None
+                    expr_list: list[str] = [
+                        "$",
+                        "Fisher's exact test, ",
+                        f"p = {self.pvalue:.4f}, ",
+                        f"OR = {self.odds_ratio:.3f}, ",
+                        f"n_{{obs}} = {self.n_obs}",
+                        "$",
+                    ]
+                else:  # test is chi2
+                    self.test_output = st.chi2_contingency(
+                        self.contingency_table, **kwargs
+                    )
+                    self.statistic = self.test_output[0]
+                    self.pvalue = self.test_output[1]
+                    self.dof = self.test_output[2]
+                    self.expected_frequencies = self.test_output[3]
+                    self.test_name = "Chi-square"
+                    self._letter = "\\chi^2"
+                    self.main_stat = f"\\chi^2({self.dof}) = {self.statistic:.3f}"
 
-        elif approach == "chi-square":
-            # Chi-square test of independence
-            self.test_output = st.chi2_contingency(self.contingency_table, **kwargs)
-            self.statistic = self.test_output[0]
-            self.pvalue = self.test_output[1]
-            self.dof = self.test_output[2]
-            self.expected_frequencies = self.test_output[3]
-            self.test_name = "Chi-square"
-            self._letter = "\\chi^2"
-            self.main_stat = f"\\chi^2({self.dof}) = {self.statistic:.3f}"
+                    if np.any(self.expected_frequencies < 5):
+                        warnings.warn(
+                            "Some expected frequencies are less than 5. Consider using Fisher's exact test."
+                        )
 
-            # Check assumptions for chi-square test
-            if np.any(self.expected_frequencies < 5):
-                warnings.warn(
-                    "Some expected frequencies are less than 5. Consider using Fisher's exact test."
+                    min_dim = min(self.contingency_table.shape) - 1
+                    self.cramers_v = np.sqrt(self.statistic / (self.n_obs * min_dim))
+
+                    expr_list: list[str] = [
+                        "$",
+                        f"{self.main_stat}, ",
+                        f"p = {self.pvalue:.4f}, ",
+                        f"Cramer's V = {self.cramers_v:.3f}, ",
+                        f"n_{{obs}} = {self.n_obs}",
+                        "$",
+                    ]
+
+                self.expression = "".join(expr_list)
+        else:
+            raise NotImplementedError(
+                (
+                    'Only `approach="parametric"` and `approach="nonparametric"` '
+                    "have been implemented."
                 )
-
-        # Calculate Cramer's V effect size
-        if approach == "chi-square":
-            n = self.n_obs
-            min_dim = min(self.contingency_table.shape) - 1
-            self.cramers_v = np.sqrt(self.statistic / (n * min_dim))
-        else:
-            self.cramers_v = np.nan
-
-        # Create expression for display
-        if approach == "fisher":
-            expr_list: list[str] = [
-                "$",
-                "Fisher's exact test, ",
-                f"p = {self.pvalue:.4f}, ",
-                f"OR = {self.odds_ratio:.3f}, ",
-                f"n_{{obs}} = {self.n_obs}",
-                "$",
-            ]
-        else:
-            expr_list: list[str] = [
-                "$",
-                f"{self.main_stat}, ",
-                f"p = {self.pvalue:.4f}, ",
-                f"Cramer's V = {self.cramers_v:.3f}, ",
-                f"n_{{obs}} = {self.n_obs}",
-                "$",
-            ]
-
-        self.expression = "".join(expr_list)
+            )
 
     def plot(
         self,
@@ -237,29 +221,39 @@ class BarStats:
 
         colors: list[str] = _get_first_n_colors(colors, self.n_levels)
 
-        # Get counts for each category
-        counts_df = (
-            self._df.group_by(self._x_name, self._y_name)
-            .agg(nw.len())
-            .pivot(values="len", index=self._x_name, on=self._y_name)
-            .with_columns(nw.selectors.numeric().fill_null(0))
-        )
-
         if plot_type == "stacked":
             self._plot_stacked(ax, orientation, colors, bar_kws)
         else:  # grouped
-            self._plot_grouped(ax, orientation, colors, bar_kws, counts_df)
+            self._plot_grouped(ax, orientation, colors, bar_kws, self.contingency_df)
 
-        # Add statistics annotation
         if show_stats:
-            annotation_params: dict = dict(transform=ax.transAxes, va="top")
-            ax.text(x=0.05, y=1.09, s=self.expression, size=9, **annotation_params)
+            ax.text(
+                x=0.05,
+                y=1.09,
+                s=self.expression,
+                size=9,
+                transform=ax.transAxes,
+                va="top",
+            )
 
-        # Set up axis labels and ticks
-        self._setup_axis_labels(ax, orientation, show_counts, counts_df)
+        if show_counts:
+            totals = self.contingency_table.sum(axis=1)
+            labels = [
+                f"{label}\nn = {total}" for label, total in zip(self._x_levels, totals)
+            ]
+        else:
+            labels = self._x_levels
 
-        # Add legend
-        ax.legend(self._y_labels, title=self._y_name, loc="upper right")
+        if orientation == "vertical":
+            ax.set_xticks(range(self.n_cat), labels=labels)
+            ax.set_xlabel(self._x_name)
+            ax.set_ylabel("Proportion" if hasattr(self, "_df_proportion") else "Count")
+        else:  # horizontal
+            ax.set_yticks(range(self.n_cat), labels=labels)
+            ax.set_ylabel(self._x_name)
+            ax.set_xlabel("Proportion" if hasattr(self, "_df_proportion") else "Count")
+
+        ax.legend(self._y_levels, title=self._y_name, loc="upper right")
 
         self.ax = ax
         return plt.gcf()
@@ -335,28 +329,6 @@ class BarStats:
                     **bar_kws,
                 )
 
-    def _setup_axis_labels(
-        self, ax: Axes, orientation: str, show_counts: bool, counts_df: Frame
-    ):
-        """Set up axis labels and ticks."""
-        if show_counts:
-            # Calculate totals for each category using contingency table
-            totals = self.contingency_table.sum(axis=1)
-            labels = [
-                f"{label}\nn = {total}" for label, total in zip(self._x_labels, totals)
-            ]
-        else:
-            labels = self._x_labels
-
-        if orientation == "vertical":
-            ax.set_xticks(range(self.n_cat), labels=labels)
-            ax.set_xlabel(self._x_name)
-            ax.set_ylabel("Proportion" if hasattr(self, "_df_proportion") else "Count")
-        else:  # horizontal
-            ax.set_yticks(range(self.n_cat), labels=labels)
-            ax.set_ylabel(self._x_name)
-            ax.set_xlabel("Proportion" if hasattr(self, "_df_proportion") else "Count")
-
 
 if __name__ == "__main__":
     from fleur import data
@@ -368,4 +340,3 @@ if __name__ == "__main__":
     bs.plot(ax=ax, show_stats=True, plot_type="grouped")
 
     fig.savefig("cache.png", dpi=300)
-    plt.show()
