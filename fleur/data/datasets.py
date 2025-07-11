@@ -1,69 +1,81 @@
 import narwhals as nw
 import os
 
-from typing import Dict, Optional, List
-from narwhals.typing import DataFrameT
+from typing import List
+from narwhals.typing import Frame
 
 PACKAGE_DIR: str = os.path.dirname(os.path.abspath(__file__))
-AVAILABLE_DATASETS: List[str] = ["iris", "mtcars"]
-AVAILABLE_OUTPUTS: List[str] = ["pandas", "polars", "pyarrow", "modin", "cudf"]
+AVAILABLE_DATASETS: List[str] = ["iris", "mtcars", "titanic"]
 
 
-def _load_data(dataset_name: str, backend: str, **kwargs) -> DataFrameT:
+def _load_data(dataset_name: str, backend: str) -> Frame:
     """
-    Load one of the available datasets in fleur. This function is a simple wrapper
-    around [`narwhals.read_csv()`](https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv)
-    function.
+    Load one of the available datasets in fleur.
 
     Args:
-        dataset_name: A string specifying the name of the dataset. Currently, "iris" and "mtcars" are supported.
-        backend: The output format of the dataframe. Note that, for example, if you set `backend="polars"`, you must have polars installed. Must be one of the following: "pandas", "polars", "pyarrow", "modin", "cudf". Default to "pandas".
-        kwargs: Additional arguments passed to [`narwhals.read_csv()`](https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv).
-
+        dataset_name: A string specifying the name of the dataset. Currently,
+            "iris", "mtcars" and "titanic" are supported.
+        backend: The output format of the dataframe.
     Returns:
         A dataframe with the specified dataset.
     """
     dataset_name: str = dataset_name.lower()
-    backend: str = backend.lower()
 
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError(
             f"dataset_name must be one of: {' ,'.join(AVAILABLE_DATASETS)}"
         )
 
-    if backend not in AVAILABLE_OUTPUTS:
-        raise ValueError(f"backend must be one of: {' ,'.join(AVAILABLE_OUTPUTS)}")
-
     dataset_file: str = f"{dataset_name}.csv"
     dataset_path: str = os.path.join(PACKAGE_DIR, dataset_file)
-    df: DataFrameT = nw.read_csv(dataset_path, backend=backend, **kwargs).to_native()
+    df: Frame = nw.read_csv(dataset_path, backend=backend)
 
-    return df
+    return df.to_native()
 
 
-def load_iris(backend: str = "pandas", **kwargs: Optional[Dict]) -> DataFrameT:
+def load_iris(output_format: str = "pandas") -> Frame:
     """
     Load the iris dataset.
 
     Args:
-        backend: The output format of the dataframe. Note that, for example, if you set `backend="polars"`, you must have polars installed. Must be one of the following: "pandas", "polars", "pyarrow", "modin", "cudf". Default to "pandas".
-        kwargs: Additional arguments passed to [`narwhals.read_csv()`](https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv).
+        output_format: The output format of the dataframe. Note that, for example,
+            if you set `output_format="polars"`, you must have polars installed.
+            Must be one of the following: "pandas", "polars", "pyarrow", "modin",
+            "cudf". Default to "pandas".
 
     Returns:
         The iris dataset.
     """
-    return _load_data("iris", backend=backend, **kwargs)
+    return _load_data("iris", backend=output_format)
 
 
-def load_mtcars(backend: str = "pandas", **kwargs: Optional[Dict]) -> DataFrameT:
+def load_mtcars(output_format: str = "pandas") -> Frame:
     """
     Load the mtcars dataset.
 
     Args:
-        backend: The output format of the dataframe. Note that, for example, if you set `backend="polars"`, you must have polars installed. Must be one of the following: "pandas", "polars", "pyarrow", "modin", "cudf". Default to "pandas".
-        kwargs: Additional arguments passed to [`narwhals.read_csv()`](https://narwhals-dev.github.io/narwhals/api-reference/narwhals/#narwhals.read_csv).
+        output_format: The output format of the dataframe. Note that, for example,
+            if you set `output_format="polars"`, you must have polars installed.
+            Must be one of the following: "pandas", "polars", "pyarrow", "modin",
+            "cudf". Default to "pandas".
 
     Returns:
         The mtcars dataset.
     """
-    return _load_data("mtcars", backend=backend, **kwargs)
+    return _load_data("mtcars", backend=output_format)
+
+
+def load_titanic(output_format: str = "pandas") -> Frame:
+    """
+    Load the titanic dataset.
+
+    Args:
+        output_format: The output format of the dataframe. Note that, for example,
+            if you set `output_format="polars"`, you must have polars installed.
+            Must be one of the following: "pandas", "polars", "pyarrow", "modin",
+            "cudf". Default to "pandas".
+
+    Returns:
+        The titanic dataset.
+    """
+    return _load_data("titanic", backend=output_format)

@@ -10,6 +10,7 @@
 
 `fleur` aims to provide some differences:
 
-- being both **super easy to use** (automatically detect which test to use and make nice plots by default, for instance), while letting you **control over everything**.
+- a lot of time spent thinking about the **developer experience**
+- being **super easy to use** (automatically detect which test to use and make nice plots by default, for instance), while letting you **control over everything**.
 - being more **lightweight**: it only relies on [`matplotlib`](https://matplotlib.org/){target="\_blank"} (for dataviz), [`scipy`](https://scipy.org/){target="\_blank"} (for stats) and [`narwhals`](https://narwhals-dev.github.io/narwhals/){target="\_blank"} (for data handling).
-- provides an **extensive documentation** in each reference page, especially about statistics.
+- provides an **extensive documentation**.
