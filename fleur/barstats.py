@@ -367,15 +367,3 @@ class BarStats:
         ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
         ax.tick_params(size=0, labelsize=8)
         return ax
-
-
-if __name__ == "__main__":
-    from fleur import data
-
-    df = data.load_mtcars()
-    fig, ax = plt.subplots()
-
-    bs = BarStats(x="cyl", y="vs", data=df)
-    bs.plot(ax=ax, show_stats=True, plot_type="grouped")
-
-    fig.savefig("cache.png", dpi=300)

@@ -35,7 +35,11 @@ def sample_2x2_data():
     return df_2x2
 
 
-def test_default(sample_data):
+@pytest.mark.parametrize("ax", [None, "new"])
+def test_default(sample_data, ax):
+    if ax is not None:
+        fig, ax = plt.subplots()
+
     bs = BarStats(x="cyl", y="vs", data=sample_data)
     assert bs.test_name == "Fisher's exact"
     assert hasattr(bs, "statistic")
@@ -45,6 +49,11 @@ def test_default(sample_data):
     assert bs.n_obs == 32
     assert bs.n_cat == 3
     assert bs.n_levels == 2
+
+    fig_output = bs.plot(ax=ax)
+
+    if ax is not None:
+        assert fig_output == fig
 
 
 def test_fisher_exact_2x2(sample_2x2_data):
@@ -183,3 +192,17 @@ def test_colors_parameter(sample_data):
 
     assert isinstance(fig_out, Figure)
     plt.close(fig)
+
+
+def test_not_implemented_error(sample_data):
+    with pytest.raises(
+        NotImplementedError,
+        match="Paired group comparison has not been implemented yet.",
+    ):
+        BarStats(x="cyl", y="vs", data=sample_data, paired=True)
+
+    with pytest.raises(
+        NotImplementedError,
+        match='Only `approach="freq"` has been implemented.',
+    ):
+        BarStats(x="cyl", y="vs", data=sample_data, approach="bayes")

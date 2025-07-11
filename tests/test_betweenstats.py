@@ -106,6 +106,17 @@ def test_three_categories(sample_data, approach):
         assert bs.name == "Kruskal-Wallis"
 
 
+@pytest.mark.parametrize("equal_var", [True, False])
+def test_equal_var(sample_data, equal_var):
+    sample_data = sample_data[sample_data["x"] != "setosa"]
+    bs = BetweenStats(sample_data["x"], sample_data["y"], equal_var=equal_var)
+
+    if equal_var:
+        assert bs.name == "Student"
+    else:
+        assert bs.name == "Welch"
+
+
 @pytest.mark.parametrize("approach", ["parametric", "nonparametric"])
 @pytest.mark.parametrize("paired", [True, False])
 def test_two_categories(sample_data, paired, approach):
