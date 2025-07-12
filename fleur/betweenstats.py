@@ -341,12 +341,13 @@ class BetweenStats:
                 else:  # "horizontal"
                     ax.scatter(values, x_coords, color=color, **scatter_default_kws)
 
-        mean_scatter_kwargs = dict(color="#c1121f", s=100, zorder=50)
-        for pos, mean in zip(range(1, len(self._result) + 1), self.means):
-            if orientation == "vertical":
-                ax.scatter(pos, mean, **mean_scatter_kwargs)
-            else:  # horizontal
-                ax.scatter(mean, pos, **mean_scatter_kwargs)
+        if show_means:
+            mean_scatter_kwargs: dict = dict(color="#c1121f", s=100, zorder=50)
+            for pos, mean in zip(range(1, len(self._result) + 1), self.means):
+                if orientation == "vertical":
+                    ax.scatter(pos, mean, **mean_scatter_kwargs)
+                else:  # horizontal
+                    ax.scatter(mean, pos, **mean_scatter_kwargs)
 
         if show_stats:
             annotation_params: dict = dict(transform=ax.transAxes, va="top")

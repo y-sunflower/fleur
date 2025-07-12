@@ -30,6 +30,7 @@ nav:
       - examples/quick-start.md
       - examples/betweenstats.md
       - examples/scatterstats.md
+      - examples/barstats.md
   - Reference:
       - reference/betweenstats.md
       - reference/scatterstats.md

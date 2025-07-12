@@ -8,10 +8,7 @@ from fleur import BetweenStats, data
 
 df = data.load_iris()
 
-BetweenStats(df["sepal_length"], df["species"]).plot(
-   colors=["#005f73", "#ee9b00", "#9b2226"],
-   box=False,
-)
+BetweenStats(df["sepal_length"], df["species"]).plot()
 ```
 
 ## Correlation
@@ -22,5 +19,17 @@ from fleur import ScatterStats, data
 
 df = data.load_iris()
 
-ScatterStats(x=df["sepal_length"], y=df["sepal_width"]).plot(bins=25)
+ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+```
+
+## Categorical data comparison
+
+```py
+# mkdocs: render
+from fleur import BarStats, data
+
+df = data.load_mtcars()
+df = df[df["cyl"].isin([4, 6])]
+
+BarStats(df["cyl"], df["vs"]).plot()
 ```

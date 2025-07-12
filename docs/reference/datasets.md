@@ -1,6 +1,10 @@
 # Built-in datasets
 
-`fleur` has a few datasets that you can load easily.
+`fleur` has a few datasets that you can load easily:
+
+- iris
+- mtcars
+- titanic
 
 <br>
 

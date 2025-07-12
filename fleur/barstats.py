@@ -193,7 +193,7 @@ class BarStats:
     def plot(
         self,
         *,
-        orientation: str = "vertical",
+        orientation: str = "horizontal",
         colors: list | None = None,
         show_stats: bool = True,
         show_counts: bool = True,
@@ -205,11 +205,11 @@ class BarStats:
         Plot a statistical comparison bar chart for categorical data.
 
         Args:
-            orientation: 'vertical' or 'horizontal' orientation of plots.
+            orientation: "vertical" or "horizontal" orientation of plots.
             colors: List of colors for each group.
             show_stats: If True, adds statistics on the plot.
             show_counts: If True, shows sample counts in axis labels.
-            plot_type: Type of bar chart ('stacked' or 'grouped').
+            plot_type: Type of bar chart ("stacked" or "grouped").
             ax: Existing Axes to plot on. If None, uses current Axes.
             bar_kws: Keyword args for bar plot customization.
 
