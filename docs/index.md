@@ -4,7 +4,7 @@
 
 With `fleur` (_pronounced "flur"_), statistics and data visualization are done at the same time. It's meant as a modern tool for highly detailed statistical annotations in plots with high customization capabilities.
 
-It's lightweight in the sense that it only requires foundational libraries: `matplotlib`, `scipy` and `narwhals`. Learn more [about fleur](./about.md).
+It only requires foundational libraries: `matplotlib`, `scipy` and `narwhals`. Learn more [about fleur](./about.md).
 
 ???+ warning
 
@@ -14,11 +14,11 @@ It's lightweight in the sense that it only requires foundational libraries: `mat
 
 ## Examples
 
-Currently, `fleur` has 3 things that you can benefit:
+Currently, `fleur` offers 3 features that you can benefit from:
 
-- `BetweenStats`: a class for group comparisons
-- `ScatterStats`: a class for numerical correlation
-- `BarStats`: a class for categorical data comparisons
+- `BetweenStats`: Use this when you want to **compare numerical data across categories** (e.g., customer satisfaction between two product versions)
+- `ScatterStats`: Use this to explore the **correlation between numerical variables** (e.g., the relationship between age and salary)
+- `BarStats`: Use this to examine the **relationship between categorical variables** (e.g., the relationship between gender and smoking status)
 
 === "Group comparison"
 
@@ -56,12 +56,14 @@ Currently, `fleur` has 3 things that you can benefit:
     BarStats(df["cyl"], df["vs"]).plot()
     ```
 
+[See more examples](./examples/quick-start.md)
+
 ## Installation
 
 === "stable"
 
     ```bash
-    pip install fleur==0.0.3
+    pip install fleur
     ```
 
 === "dev"

@@ -7,7 +7,6 @@ def _beeswarm(y, width):
 
     Args:
         y (array-like): The y-values (e.g., numerical data).
-        nbins (int, optional): Number of bins for dividing the y-axis.
         width (float): Maximum horizontal spread of the swarm.
 
     Returns:
