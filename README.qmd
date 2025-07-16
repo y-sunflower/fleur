@@ -1,0 +1,77 @@
+---
+format: gfm
+---
+
+<!-- Automatically generated, uses README.qmd to modify README.md -->
+
+```{python}
+# | echo: false
+# | output: false
+from fleur import BetweenStats, ScatterStats, data
+
+df = data.load_iris()
+
+fig = BetweenStats(df["sepal_length"], df["species"]).plot()
+fig.savefig("img/quickstart-betweenstats.png", dpi=200)
+
+fig = ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+fig.savefig("img/quickstart-scatterstats.png", dpi=200)
+```
+
+
+# `fleur`: combining statistics with visualization
+
+<img src="https://github.com/JosephBARBIERDARNAL/static/blob/main/python-libs/fleur/image.png?raw=true" alt="fleur logo" align="right" width="150px"/>
+
+With `fleur` (_pronounced "flur"_), statistics and data visualization are done at the same time. It's meant as a modern tool for highly detailed statistical annotations in plots with high customization capabilities.
+
+It's lightweight in the sense that it only requires foundational libraries: `matplotlib`, `scipy` and `narwhals`. Learn more [about fleur](./about.md).
+
+> [!WARNING]
+> fleur is still in a very early stage: expect regular breaking changes.
+
+[Documentation website](https://y-sunflower.github.io/fleur/)
+
+![Coverage](coverage-badge.svg)
+
+<br>
+
+## Quick start
+
+### Group comparison
+
+```{python}
+# | output: false
+from fleur import BetweenStats
+from fleur import data
+
+df = data.load_iris()
+
+BetweenStats(df["sepal_length"], df["species"]).plot()
+```
+
+![](https://github.com/y-sunflower/fleur/blob/main/docs/img/quickstart-betweenstats.png)
+
+### Correlation
+
+```{python}
+# | output: false
+from fleur import ScatterStats
+from fleur import data
+
+df = data.load_iris()
+
+ScatterStats(df["sepal_length"], df["sepal_width"]).plot()
+```
+
+![](https://github.com/y-sunflower/fleur/blob/main/docs/img/quickstart-scatterstats.png)
+
+<br><br>
+
+## Installation
+
+```bash
+pip install fleur
+```
+
+<br><br>

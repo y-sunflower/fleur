@@ -1,0 +1,27 @@
+:root {
+  --primary-color: #0096c7;
+}
+
+h2,
+h3,
+h4 {
+  margin-top: 3em !important;
+}
+
+.after-statistical {
+  margin-top: 1.5em !important; /* or 0 */
+}
+
+.md-header {
+  background-color: var(--primary-color);
+}
+
+.md-tabs {
+  background-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .md-nav--primary .md-nav__title[for="__drawer"] {
+    background-color: var(--primary-color);
+  }
+}
